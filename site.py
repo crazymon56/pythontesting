@@ -11,7 +11,7 @@ app = Flask(__name__)
 @app.route("/")
 def hello():
 
-    html = "<h1><center>Chat</center></h1>" \
+    html = "<h1><center>Sling</center></h1>" \
 	   "<h1><center>Login</center></h1>" \
 	   "<form>" \
 	   "<h3><center>Username</center></h3>" \
