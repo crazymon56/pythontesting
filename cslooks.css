@@ -1,0 +1,8 @@
+body {
+    color: rgb(54, 0, 0);
+}
+fieldset {
+    margin: 50px;
+    padding: 20px;
+    border: 1px solid white;
+}
