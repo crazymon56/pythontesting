@@ -1,18 +1,17 @@
 <html>
 <header>
+<link rel = "stylesheet" href = "cslogin.css">
 <h1><center>Happy Times Chat</center></h1>
 </header>
 <body>
-<h1><center>Login</center></h1>
-<form method = "POST"> 
-<h3><center>Username</center></h3>
-<center><input type=text name=Username placeholder=username></center><br>
-            
-<h3><center>Password</center></h3>
-<center><input type=text name=Password placeholder=password></center><br>
-            
-<center><input type=submit class=submit value=Login></center>
-<p><center><a href="/">Signup</a></center></p>
+<form method = "POST" action = "/Login"> 
+<fieldset><center>
+<legend>User Login</legend>
+Username: <input type=text name=LUsername placeholder=username><br>           
+Password: <input type=text name=LPassword placeholder=password><br>           
+<input type=submit class=submit value=Login>
+</center></fieldset>
 </form>
+<p><center><a href="Invalidlogin.html">Signup</a></center></p>
 </body>
 </html> 
