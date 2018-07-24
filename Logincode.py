@@ -10,14 +10,15 @@ redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
 app = Flask(__name__)
 
 app.secret_key = 'k4k29_dk!!ko'
-
+Userinfo = list()
 #Signing Up
 @app.route("/SignUp", methods=['POST', 'GET'])
 def signup():
+    Userinfo.append(request.form['SUsername'] + ',' + request.form['SPassword'])
     UserP = request.form['SPassword']
     UserCP = request.form['SCPassword']
     if UserP != UserCP:
-        with open('Invalidlogin.html', 'r') as fh:        
+        with open('Signup.html', 'r') as fh:        
             html = fh.read()
         return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname())
     with open('Signupcon.html', 'r') as fh:        
@@ -35,7 +36,6 @@ def login():
 #LoginCheck        
 @app.route("/Logged", methods=['POST', 'GET'])    
 def logged(): 
-    Userinfo = [request.form['SUsername'] + ',' + request.form['SPassword'], ]
     UserN = request.form['LUsername']
     UserP = request.form['LPassword']
     usercheck = False  
