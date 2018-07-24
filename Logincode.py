@@ -37,9 +37,8 @@ def login():
 def logged(): 
     Userinfo = [request.form['SUsername'] + ',' + request.form['SPassword'], ]
     UserN = request.form['LUsername']
-    UserP = request.form['LSPassword']
-    usercheck = False
-    return request.form['SUsername']   
+    UserP = request.form['LPassword']
+    usercheck = False  
     if request.method == 'POST':
         session['username'] = UserN
         for x  in Userinfo:
@@ -52,6 +51,7 @@ def logged():
                     return 'Hello, ' + UserN     
         if usercheck == False:
             with open('Invalidlogin.html', 'r') as fh:        
+                usercheck = False
                 html = fh.read()        
             return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname())                    
 
