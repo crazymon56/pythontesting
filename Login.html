@@ -1,13 +1,27 @@
 <html>
 <header>
+<style>
+.alignment{
+  width: 500px;
+  clear: both;
+}
+.alignment input{
+  width: 100%;
+  clear: both;
+}
+
+
+</style>
 <h1 style="color:white"><center>Blah Chat</center></h1>
 </header>
 <body style="background-color:black">
 <form method = "POST" action = "/Logged"> 
 <fieldset style="color:white; background-color:rgb(114, 0, 0);" ><center>
 <legend>User Login</legend>
+<div class=alignment>
 Username: <input type=text name=LUsername placeholder=username><br>           
-Password: <input type=text name=LPassword placeholder=password><br>           
+Password: <input type=text name=LPassword placeholder=password><br>  
+</div>         
 <input type=submit class=submit value=Login>
 </center></fieldset>
 </form>
