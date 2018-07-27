@@ -6,3 +6,13 @@ fieldset {
     padding: 20px;
     border: 1px solid white;
 }
+.alignment{
+    width: 500px;
+    clear: both;
+}
+.alignment input{
+    width: 100%;
+    clear: both;
+}
+  
+  

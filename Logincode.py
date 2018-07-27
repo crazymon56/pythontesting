@@ -20,10 +20,10 @@ def signup():
     if UserP != UserCP:
         with open('Signup.html', 'r') as fh:        
             html = fh.read()
-        return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname())
+        return html
     with open('Signupcon.html', 'r') as fh:        
         html = fh.read()
-        return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname())
+        return html
 
 #Loginpage
 @app.route("/Login", methods=['POST', 'GET'])
@@ -31,7 +31,7 @@ def login():
     with open('Login.html', 'r') as fh:
         html = fh.read()
         
-    return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname())
+    return html
 
 #LoginCheck        
 @app.route("/Logged", methods=['POST', 'GET'])    
@@ -53,7 +53,7 @@ def logged():
             with open('Invalidlogin.html', 'r') as fh:        
                 usercheck = False
                 html = fh.read()        
-            return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname())                    
+            return html                   
 
 # Login
 @app.route("/", methods=['GET', 'POST'])
@@ -62,6 +62,6 @@ def index():
     with open('Signup.html', 'r') as fh:
         html = fh.read()
         
-    return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname())
+    return html
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)       

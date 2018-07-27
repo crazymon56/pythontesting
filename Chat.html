@@ -1,113 +1,113 @@
 <html>
-<header>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
 <script>
 function textcolor(TColor) {
   var elem = document.getElementById('text');
+  var test = document.getElementById('test');
   elem.style.color = TColor;
+  test.style.color = TColor;
 }
 function backgroundcolor(BKcolor){
   var elem = document.getElementById('back');
   elem.style.backgroundColor = BKcolor;
-  
 }
-
+function dispaly(flipswitch) {
+  var cl = document.getElementsByClassName('smallchatbub')
+  cl.style.dispaly = flipswitch;
+}
 </script>
 <style>
-* {
-  box-sizing: border-box;
-}
-.top{
-
-  height: 20%;
-  width: 100%;
-  border-style: solid;
-  border-width: 5px;
-  border-bottom-style: none;
-}
-.topbottom{
-  border-left-style: solid;
-  border-right-style: solid;
-  border-width: 5px;
-}
-.channels{
-  padding: 120px;
-  padding-top: 10px;
-  width: 20%;
-  height: 80%;
-  float: left;
-  border-style: solid;
-  border-width: 5px;
-  border-color: black;
-}
-.chat{
-  padding: 10px;
-  height: 80%;
-  width: 80%;
-  float: left;
-  border-style: solid;
-  border-left-style: none;
-  border-width: 5px;
-  border-color: black;
-}
-.chatbub{
-  height: 100px;
-  width: 100px;
-  border-radius: 50%;
-  display: inline-block;
-  position: relative;
-  transition: transform .5s;
-}
-.smallchatbub{
-  height: 40px;
-  width: 40px;
-  border: none;
-  background-color: rgb(133, 133, 133);
-  border-radius: 50%;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  position: relative;
-
-}
-.chatbub:hover{
-  transform: scale(1.2)
-}
-
-
-
-
-
+  * {
+    box-sizing: border-box;
+  }
+  .top{
+  
+    height: 20%;
+    width: 100%;
+    border-style: solid;
+    border-width: 5px, auto;
+    border-bottom-style: none;
+  }
+  .topbottom{
+    border-left-style: solid;
+    border-right-style: solid;
+    border-width: 5px, auto;
+  }
+  .channels{
+    padding: 120px;
+    padding-top: 10px;
+    width: 20%;
+    height: 80%;
+    float: left;
+    border-style: solid;
+    border-width: 5px, auto;
+    border-color: black;
+  }
+  .chat{
+    height: 80%;
+    width: 80%;
+    float: left;
+    border-style: solid;
+    border-left-style: none;
+    border-width: 5px, auto;
+    border-color: black;
+  }
+  .chatbub{
+    height: 100px;
+    width: 100px;
+    color: white;
+    background-color: red;
+    border: none;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    transition: transform .5s;
+    cursor: pointer;
+  }
+  .smallchatbub{
+    height: 40px;
+    width: 40px;
+    border: none;
+    background-color: black;
+    font-size: auto;
+    border-radius: 50%;
+    text-align: center;
+    text-decoration: none;
+    display: initial;
+    position: relative;
+    float: left;
+  
+  }
+  .chatbub:hover{
+    transform: scale(1.2)
+  }
 </style>
 
-
 <div style="background-color:rgb(199, 199, 199)">
-<div class=top>
-<h1 id=text>Hi, Chris</h1></div>
-<div class=topbottom style="background-color:rgb(255, 117, 117)">
-<button onclick="textcolor('white'); backgroundcolor('rgb(68, 68, 68)'); ">Dark background</button>
-<button onclick="textcolor('black'); backgroundcolor('white')">Light background</button>
-</div>
-</div>
-</header>
-<body id=back></body>
+  <div class=top>
+    <h1 id=text>Hi, Chris</h1></div>
+    <div class=topbottom style="background-color:rgb(255, 117, 117)">
+        <button onclick="textcolor('white'); backgroundcolor('rgb(68, 68, 68)'); ">Dark background</button>
+        <button onclick="textcolor('black'); backgroundcolor('white')">Light background</button>
+        </div>
+    </div>
+<body id=back>
 
 
-<div class=channels>
-<div>
-<button class=chatbub><img class=chatbub src='HM.jpeg'></button>
-  <button class=smallchatbub>RB6S chat</button>
-</div>
-</div>
-
-<div class=chat>
-<div><input style="width: auto;"type=text placeholder=message><input type=submit value=send></div>
+<div class="container-fluid, channels">
+  <div>
+    <center><button class="chatbub" onclick="dispaly('inline-block'); textcolor('green')"><img </button></center>
+      <button class="smallchatbub">RB6S chat</button>
+  </div>
 </div>
 
-
-
-
-
-
-
+<div class="container-fluid, chat">
+  <div>
+    <input class="container-fluid" type=text placeholder=message><input type=submit value=send />
+  </div>
+</div>
+</body>
 </html>
