@@ -48,7 +48,9 @@ def logged():
             if UserN == ChUN:
                 if UserP == ChUP:
                     usercheck = True
-                    return 'Hello, ' + UserN     
+                    with open('Chat.html', 'r') as fh:        
+                        html = fh.read()
+                    return html     
         if usercheck == False:
             with open('Invalidlogin.html', 'r') as fh:        
                 usercheck = False

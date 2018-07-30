@@ -1,16 +1,35 @@
 <html>
 <head> 
 <style>
-h1{
-  color:white;
+body {
+    background-color: black;
 }
+fieldset {
+    margin: 50px;
+    padding: 20px;
+    border: 1px solid white;
+    background-color: rgb(54, 0, 0);
+    color: white;
+}
+h1{
+  color: white;
+}
+.alignment{
+    width: 500px;
+    clear: both;
+}
+.alignment input{
+    width: 100%;
+    clear: both;
+}
+  
 </style>
 </head>
 <h1><center>Blah Chat</center></h1>
-<body style="background-color:black">
+<body>
 <form method = "POST" action = "/Logged"> 
-<fieldset style="color:white; background-color:rgb(114, 0, 0);" ><center>
-<legend>User Login</legend>
+<fieldset><center>
+<legend>User Login</legend><br>
 <div class=alignment>
 Username: <input type=text name=LUsername placeholder=username><br>           
 Password: <input type=text name=LPassword placeholder=password><br>  

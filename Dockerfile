@@ -1,6 +1,6 @@
 FROM python:2.7-slim
 
-CMD ["python", "Logincode.py"]
+CMD ["python", "appcode.py"]
 
 WORKDIR /app
 
