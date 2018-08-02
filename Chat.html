@@ -5,7 +5,10 @@
 </head>
 <script type="text/javascript">
 var channelplace = null;
+var chatplace = null;
+var focelem = null;
 var x = 0;
+var CHNN = null;
 function textcolor(TColor) 
 {
   var elem = document.getElementById('text');
@@ -25,13 +28,27 @@ function smallchan()
 function disp()
 {
     var x = document.getElementById("small");
-    x.style.display = "block"
+    var HLName = document.getElementById("Boldname");
+    
+    if(this.className == "smallchatbub")
+    {
+      x.style.display = "none";
+      HLName.textContent = CHNN + ": " + "#" + this.textContent;
+    }
+    else
+    {
+      CHNN = this.textContent;
+      x.style.display = "block";
+      focelem = this.closest("div");
+      HLName.textContent = this.textContent + ": " + "#general";
+    }
 }
+
 function newchannel() 
 {
-  var channelname = prompt("Put an image for your channel.", "");
+  var channelname = prompt("Name your new channel.", "");
   var channel = document.createElement("button");
-  var channelplace = document.createElement("div");
+  channelplace = document.createElement("div");
   var text = document.createTextNode(channelname);
   var element = document.getElementById("chan");
   var child = document.getElementById("begin");
@@ -79,12 +96,11 @@ function newchat()
 {
   var chatname = prompt("Name your new chat.", "");
   var chat = document.createElement("button");
-  var chatplace = document.createElement("div");
+  chatplace = document.createElement("div");
   var text = document.createTextNode(chatname);
-  var element = document.getElementById("chatbegin");
   var child = document.getElementById("mainchat");
 
-  element.appendChild(chatplace);
+  focelem.appendChild(chatplace);  
 
   if(chatname == null || chatname == "")
   {
@@ -92,7 +108,8 @@ function newchat()
   }
   else
   {
-    chat.setAttribute("class", "smallchatbub");
+    chat.addEventListener("click", disp);
+    chat.className = "smallchatbub";
     chat.appendChild(text);
     chatplace.appendChild(chat);
   }
@@ -202,6 +219,7 @@ function newchat()
     overflow: hidden;
     transition: transform .5s;
     font-size: 10px;
+    cursor: pointer;
   }
   .smallchatbub:hover{
     transform: scale(1.2)
@@ -228,13 +246,13 @@ function newchat()
 <body id="back">
 
 
-<div id="chan" class="container-fluid, channels">
+<div id=chan class="container-fluid, channels">
   <button class=change style=float:left onclick=newchannel()>+</button>
 </div>
 
 <div class="container-fluid, chat">
   
-      <button onclick=newchat() style=display:none class=change id="small" >+chat</button>
+      <button onclick=newchat() style=display:none class=change id="small" >+chat</button><h1 id="Boldname"></h1>
       <div id=chattext>
         <input class="container-fluid" type=text placeholder=message><form method="POST" action="" target="_self"></form>
       </div>
