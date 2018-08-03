@@ -9,6 +9,9 @@ var chatplace = null;
 var focelem = null;
 var x = 0;
 var CHNN = null;
+var check = false;
+var num = 0;
+var firstchat = true;
 function textcolor(TColor) 
 {
   var elem = document.getElementById('text');
@@ -29,7 +32,10 @@ function disp()
 {
     var x = document.getElementById("small");
     var HLName = document.getElementById("Boldname");
-    
+    if(check == false){
+      CHNN = this.textContent;
+      check = true;
+    }
     if(this.className == "smallchatbub")
     {
       x.style.display = "none";
@@ -37,10 +43,28 @@ function disp()
     }
     else
     {
-      CHNN = this.textContent;
-      x.style.display = "block";
-      focelem = this.closest("div");
-      HLName.textContent = this.textContent + ": " + "#general";
+        
+      if(CHNN == this.textContent)
+      {
+        CHNN = this.textContent;
+        x.style.display = "block";
+        focelem = this.closest("div");
+        HLName.textContent = this.textContent + ": " + "#general";
+      }
+      else
+      {
+          x.style.display = "block";
+          focelem = this.closest("div");
+          chats = CHNN + "chat";
+          var elem = document.getElementById(chats);
+          elem.style.display = "none";
+          CHNN = this.textContent;
+          chats = CHNN + "chat";
+          elem = document.getElementById(chats);
+          elem.style.display = "block";
+          HLName.textContent = this.textContent + ": " + "#general";
+      }
+      
     }
 }
 
@@ -49,43 +73,50 @@ function newchannel()
   var channelname = prompt("Name your new channel.", "");
   var channel = document.createElement("button");
   channelplace = document.createElement("div");
+  var br =  document.createElement("br");
   var text = document.createTextNode(channelname);
   var element = document.getElementById("chan");
-  var child = document.getElementById("begin");
-
-  element.appendChild(channelplace);
+  var cl = channelname + "channel";
+  firstchat = true;
   
   if(x == 0)
   {
-    channelplace.setAttribute("id", "{x}");
-    x = x + 1;
+    
     
       if(channelname == null || channelname == "")
       {
 
       }
       else
-      {
+      { 
+        channelplace.className = cl;
+        channelplace.setAttribute("id", "{x}");
+        x = x + 1;
+        element.appendChild(channelplace);
         channel.setAttribute("class", "chatbub");
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         channelplace.appendChild(channel);
+        element.appendChild(br);
       }
   }
   else
   {
-      channelplace.setAttribute("id", "{x}");
-      x = x + 1;
+      
       if(channelname == null || channelname == "")
       {
 
       }
       else
       {
+        channelplace.setAttribute("id", "{x}");
+        x = x + 1;
+        element.appendChild(channelplace);
         channel.setAttribute("class", "chatbub");
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         channelplace.appendChild(channel);
+        element.appendChild(br);
       }
 
   }
@@ -94,24 +125,38 @@ function newchannel()
 
 function newchat()
 {
+  
   var chatname = prompt("Name your new chat.", "");
   var chat = document.createElement("button");
-  chatplace = document.createElement("div");
   var text = document.createTextNode(chatname);
-  var child = document.getElementById("mainchat");
-
-  focelem.appendChild(chatplace);  
-
+  var obcl = CHNN + "chat";
+  
+  
   if(chatname == null || chatname == "")
   {
 
   }
   else
   {
-    chat.addEventListener("click", disp);
-    chat.className = "smallchatbub";
-    chat.appendChild(text);
-    chatplace.appendChild(chat);
+    
+    if(firstchat == false)
+    {
+      chat.addEventListener("click", disp);
+      chat.className = "smallchatbub";
+      chat.appendChild(text);
+      document.getElementById(obcl).appendChild(chat);
+    }
+    else
+    {
+      chatplace = document.createElement("div");
+      chatplace.setAttribute("id", obcl);
+      firstchat = false;
+      focelem.appendChild(chatplace);  
+      chat.addEventListener("click", disp);
+      chat.className = "smallchatbub";
+      chat.appendChild(text);
+      chatplace.appendChild(chat);
+    }
   }
 }
 </script>
