@@ -14,7 +14,7 @@ var num = 0;
 var firstchat = true;
 function textcolor(TColor) 
 {
-  var elem = document.getElementById('text');
+  var elem = document.getElementById('Boldname');
   elem.style.color = TColor;
 }
 function backgroundcolor(BKcolor)
@@ -28,10 +28,31 @@ function smallchan()
   c.setAttribute("class", "smallchatbub");
   c.setAttribute("id", "small");
 }
+function ToOP()
+{
+  var thefront = document.getElementById("front");
+  var options = document.getElementById("OPback");
+  thefront.style.display = "none";
+  options.style.display = "block";
+  if(this.id == "settings")
+  {
+    
+  }
+  else
+  {
+    options.style.display = "none";
+    thefront.style.display = "block";
+  }
+}
+function options()
+{
+
+}
 function disp()
 {
   var x = document.getElementById("small");
   var HLName = document.getElementById("Boldname");
+  var Chansets = document.getElementById("settings");
   chats = CHNN + "chat";
   var elem = document.getElementById(chats);
   if(check == false){
@@ -41,7 +62,8 @@ function disp()
   if(this.className == "smallchatbub")
   {
     x.style.display = "none";
-    HLName.textContent = CHNN + ": " + "#" + this.textContent;
+    HLName.textContent = CHNN + ": " + this.textContent;
+    Chansets.style.display = "none";
   }
   else
   {
@@ -49,20 +71,24 @@ function disp()
     if(CHNN == this.textContent)
     {
       CHNN = this.textContent;
-      x.style.display = "block";
       focelem = this.closest("div");
+      x.style.display = "block";
+      Chansets.style.display = "block";
+      HLName.style.display = "block";
       HLName.textContent = this.textContent + ": " + "#general";
     }
     else
     {   
       if(focelem.getElementsByTagName("*").length == 1)
       {
-        x.style.display = "block";   
+        x.style.display = "block";
+        Chansets.style.display = "block";  
         }
         else
         {
           x.style.display = "block";
           elem.style.display = "none";
+          Chansets.style.display = "block";
         }
         focelem = this.closest("div");
         if(focelem.getElementsByTagName("*").length == 1)
@@ -112,7 +138,6 @@ function newchannel()
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         channelplace.appendChild(channel);
-        
       }
   }
   else
@@ -133,7 +158,6 @@ function newchannel()
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         channelplace.appendChild(channel);
-        
       }
 
   }
@@ -142,9 +166,9 @@ function newchannel()
 
 function newchat()
 {
-  
   var chatname = prompt("Name your new chat.", "");
   var chat = document.createElement("button");
+  chatname = "#" + chatname;
   var text = document.createTextNode(chatname);
   var chats = CHNN + "chat";
   
@@ -231,6 +255,21 @@ function newchat()
   .chattext{
     position: absolute;
     bottom: 0;
+    width: 90%;
+  }
+  .sendbutton{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10%
+  }
+  .chatitle{
+    border-style: solid;
+    border-top-style: none;
+    border-left-style: none;
+    border-right-style: none;
+    border-color: black;
+    color: rgb(68, 68, 68);
   }
   .chat{
     height: 80%;
@@ -252,12 +291,36 @@ function newchat()
     border-color: black;
     text-align: center;
     overflow: scroll;
+    background-color: rgb(49, 49, 49);
+  }
+  .optionbutton{
+    border-style:solid;
+    border-radius: 12px;
+    width: 15%;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+  }
+  .optionbutton:hover{
+    border-style:solid;
+    background-color: gray;
+    border-radius: 12px;
+    width: 15%;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+  }
+  .options{
+    width: 50%;
+    height: 50%;
+    display: none;
   }
   .chatbub{
-    height: 100px;
-    width: 100px;
-    color: red;
-    background-color: rgb(0, 112, 0);
+    height: 90px;
+    width: 90px;
+    color: black;
+    background-color: white;
     border: none;
     border-radius: 50%;
     display: inline-block;
@@ -265,33 +328,49 @@ function newchat()
     transition: transform .5s;
     cursor: pointer;
     margin: auto;
-    
   }
   .smallchatbub{
     height: 40px;
-    width: 40px;
-    border: none;
-    background-color: black;
-    font-size: auto;
-    border-radius: 50%;
+    width: 100%;
+    border-style: solid;
+    border-width: 3.5px;
+    border-color: black;
+    background-color: gray;
+    font-family: fantasy;
+    font-size-adjust: 0.5; 
+    border-radius: 12px;
     text-align: center;
     text-decoration: none;
     text-size-adjust: auto;
     position: relative;
     float: left;
     overflow: hidden;
-    transition: transform .5s;
     font-size: 10px;
     cursor: pointer;
   }
-  .smallchatbub:hover{
-    transform: scale(1.2)
+  .smallchatbub:focus{
+    height: 40px;
+    width: 100%;
+    border-style: solid;
+    border-width: 3.5px;
+    border-color: black;
+    background-color: white;
+    font-family: fantasy;
+    font-size-adjust: 0.5; 
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    text-size-adjust: auto;
+    position: relative;
+    float: left;
+    overflow: hidden;
+    font-size: 10px;
+    cursor: pointer;
   }
   .chatbub:hover{
     transform: scale(1.2)
   }
 </style>
-
 <div style="background-color:rgb(68, 68, 68)">
   <div class=top>
     <h1 id=text>Chris</h1>
@@ -302,25 +381,34 @@ function newchat()
   </div>      
   
     <div class=topbottom style="background-color:rgb(68, 68, 68)">
-        <button class=change onclick="backgroundcolor('rgb(68, 68, 68)')">Dark background</button>
-        <button class=change onclick="backgroundcolor('white')">Light background</button>
+        <button class=change onclick="backgroundcolor('rgb(68, 68, 68)'), textcolor('white')">Dark background</button>
+        <button class=change onclick="backgroundcolor('white'), textcolor('rgb(68, 68, 68)')">Light background</button>
         </div>
     </div>
-<body id="back">
 
-
+<body>
+<div id=front>
 <div id=chan class="container-fluid, channels">
   <button class=change style=float:left onclick=newchannel()>+</button>
+  
   <br>
 </div>
 
-<div class="container-fluid, chat">
+<div id="back" class="container-fluid, chat">
   
-      <button onclick=newchat() style=display:none class=change id="small" >+chat</button><h1 id="Boldname"></h1>
-      <div id=chattext>
-        <input class="container-fluid" type=text placeholder=message><form method="POST" action="" target="_self"></form>
+      <div>
+        <button onclick=newchat() style=display:none class=change id="small" >+chat</button>
+        <button id="settings" style="display: none" class="change">Channel Settings</button>
       </div>
-  
+      <h1 style="display: none;"class=chatitle id="Boldname"></h1>
+      <form method="POST" action="" target="_self">
+        <input class="container-fluid, chattext" type=text placeholder=message /><input class="sendbutton" type=submit value=Send />
+      </form>
+</div>
+</div>
+<div class="options" id=OPback>
+<button id=Close onclick="ToOP()">Close</button>
+
 </div>
 </body>
 </html>
