@@ -24,47 +24,61 @@ function backgroundcolor(BKcolor)
 }
 function smallchan() 
 {
-    var c = document.createElement("button");
-    c.setAttribute("class", "smallchatbub");
-    c.setAttribute("id", "small");
+  var c = document.createElement("button");
+  c.setAttribute("class", "smallchatbub");
+  c.setAttribute("id", "small");
 }
 function disp()
 {
-    var x = document.getElementById("small");
-    var HLName = document.getElementById("Boldname");
-    if(check == false){
-      CHNN = this.textContent;
-      check = true;
-    }
-    if(this.className == "smallchatbub")
+  var x = document.getElementById("small");
+  var HLName = document.getElementById("Boldname");
+  chats = CHNN + "chat";
+  var elem = document.getElementById(chats);
+  if(check == false){
+    CHNN = this.textContent;
+    check = true;
+  }
+  if(this.className == "smallchatbub")
+  {
+    x.style.display = "none";
+    HLName.textContent = CHNN + ": " + "#" + this.textContent;
+  }
+  else
+  {
+        
+    if(CHNN == this.textContent)
     {
-      x.style.display = "none";
-      HLName.textContent = CHNN + ": " + "#" + this.textContent;
+      CHNN = this.textContent;
+      x.style.display = "block";
+      focelem = this.closest("div");
+      HLName.textContent = this.textContent + ": " + "#general";
     }
     else
-    {
-        
-      if(CHNN == this.textContent)
+    {   
+      if(focelem.getElementsByTagName("*").length == 1)
       {
-        CHNN = this.textContent;
-        x.style.display = "block";
-        focelem = this.closest("div");
-        HLName.textContent = this.textContent + ": " + "#general";
-      }
-      else
-      {
+        x.style.display = "block";   
+        }
+        else
+        {
           x.style.display = "block";
-          focelem = this.closest("div");
-          chats = CHNN + "chat";
-          var elem = document.getElementById(chats);
           elem.style.display = "none";
+        }
+        focelem = this.closest("div");
+        if(focelem.getElementsByTagName("*").length == 1)
+        {
           CHNN = this.textContent;
+          HLName.textContent = this.textContent + ": " + "#general";
+        }
+        else
+        {
+          CHNN = this.textContent;
+          HLName.textContent = this.textContent + ": " + "#general";
           chats = CHNN + "chat";
           elem = document.getElementById(chats);
           elem.style.display = "block";
-          HLName.textContent = this.textContent + ": " + "#general";
+        }   
       }
-      
     }
 }
 
@@ -89,6 +103,7 @@ function newchannel()
       }
       else
       { 
+        element.appendChild(br);
         channelplace.className = cl;
         channelplace.setAttribute("id", "{x}");
         x = x + 1;
@@ -97,7 +112,7 @@ function newchannel()
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         channelplace.appendChild(channel);
-        element.appendChild(br);
+        
       }
   }
   else
@@ -109,6 +124,8 @@ function newchannel()
       }
       else
       {
+        element.appendChild(br);
+        channelplace.className = cl;
         channelplace.setAttribute("id", "{x}");
         x = x + 1;
         element.appendChild(channelplace);
@@ -116,7 +133,7 @@ function newchannel()
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         channelplace.appendChild(channel);
-        element.appendChild(br);
+        
       }
 
   }
@@ -129,7 +146,7 @@ function newchat()
   var chatname = prompt("Name your new chat.", "");
   var chat = document.createElement("button");
   var text = document.createTextNode(chatname);
-  var obcl = CHNN + "chat";
+  var chats = CHNN + "chat";
   
   
   if(chatname == null || chatname == "")
@@ -144,12 +161,12 @@ function newchat()
       chat.addEventListener("click", disp);
       chat.className = "smallchatbub";
       chat.appendChild(text);
-      document.getElementById(obcl).appendChild(chat);
+      document.getElementById(chats).appendChild(chat);
     }
     else
     {
       chatplace = document.createElement("div");
-      chatplace.setAttribute("id", obcl);
+      chatplace.setAttribute("id", chats);
       firstchat = false;
       focelem.appendChild(chatplace);  
       chat.addEventListener("click", disp);
@@ -222,7 +239,7 @@ function newchat()
     position: relative;
     border-style: solid;
     border-left-style: none;
-    border-width: 5px, auto;
+    border-width: auto;
     border-color: black;
   }
   .channels{
@@ -234,6 +251,7 @@ function newchat()
     border-width: 5px, auto;
     border-color: black;
     text-align: center;
+    overflow: scroll;
   }
   .chatbub{
     height: 100px;
@@ -293,6 +311,7 @@ function newchat()
 
 <div id=chan class="container-fluid, channels">
   <button class=change style=float:left onclick=newchannel()>+</button>
+  <br>
 </div>
 
 <div class="container-fluid, chat">
