@@ -1,0 +1,39 @@
+---------------------------
+---------BLAH CHAT---------
+---------------------------
+#IMPORTANT
+    - Make a logo for Blah Chat.
+
+
+#LOGIN PAGE
+1. Change login username and password saving location.(NOT INTERNALLY), but possibly in a database. -----MYSQL?-----
+
+
+
+#CHAT PAGE
+!!!!!DOUBLE CHECK AND MAKE SURE CHAT PAGE CAN FIT ON MOBILE DEVICES!!!!!
+!!!!!DOUBLE CHECK CODE AND MAKE SURE THERE IS NO EXTRA!!!!!
+
+1. Changing channel interface.
+    - Create a deleting and removing system for channels.
+    - Figure out how to add image for the channel look.
+    - Possibly change location of Channel Settings button.
+        * Make a possible entire new div to make the channel settings menu.
+    - Make channel interface any bit cleaner if possble.
+    - Resize or refit the channel button.
+    - Make the focus change on the chat buttons stay.
+    - Make a possible focus option for the channel button itself.
+    - Allow user to minimize the channels.
+    - Make a possible animation for the chats when user clicks on the channel.
+
+2. Changing chat interface.
+    - Finish the chatting system so user can chat back and forth with another user.
+    - Alter the look of the send button.
+    - Alter the look of the messagging box.
+    - Allow user to @message another user.
+    - Allow user to send not only text, but also Images and possible Vidoes to another user.
+
+3. Changin top interface.
+    - Make sure to have it greet user on top with name he/she logged in with.
+    - Allow user to see who is online or offline.
+
