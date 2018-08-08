@@ -4,7 +4,8 @@
 #IMPORTANT
     - Make a logo for Blah Chat.
 
-
+#CURRENT TASK
+----Finish fixing the problem of multiple channels having the same name and user is trying to make a chat in those channels.
 #LOGIN PAGE
 1. Change login username and password saving location.(NOT INTERNALLY), but possibly in a database. -----MYSQL?-----
 
