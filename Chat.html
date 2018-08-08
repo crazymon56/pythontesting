@@ -12,6 +12,7 @@ var CHNN = null;
 var check = false;
 var num = 0;
 var firstchat = true;
+var lstid = null;
 function textcolor(TColor) 
 {
   var elem = document.getElementById('Boldname');
@@ -32,11 +33,11 @@ function ToOP()
 {
   var thefront = document.getElementById("front");
   var options = document.getElementById("OPback");
-  thefront.style.display = "none";
-  options.style.display = "block";
+  
   if(this.id == "settings")
   {
-    
+    thefront.style.display = "none";
+    options.style.display = "block";
   }
   else
   {
@@ -54,7 +55,7 @@ function disp()
   var HLName = document.getElementById("Boldname");
   var Chansets = document.getElementById("settings");
   chats = CHNN + "chat";
-  var elem = document.getElementById(chats);
+  var elem = null;
   if(check == false){
     CHNN = this.textContent;
     check = true;
@@ -68,44 +69,49 @@ function disp()
   else
   {
         
-    if(CHNN == this.textContent)
+    if(this.closest("div").id == lstid)
     {
-      CHNN = this.textContent;
-      focelem = this.closest("div");
-      x.style.display = "block";
-      Chansets.style.display = "block";
-      HLName.style.display = "block";
-      HLName.textContent = this.textContent + ": " + "#general";
+        CHNN = this.textContent;
+        focelem = this.closest("div");
+        elem = document.getElementById(chats);
+        x.style.display = "block";
+        Chansets.style.display = "block";
+        HLName.style.display = "block";
+        HLName.textContent = this.textContent + ": " + "#general"; 
     }
     else
     {   
       if(focelem.getElementsByTagName("*").length == 1)
       {
         x.style.display = "block";
-        Chansets.style.display = "block";  
-        }
-        else
-        {
-          x.style.display = "block";
-          elem.style.display = "none";
-          Chansets.style.display = "block";
-        }
-        focelem = this.closest("div");
-        if(focelem.getElementsByTagName("*").length == 1)
-        {
-          CHNN = this.textContent;
-          HLName.textContent = this.textContent + ": " + "#general";
-        }
-        else
-        {
-          CHNN = this.textContent;
-          HLName.textContent = this.textContent + ": " + "#general";
-          chats = CHNN + "chat";
-          elem = document.getElementById(chats);
-          elem.style.display = "block";
-        }   
+        Chansets.style.display = "block";
+          
       }
+      else
+      {
+        x.style.display = "block";
+        elem.style.display = "none";
+        Chansets.style.display = "block";
+      }
+      focelem = this.closest("div");
+      if(focelem.getElementsByTagName("*").length == 1)
+      {
+        CHNN = this.textContent;
+        HLName.textContent = this.textContent + ": " + "#general";
+        firstchat = true;
+        lstid = this.closest("div").id;
+      }
+      else
+      {
+        CHNN = this.textContent;
+        HLName.textContent = this.textContent + ": " + "#general";
+        chats = CHNN + "chat";
+        elem = document.getElementById(chats);
+        elem.style.display = "block";
+        lstid = this.closest("div").id;
+      }   
     }
+  }
 }
 
 function newchannel() 
@@ -118,47 +124,46 @@ function newchannel()
   var element = document.getElementById("chan");
   var cl = channelname + "channel";
   firstchat = true;
-  
+
   if(x == 0)
   {
-    
-    
-      if(channelname == null || channelname == "")
-      {
+    if(channelname == null || channelname == "")
+    {
 
-      }
-      else
-      { 
-        element.appendChild(br);
-        channelplace.className = cl;
-        channelplace.setAttribute("id", "{x}");
-        x = x + 1;
-        element.appendChild(channelplace);
-        channel.setAttribute("class", "chatbub");
-        channel.addEventListener("click", disp);
-        channel.appendChild(text);
-        channelplace.appendChild(channel);
+    }
+    else
+    { 
+      element.appendChild(br);
+      channelplace.className = cl;
+      channelplace.setAttribute("id", x);
+      x = x + 1;
+      element.appendChild(channelplace);
+      channel.setAttribute("class", "chatbub");
+      channel.addEventListener("click", disp);
+      channel.appendChild(text);
+      channelplace.appendChild(channel);
+      lstid = channelplace.id;
       }
   }
   else
   {
       
-      if(channelname == null || channelname == "")
-      {
+    if(channelname == null || channelname == "")
+    {
 
-      }
-      else
-      {
-        element.appendChild(br);
-        channelplace.className = cl;
-        channelplace.setAttribute("id", "{x}");
-        x = x + 1;
-        element.appendChild(channelplace);
-        channel.setAttribute("class", "chatbub");
-        channel.addEventListener("click", disp);
-        channel.appendChild(text);
-        channelplace.appendChild(channel);
-      }
+    }
+    else
+    {
+      element.appendChild(br);
+      channelplace.className = cl;
+      channelplace.setAttribute("id", x);
+      x = x + 1;
+      element.appendChild(channelplace);
+      channel.setAttribute("class", "chatbub");
+      channel.addEventListener("click", disp);
+      channel.appendChild(text);
+      channelplace.appendChild(channel);
+    }
 
   }
   
@@ -168,8 +173,6 @@ function newchat()
 {
   var chatname = prompt("Name your new chat.", "");
   var chat = document.createElement("button");
-  chatname = "#" + chatname;
-  var text = document.createTextNode(chatname);
   var chats = CHNN + "chat";
   
   
@@ -182,13 +185,19 @@ function newchat()
     
     if(firstchat == false)
     {
+      chatname = "#" + chatname;
+      var text = document.createTextNode(chatname);
       chat.addEventListener("click", disp);
       chat.className = "smallchatbub";
       chat.appendChild(text);
+      
       document.getElementById(chats).appendChild(chat);
     }
     else
     {
+      
+      chatname = "#" + chatname;
+      var text = document.createTextNode(chatname);
       chatplace = document.createElement("div");
       chatplace.setAttribute("id", chats);
       firstchat = false;
@@ -212,6 +221,10 @@ function newchat()
     border-style: solid;
     border-width: 5px, auto;
     border-bottom-style: none;
+    color: white;
+    border-right-color: black;
+    border-left-color: black;
+    border-top-color: black;
   }
   .topbottom{
     border-left-style: solid;
@@ -383,8 +396,8 @@ function newchat()
     <div class=topbottom style="background-color:rgb(68, 68, 68)">
         <button class=change onclick="backgroundcolor('rgb(68, 68, 68)'), textcolor('white')">Dark background</button>
         <button class=change onclick="backgroundcolor('white'), textcolor('rgb(68, 68, 68)')">Light background</button>
-        </div>
     </div>
+</div>
 
 <body>
 <div id=front>
@@ -398,7 +411,7 @@ function newchat()
   
       <div>
         <button onclick=newchat() style=display:none class=change id="small" >+chat</button>
-        <button id="settings" style="display: none" class="change">Channel Settings</button>
+        <button id="settings" onclick="ToOP()" style="display: none" class="change">Channel Settings</button>
       </div>
       <h1 style="display: none;"class=chatitle id="Boldname"></h1>
       <form method="POST" action="" target="_self">
