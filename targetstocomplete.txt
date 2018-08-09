@@ -5,7 +5,7 @@
     - Make a logo for Blah Chat.
 
 #CURRENT TASK
-----Finish fixing the problem of multiple channels having the same name and user is trying to make a chat in those channels.
+----Getting network setup so Chat system actually can operate.
 #LOGIN PAGE
 1. Change login username and password saving location.(NOT INTERNALLY), but possibly in a database. -----MYSQL?-----
 
@@ -26,6 +26,7 @@
     - Make a possible focus option for the channel button itself.
     - Allow user to minimize the channels.
     - Make a possible animation for the chats when user clicks on the channel.
+    - Fix the problem when the user does not click on the first channel they make.
 
 2. Changing chat interface.
     - Finish the chatting system so user can chat back and forth with another user.
