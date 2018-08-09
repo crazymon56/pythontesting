@@ -13,6 +13,7 @@ var check = false;
 var num = 0;
 var firstchat = true;
 var lstid = null;
+var number = 0;
 function textcolor(TColor) 
 {
   var elem = document.getElementById('Boldname');
@@ -54,7 +55,7 @@ function disp()
   var x = document.getElementById("small");
   var HLName = document.getElementById("Boldname");
   var Chansets = document.getElementById("settings");
-  chats = CHNN + "chat";
+  
   var elem = null;
   if(check == false){
     CHNN = this.textContent;
@@ -68,11 +69,13 @@ function disp()
   }
   else
   {
-        
+    
+    var chats = null;    
     if(this.closest("div").id == lstid)
     {
         CHNN = this.textContent;
         focelem = this.closest("div");
+        chats = "chat" + focelem.id;
         elem = document.getElementById(chats);
         x.style.display = "block";
         Chansets.style.display = "block";
@@ -89,6 +92,8 @@ function disp()
       }
       else
       {
+        chats = "chat" + focelem.id;
+        elem = document.getElementById(chats);
         x.style.display = "block";
         elem.style.display = "none";
         Chansets.style.display = "block";
@@ -105,7 +110,7 @@ function disp()
       {
         CHNN = this.textContent;
         HLName.textContent = this.textContent + ": " + "#general";
-        chats = CHNN + "chat";
+        chats = "chat" + focelem.id;
         elem = document.getElementById(chats);
         elem.style.display = "block";
         lstid = this.closest("div").id;
@@ -173,7 +178,8 @@ function newchat()
 {
   var chatname = prompt("Name your new chat.", "");
   var chat = document.createElement("button");
-  var chats = CHNN + "chat";
+  var chats = "chat" + focelem.id;
+  
   
   
   if(chatname == null || chatname == "")
@@ -190,12 +196,10 @@ function newchat()
       chat.addEventListener("click", disp);
       chat.className = "smallchatbub";
       chat.appendChild(text);
-      
       document.getElementById(chats).appendChild(chat);
     }
     else
     {
-      
       chatname = "#" + chatname;
       var text = document.createTextNode(chatname);
       chatplace = document.createElement("div");
@@ -293,6 +297,12 @@ function newchat()
     border-left-style: none;
     border-width: auto;
     border-color: black;
+  }
+  .Chatarea{
+    width: 100%;
+    height: 40%;
+    position: absolute;
+    top: 0;
   }
   .channels{
     padding-top: 10px;
@@ -414,8 +424,9 @@ function newchat()
         <button id="settings" onclick="ToOP()" style="display: none" class="change">Channel Settings</button>
       </div>
       <h1 style="display: none;"class=chatitle id="Boldname"></h1>
-      <form method="POST" action="" target="_self">
-        <input class="container-fluid, chattext" type=text placeholder=message /><input class="sendbutton" type=submit value=Send />
+      <div id="Chatarea" class="Chatarea"></div>
+      <form method="POST" action="">
+        <input class="container-fluid, chattext" name="usertext" type=text placeholder=message /><input class="sendbutton" type=submit value=Send />
       </form>
 </div>
 </div>
