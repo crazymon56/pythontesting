@@ -3,6 +3,232 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  .top{
+  
+    height: 20%;
+    width: 100%;
+    border-style: solid;
+    border-width: 5px, auto;
+    border-bottom-style: none;
+    color: white;
+    border-right-color: black;
+    border-left-color: black;
+    border-top-color: black;
+  }
+  .topbottom{
+    border-left-style: solid;
+    border-right-style: solid;
+    border-width: 5px, auto;
+  }
+  .change{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+  }
+  .change:hover{
+    border-style:solid;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+  }
+  .logoutbutton{
+    border: solid;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    float: left;
+    border-radius: 12px;
+    width: 10%;
+    height: 20%;
+  }
+  .logoutbutton:hover{
+    border-style: solid;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    float: left;
+    cursor: pointer;
+    border-radius: 12px;
+  }
+  .chattext{
+    position: absolute;
+    bottom: 0;
+    width: 90%;
+  }
+  .sendbutton{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10%
+  }
+  .chatitle{
+    border-style: solid;
+    border-top-style: none;
+    border-left-style: none;
+    border-right-style: none;
+    border-color: black;
+    color: rgb(68, 68, 68);
+  }
+  .chat{
+    height: 80%;
+    width: 80%;
+    float: left;
+    position: relative;
+    border-style: solid;
+    border-left-style: none;
+    border-width: auto;
+    border-color: black;
+  }
+  .Chatarea{
+    width: 100%;
+    height: 40%;
+    position: absolute;
+    top: 0;
+  }
+  .channels{
+    padding-top: 10px;
+    width: 20%;
+    height: 80%;
+    float: left;
+    border-style: solid;
+    border-width: 5px, auto;
+    border-color: black;
+    text-align: center;
+    overflow: scroll;
+    background-color: rgb(49, 49, 49);
+  }
+  .optionbutton{
+    border-style:solid;
+    border-radius: 12px;
+    width: 15%;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+  }
+  .optionbutton:hover{
+    border-style:solid;
+    background-color: gray;
+    border-radius: 12px;
+    width: 15%;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+  }
+  .options{
+    width: 50%;
+    height: 50%;
+    display: none;
+  }
+  .chatbub{
+    height: 90px;
+    width: 90px;
+    color: black;
+    background-color: white;
+    border: none;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    transition: transform .5s;
+    cursor: pointer;
+    margin: auto;
+  }
+  .smallchatbub{
+    height: 40px;
+    width: 100%;
+    border-style: solid;
+    border-width: 3.5px;
+    border-color: black;
+    background-color: gray;
+    font-family: fantasy;
+    font-size-adjust: 0.5; 
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    text-size-adjust: auto;
+    position: relative;
+    float: left;
+    overflow: hidden;
+    font-size: 10px;
+    cursor: pointer;
+  }
+  .smallchatbub:focus{
+    height: 40px;
+    width: 100%;
+    border-style: solid;
+    border-width: 3.5px;
+    border-color: black;
+    background-color: white;
+    font-family: fantasy;
+    font-size-adjust: 0.5; 
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    text-size-adjust: auto;
+    position: relative;
+    float: left;
+    overflow: hidden;
+    font-size: 10px;
+    cursor: pointer;
+  }
+  .chatbub:hover{
+    transform: scale(1.2)
+  }
+</style>
+<div style="background-color:rgb(68, 68, 68)">
+  <div class=top>
+    <h1 id=text>Chris</h1>
+    <form method="POST" action="/Logout">
+      <input class=logoutbutton type="submit" value="Logout" />
+    </form>
+    <h3><center>Blah Chat</center></h3>
+  </div>      
+  
+    <div class=topbottom style="background-color:rgb(68, 68, 68)">
+        <button class=change onclick="backgroundcolor('rgb(68, 68, 68)'), textcolor('white')">Dark background</button>
+        <button class=change onclick="backgroundcolor('white'), textcolor('rgb(68, 68, 68)')">Light background</button>
+    </div>
+</div>
+
+<body>
+<div id=front>
+<div id=chan class="container-fluid, channels">
+  <button class=change style=float:left onclick=newchannel()>+</button>
+  
+  <br>
+</div>
+
+<div id="back" class="container-fluid, chat">
+  
+      <div>
+        <button onclick=newchat() style=display:none class=change id="small" >+chat</button>
+        <button id="settings" onclick="ToOP()" style="display: none" class="change">Channel Settings</button>
+      </div>
+      <h1 style="display: none;"class=chatitle id="Boldname"></h1>
+      <div id="Chatarea" class="Chatarea"></div>
+      
+        <input class="container-fluid, chattext" name="usertext" type=text placeholder=message /><input class="sendbutton" type=submit value=Send />
+      
+</div>
+</div>
+<div class="options" id=OPback>
+<button id=Close onclick="ToOP()">Close</button>
+
+</div>
+</body>
+<script
+			  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+			  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+			  crossorigin="anonymous"></script>
 <script type="text/javascript">
 var channelplace = null;
 var chatplace = null;
@@ -214,225 +440,6 @@ function newchat()
   }
 }
 </script>
-<style>
-  * {
-    box-sizing: border-box;
-  }
-  .top{
-  
-    height: 20%;
-    width: 100%;
-    border-style: solid;
-    border-width: 5px, auto;
-    border-bottom-style: none;
-    color: white;
-    border-right-color: black;
-    border-left-color: black;
-    border-top-color: black;
-  }
-  .topbottom{
-    border-left-style: solid;
-    border-right-style: solid;
-    border-width: 5px, auto;
-  }
-  .change{
-    border-style:solid;
-    border-radius: 12px;
-    background-color: white;
-    text-align: center;
-    color: gray;
-    border: solid;
-  }
-  .change:hover{
-    border-style:solid;
-    background-color: gray;
-    text-align: center;
-    color: white;
-    cursor: pointer;
-  }
-  .logoutbutton{
-    border: solid;
-    background-color: white;
-    text-align: center;
-    color: gray;
-    float: left;
-    border-radius: 12px;
-    width: 10%;
-    height: 20%;
-  }
-  .logoutbutton:hover{
-    border-style: solid;
-    background-color: gray;
-    text-align: center;
-    color: white;
-    float: left;
-    cursor: pointer;
-    border-radius: 12px;
-  }
-  .chattext{
-    position: absolute;
-    bottom: 0;
-    width: 90%;
-  }
-  .sendbutton{
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 10%
-  }
-  .chatitle{
-    border-style: solid;
-    border-top-style: none;
-    border-left-style: none;
-    border-right-style: none;
-    border-color: black;
-    color: rgb(68, 68, 68);
-  }
-  .chat{
-    height: 80%;
-    width: 80%;
-    float: left;
-    position: relative;
-    border-style: solid;
-    border-left-style: none;
-    border-width: auto;
-    border-color: black;
-  }
-  .Chatarea{
-    width: 100%;
-    height: 40%;
-    position: absolute;
-    top: 0;
-  }
-  .channels{
-    padding-top: 10px;
-    width: 20%;
-    height: 80%;
-    float: left;
-    border-style: solid;
-    border-width: 5px, auto;
-    border-color: black;
-    text-align: center;
-    overflow: scroll;
-    background-color: rgb(49, 49, 49);
-  }
-  .optionbutton{
-    border-style:solid;
-    border-radius: 12px;
-    width: 15%;
-    background-color: white;
-    text-align: center;
-    color: gray;
-    border: solid;
-  }
-  .optionbutton:hover{
-    border-style:solid;
-    background-color: gray;
-    border-radius: 12px;
-    width: 15%;
-    text-align: center;
-    color: white;
-    cursor: pointer;
-  }
-  .options{
-    width: 50%;
-    height: 50%;
-    display: none;
-  }
-  .chatbub{
-    height: 90px;
-    width: 90px;
-    color: black;
-    background-color: white;
-    border: none;
-    border-radius: 50%;
-    display: inline-block;
-    position: relative;
-    transition: transform .5s;
-    cursor: pointer;
-    margin: auto;
-  }
-  .smallchatbub{
-    height: 40px;
-    width: 100%;
-    border-style: solid;
-    border-width: 3.5px;
-    border-color: black;
-    background-color: gray;
-    font-family: fantasy;
-    font-size-adjust: 0.5; 
-    border-radius: 12px;
-    text-align: center;
-    text-decoration: none;
-    text-size-adjust: auto;
-    position: relative;
-    float: left;
-    overflow: hidden;
-    font-size: 10px;
-    cursor: pointer;
-  }
-  .smallchatbub:focus{
-    height: 40px;
-    width: 100%;
-    border-style: solid;
-    border-width: 3.5px;
-    border-color: black;
-    background-color: white;
-    font-family: fantasy;
-    font-size-adjust: 0.5; 
-    border-radius: 12px;
-    text-align: center;
-    text-decoration: none;
-    text-size-adjust: auto;
-    position: relative;
-    float: left;
-    overflow: hidden;
-    font-size: 10px;
-    cursor: pointer;
-  }
-  .chatbub:hover{
-    transform: scale(1.2)
-  }
-</style>
-<div style="background-color:rgb(68, 68, 68)">
-  <div class=top>
-    <h1 id=text>Chris</h1>
-    <form method="POST" action="/Login">
-      <input class=logoutbutton type="submit" value="Logout" />
-    </form>
-    <h3><center>Blah Chat</center></h3>
-  </div>      
-  
-    <div class=topbottom style="background-color:rgb(68, 68, 68)">
-        <button class=change onclick="backgroundcolor('rgb(68, 68, 68)'), textcolor('white')">Dark background</button>
-        <button class=change onclick="backgroundcolor('white'), textcolor('rgb(68, 68, 68)')">Light background</button>
-    </div>
-</div>
 
-<body>
-<div id=front>
-<div id=chan class="container-fluid, channels">
-  <button class=change style=float:left onclick=newchannel()>+</button>
-  
-  <br>
-</div>
 
-<div id="back" class="container-fluid, chat">
-  
-      <div>
-        <button onclick=newchat() style=display:none class=change id="small" >+chat</button>
-        <button id="settings" onclick="ToOP()" style="display: none" class="change">Channel Settings</button>
-      </div>
-      <h1 style="display: none;"class=chatitle id="Boldname"></h1>
-      <div id="Chatarea" class="Chatarea"></div>
-      <form method="POST" action="">
-        <input class="container-fluid, chattext" name="usertext" type=text placeholder=message /><input class="sendbutton" type=submit value=Send />
-      </form>
-</div>
-</div>
-<div class="options" id=OPback>
-<button id=Close onclick="ToOP()">Close</button>
-
-</div>
-</body>
 </html>

@@ -6,6 +6,13 @@
 
 #CURRENT TASK
 ----Getting network setup so Chat system actually can operate.
+----Use these websites.
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+http://api.jquery.com/jquery.ajax/
+https://www.tutorialspoint.com/flask/flask_sessions.htm
+https://flask-socketio.readthedocs.io/en/latest/
+
+
 #LOGIN PAGE
 1. Change login username and password saving location.(NOT INTERNALLY), but possibly in a database. -----MYSQL?-----
 
