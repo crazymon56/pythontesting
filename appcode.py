@@ -3,13 +3,16 @@ from redis import Redis, RedisError
 import os
 import socket
 import codecs
+import flask_socketio import SocketIO
 
 # Connect to Redis
 redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = "slwol;ayesal."
+socketio = SocketIO(app)
 
-app.secret_key = 'k4k29_dk!!ko'
+
 Userinfo = list()
 #Signing Up
 @app.route("/SignUp", methods=['POST', 'GET'])
@@ -24,6 +27,12 @@ def signup():
     with open('Signupcon.html', 'r') as fh:        
         html = fh.read()
         return html
+
+#Logout
+@app.route("/Logout", methods=['GET'])
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('Login'))        
 
 #Loginpage
 @app.route("/Login", methods=['POST', 'GET'])
@@ -40,7 +49,7 @@ def logged():
     UserP = request.form['LPassword']
     usercheck = False  
     if request.method == 'POST':
-        session['username'] = UserN
+        session['username'] = UserN 
         for x  in Userinfo:
             data = x.split(",")
             ChUN = data[0]
@@ -66,4 +75,5 @@ def index():
         
     return html
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)       
+    app.run(host='0.0.0.0', port=80)   
+    socketio.run(app)    
