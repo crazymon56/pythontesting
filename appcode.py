@@ -3,7 +3,8 @@ from redis import Redis, RedisError
 import os
 import socket
 import codecs
-import flask_socketio import SocketIO
+from flask_socketio import SocketIO
+import mysql.connector 
 
 # Connect to Redis
 redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
@@ -12,14 +13,38 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "slwol;ayesal."
 socketio = SocketIO(app)
 
+UserIn = mysql.connector.connect("localhost", "root", "password", "userinformation")
+cursor = UserIn.cursor()
+
 
 Userinfo = list()
-#Signing Up
-@app.route("/SignUp", methods=['POST', 'GET'])
+#Chat
+@app.route("/BlahChat/" + UserN, methods=['POST', 'GET'])
+def chat():
+    pass
+
+
+#SigningUp
+@app.route("/SignUpCon", methods=['POST', 'GET'])
 def signup():
-    Userinfo.append(request.form['SUsername'] + ',' + request.form['SPassword'])
+    UserN = request.form['SUsername']
     UserP = request.form['SPassword']
     UserCP = request.form['SCPassword']
+    try:
+        cursor.execute(
+        """
+        IF (SELECT username FROM user WHERE username = %s) 
+        THEN 
+        ELSE
+        THEN INSERT INTO user VALUES (%s,%s,%s)
+        END IF
+        """
+        ,(UserN, UserN, UserP, UserCP))
+        UserIn.commit()
+        UserIn.close()
+    except:
+        UserIn.rollback()
+        UserIn.close()
     if UserP != UserCP:
         with open('Signup.html', 'r') as fh:        
             html = fh.read()
@@ -66,7 +91,7 @@ def logged():
                 html = fh.read()        
             return html                   
 
-# Login
+#SignUp
 @app.route("/", methods=['GET', 'POST'])
 def index():
 
