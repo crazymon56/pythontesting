@@ -11,6 +11,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 http://api.jquery.com/jquery.ajax/
 https://www.tutorialspoint.com/flask/flask_sessions.htm
 https://flask-socketio.readthedocs.io/en/latest/
+----Get database up and working.
 
 
 #LOGIN PAGE
