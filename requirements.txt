@@ -1,3 +1,4 @@
 Flask
 Redis
 flask-socketio
+mysql-connector-python

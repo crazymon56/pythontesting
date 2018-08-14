@@ -13,13 +13,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "slwol;ayesal."
 socketio = SocketIO(app)
 
-UserIn = mysql.connector.connect("localhost", "root", "password", "userinformation")
-cursor = UserIn.cursor()
+UserIn = mysql.connector.connect(user="root", db="userinformation", passwd="passwordfun", host="mysqldb")
 
 
-Userinfo = list()
 #Chat
-@app.route("/BlahChat/" + UserN, methods=['POST', 'GET'])
+@app.route("/BlahChat/", methods=['POST', 'GET'])
 def chat():
     pass
 
@@ -27,24 +25,27 @@ def chat():
 #SigningUp
 @app.route("/SignUpCon", methods=['POST', 'GET'])
 def signup():
+    cursor = UserIn.cursor()
     UserN = request.form['SUsername']
     UserP = request.form['SPassword']
     UserCP = request.form['SCPassword']
+    query =(
+        "IF (SELECT username FROM user WHERE username = %s)" 
+        "THEN"
+        "ELSE"
+        "THEN INSERT INTO user VALUES (%s,%s,%s)"
+        "END IF"
+    )
+    
+    
     try:
-        cursor.execute(
-        """
-        IF (SELECT username FROM user WHERE username = %s) 
-        THEN 
-        ELSE
-        THEN INSERT INTO user VALUES (%s,%s,%s)
-        END IF
-        """
-        ,(UserN, UserN, UserP, UserCP))
+        cursor.execute(query, (UserN, UserN, UserP, UserCP), multi=True)
         UserIn.commit()
-        UserIn.close()
+        cursor.close()
     except:
         UserIn.rollback()
-        UserIn.close()
+        cursor.close()
+
     if UserP != UserCP:
         with open('Signup.html', 'r') as fh:        
             html = fh.read()
@@ -70,25 +71,26 @@ def login():
 #LoginCheck        
 @app.route("/Logged", methods=['POST', 'GET'])    
 def logged(): 
+    cursor = UserIn.cursor()
     UserN = request.form['LUsername']
     UserP = request.form['LPassword']
     usercheck = False  
     if request.method == 'POST':
         session['username'] = UserN 
-        for x  in Userinfo:
-            data = x.split(",")
-            ChUN = data[0]
-            ChUP = data[1]
-            if UserN == ChUN:
-                if UserP == ChUP:
-                    usercheck = True
-                    with open('Chat.html', 'r') as fh:        
-                        html = fh.read()
-                    return html     
+        cursor.execute("SELECT username FROM user")
+        for x in cursor:
+            if(x == UserN):
+                cursor.execute("SELECT password FROM user WHERE username = %s", (UserN))
+                for passw in cursor:
+                    if(passw == UserP):
+                        usercheck = True
+                        return 'Database worked' 
+                        cursor.close()
         if usercheck == False:
             with open('Invalidlogin.html', 'r') as fh:        
                 usercheck = False
-                html = fh.read()        
+                html = fh.read() 
+                cursor.close()       
             return html                   
 
 #SignUp
