@@ -19,40 +19,36 @@ UserIn = mysql.connector.connect(user="root", db="userinformation", passwd="pass
 #Chat
 @app.route("/BlahChat/", methods=['POST', 'GET'])
 def chat():
-    pass
+    with open('Chat.html', 'r') as fh:
+        html = fh.read()
+    return html
 
 
 #SigningUp
 @app.route("/SignUpCon", methods=['POST', 'GET'])
 def signup():
     cursor = UserIn.cursor()
-    UserN = request.form['SUsername']
-    UserP = request.form['SPassword']
-    UserCP = request.form['SCPassword']
-    query =(
-        "IF (SELECT username FROM user WHERE username = %s)" 
-        "THEN"
-        "ELSE"
-        "THEN INSERT INTO user VALUES (%s,%s,%s)"
-        "END IF"
-    )
-    
-    
-    try:
-        cursor.execute(query, (UserN, UserN, UserP, UserCP), multi=True)
-        UserIn.commit()
-        cursor.close()
-    except:
-        UserIn.rollback()
-        cursor.close()
-
-    if UserP != UserCP:
+    if request.form['SPassword'] != request.form['SCPassword']:
         with open('Signup.html', 'r') as fh:        
             html = fh.read()
         return html
+    try:
+        cursor.execute("SELECT username FROM user")
+        for item in cursor:
+            if item[0] != request.form['SUsername']:
+            if len(item) < :
+                cursor.execute("INSERT INTO user (username, password, confirmpassword) VALUES(%s, %s, %s);", (request.form["SUsername"], request.form["SPassword"], request.form["SCPassword"]))
+                UserIn.commit()
+                cursor.close()
+    except:
+        cursor.execute("INSERT INTO user (username, password, confirmpassword) VALUES(%s, %s, %s);", (request.form["SUsername"], request.form["SPassword"], request.form["SCPassword"]))
+        UserIn.commit()
+        cursor.close()
+
+    
     with open('Signupcon.html', 'r') as fh:        
         html = fh.read()
-        return html
+    return html
 
 #Logout
 @app.route("/Logout", methods=['GET'])
@@ -72,26 +68,20 @@ def login():
 @app.route("/Logged", methods=['POST', 'GET'])    
 def logged(): 
     cursor = UserIn.cursor()
-    UserN = request.form['LUsername']
-    UserP = request.form['LPassword']
-    usercheck = False  
-    if request.method == 'POST':
-        session['username'] = UserN 
-        cursor.execute("SELECT username FROM user")
-        for x in cursor:
-            if(x == UserN):
-                cursor.execute("SELECT password FROM user WHERE username = %s", (UserN))
-                for passw in cursor:
-                    if(passw == UserP):
-                        usercheck = True
+    try:
+        if request.method == 'POST':
+            session['username'] = request.form['LUsername'] 
+            cursor.execute("SELECT username, password FROM user")
+            for items in cursor:
+                if(items[0] == request.form['LUsername']):
+                    if(items[1] == request.form['LPassword']):
                         return 'Database worked' 
-                        cursor.close()
-        if usercheck == False:
-            with open('Invalidlogin.html', 'r') as fh:        
-                usercheck = False
-                html = fh.read() 
-                cursor.close()       
-            return html                   
+                        cursor.close()      
+    except:
+        with open('Invalidlogin.html', 'r') as fh:        
+            html = fh.read() 
+            cursor.close()       
+        return html                   
 
 #SignUp
 @app.route("/", methods=['GET', 'POST'])
