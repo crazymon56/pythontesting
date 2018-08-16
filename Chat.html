@@ -216,7 +216,7 @@
       <h1 style="display: none;"class=chatitle id="Boldname"></h1>
       <div id="Chatarea" class="Chatarea"></div>
       
-        <input class="container-fluid, chattext" name="usertext" type=text placeholder=message /><input class="sendbutton" type=submit value=Send />
+        <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message /><input class="sendbutton" type=button value=Send onclick='dothings()' />
       
 </div>
 </div>
@@ -240,6 +240,19 @@ var num = 0;
 var firstchat = true;
 var lstid = null;
 var number = 0;
+function dothings()
+{
+  if(document.getElementById('usertext').value == null || document.getElementById('usertext').value == "")
+  {
+
+  }
+  else
+  {
+    $.post("BlahChat", document.getElementById('usertext').value, function(){
+    });
+  }
+  event.preventDefault();
+}
 function textcolor(TColor) 
 {
   var elem = document.getElementById('Boldname');

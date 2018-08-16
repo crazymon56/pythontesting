@@ -5,6 +5,7 @@ import socket
 import codecs
 from flask_socketio import SocketIO
 import mysql.connector 
+import json
 
 # Connect to Redis
 redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
@@ -19,6 +20,10 @@ UserIn = mysql.connector.connect(user="root", db="userinformation", passwd="pass
 #Chat
 @app.route("/BlahChat/", methods=['POST', 'GET'])
 def chat():
+    data = request.get_json()
+    result = ''
+    
+
     with open('Chat.html', 'r') as fh:
         html = fh.read()
     return html
@@ -32,18 +37,10 @@ def signup():
         with open('Signup.html', 'r') as fh:        
             html = fh.read()
         return html
-    try:
-        cursor.execute("SELECT username FROM user")
-        for item in cursor:
-            if item[0] != request.form['SUsername']:
-            if len(item) < :
-                cursor.execute("INSERT INTO user (username, password, confirmpassword) VALUES(%s, %s, %s);", (request.form["SUsername"], request.form["SPassword"], request.form["SCPassword"]))
-                UserIn.commit()
-                cursor.close()
-    except:
-        cursor.execute("INSERT INTO user (username, password, confirmpassword) VALUES(%s, %s, %s);", (request.form["SUsername"], request.form["SPassword"], request.form["SCPassword"]))
-        UserIn.commit()
-        cursor.close()
+    
+    cursor.execute("INSERT INTO user (username, password, confirmpassword) VALUES(%s, %s, %s);", (request.form["SUsername"], request.form["SPassword"], request.form["SCPassword"]))
+    UserIn.commit()
+    cursor.close()
 
     
     with open('Signupcon.html', 'r') as fh:        
@@ -86,7 +83,10 @@ def logged():
 #SignUp
 @app.route("/", methods=['GET', 'POST'])
 def index():
-
+    cursor = UserIn.cursor()
+    cursor.close()
+    
+    
     with open('Signup.html', 'r') as fh:
         html = fh.read()
         
