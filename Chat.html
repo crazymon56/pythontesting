@@ -93,6 +93,7 @@
     height: 40%;
     position: absolute;
     top: 0;
+    bottom: 0;
   }
   .channels{
     padding-top: 10px;
@@ -214,7 +215,6 @@
         <button id="settings" onclick="ToOP()" style="display: none" class="change">Channel Settings</button>
       </div>
       <h1 style="display: none;"class=chatitle id="Boldname"></h1>
-      <div id="Chatarea" class="Chatarea"></div>
       
         <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message /><input class="sendbutton" type=button value=Send onclick='dothings()' />
       
@@ -320,6 +320,9 @@ function disp()
         Chansets.style.display = "block";
         HLName.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general"; 
+        $.post("BlahChat", focelem.id, function(){
+
+        });
     }
     else
     {   
@@ -327,7 +330,6 @@ function disp()
       {
         x.style.display = "block";
         Chansets.style.display = "block";
-          
       }
       else
       {
@@ -344,6 +346,9 @@ function disp()
         HLName.textContent = this.textContent + ": " + "#general";
         firstchat = true;
         lstid = this.closest("div").id;
+        $.post("BlahChat", focelem.id, function(){
+
+        });
       }
       else
       {
@@ -353,6 +358,9 @@ function disp()
         elem = document.getElementById(chats);
         elem.style.display = "block";
         lstid = this.closest("div").id;
+        $.post("BlahChat", focelem.id, function(){
+
+        });
       }   
     }
   }
@@ -387,7 +395,11 @@ function newchannel()
       channel.appendChild(text);
       channelplace.appendChild(channel);
       lstid = channelplace.id;
+      $.post("BlahChat", channelplace.id, function(){
+
+      });
       }
+
   }
   else
   {
@@ -407,6 +419,9 @@ function newchannel()
       channel.addEventListener("click", disp);
       channel.appendChild(text);
       channelplace.appendChild(channel);
+      $.post("BlahChat", channelplace.id, function(){
+        
+      });
     }
 
   }

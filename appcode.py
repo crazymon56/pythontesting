@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session
+from flask import Flask, request, redirect, url_for, session, render_template
 from redis import Redis, RedisError
 import os
 import socket
@@ -20,13 +20,10 @@ UserIn = mysql.connector.connect(user="root", db="userinformation", passwd="pass
 #Chat
 @app.route("/BlahChat/", methods=['POST', 'GET'])
 def chat():
-    data = request.get_json()
+    data = request.args.get('key', '')
     result = ''
-    
 
-    with open('Chat.html', 'r') as fh:
-        html = fh.read()
-    return html
+    render_template('Chat.html', )
 
 
 #SigningUp
