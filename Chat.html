@@ -88,12 +88,11 @@
     border-width: auto;
     border-color: black;
   }
-  .Chatarea{
+  .chatarea{
     width: 100%;
-    height: 40%;
+    height: 76%;
     position: absolute;
-    top: 0;
-    bottom: 0;
+    bottom: 6%;
   }
   .channels{
     padding-top: 10px;
@@ -200,7 +199,7 @@
     </div>
 </div>
 
-<body>
+<body >
 <div id=front>
 <div id=chan class="container-fluid, channels">
   <button class=change style=float:left onclick=newchannel()>+</button>
@@ -215,8 +214,8 @@
         <button id="settings" onclick="ToOP()" style="display: none" class="change">Channel Settings</button>
       </div>
       <h1 style="display: none;"class=chatitle id="Boldname"></h1>
-      
-        <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message /><input class="sendbutton" type=button value=Send onclick='dothings()' />
+      <div id="chatarea" class='chatarea'></div>
+        <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message /><input class="sendbutton" type=submit value=Send onclick='dothings()' />
       
 </div>
 </div>
@@ -228,7 +227,8 @@
 <script
 			  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
-			  crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script type="text/javascript">
 var channelplace = null;
 var chatplace = null;
@@ -240,6 +240,14 @@ var num = 0;
 var firstchat = true;
 var lstid = null;
 var number = 0;
+
+
+$.submit(function(){
+  var socket = io.connect('http://' + document.domain + ':' + location.port);
+  socket.on('usermessage', function(msg) {
+    $('#log').document.getElementById('chatarea').append(msg.data);
+  })
+})
 function dothings()
 {
   if(document.getElementById('usertext').value == null || document.getElementById('usertext').value == "")
@@ -248,8 +256,8 @@ function dothings()
   }
   else
   {
-    $.post("BlahChat", document.getElementById('usertext').value, function(){
-    });
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    socket.emit('message', {userdata: document.getElementById('usertext').value})
   }
   event.preventDefault();
 }
@@ -271,10 +279,11 @@ function smallchan()
 }
 function ToOP()
 {
+  var chosen = document.getElementById("settings");
   var thefront = document.getElementById("front");
   var options = document.getElementById("OPback");
   
-  if(this.id == "settings")
+  if(this.className == chosen.className)
   {
     thefront.style.display = "none";
     options.style.display = "block";
@@ -320,9 +329,6 @@ function disp()
         Chansets.style.display = "block";
         HLName.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general"; 
-        $.post("BlahChat", focelem.id, function(){
-
-        });
     }
     else
     {   
@@ -346,9 +352,6 @@ function disp()
         HLName.textContent = this.textContent + ": " + "#general";
         firstchat = true;
         lstid = this.closest("div").id;
-        $.post("BlahChat", focelem.id, function(){
-
-        });
       }
       else
       {
@@ -358,9 +361,7 @@ function disp()
         elem = document.getElementById(chats);
         elem.style.display = "block";
         lstid = this.closest("div").id;
-        $.post("BlahChat", focelem.id, function(){
 
-        });
       }   
     }
   }
@@ -395,9 +396,6 @@ function newchannel()
       channel.appendChild(text);
       channelplace.appendChild(channel);
       lstid = channelplace.id;
-      $.post("BlahChat", channelplace.id, function(){
-
-      });
       }
 
   }
@@ -419,9 +417,6 @@ function newchannel()
       channel.addEventListener("click", disp);
       channel.appendChild(text);
       channelplace.appendChild(channel);
-      $.post("BlahChat", channelplace.id, function(){
-        
-      });
     }
 
   }

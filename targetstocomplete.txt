@@ -16,7 +16,7 @@ https://pythonprogramming.net/flask-homepage-completed/
 
 
 #LOGIN PAGE
-1. Change login username and password saving location.(NOT INTERNALLY), but possibly in a database. -----MYSQL?-----
+1. 
 
 
 

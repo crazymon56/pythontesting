@@ -3,7 +3,7 @@ from redis import Redis, RedisError
 import os
 import socket
 import codecs
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send, emit
 import mysql.connector 
 import json
 
@@ -17,14 +17,21 @@ socketio = SocketIO(app)
 UserIn = mysql.connector.connect(user="root", db="userinformation", passwd="passwordfun", host="mysqldb")
 
 
+
 #Chat
-@app.route("/BlahChat/", methods=['POST', 'GET'])
+@app.route("/BlahChat", methods=['POST', 'GET'])
 def chat():
-    data = request.args.get('key', '')
-    result = ''
+    if(session['username'] == ''):
+        return 'Username already taken'
+    else:
+        with open('Chat.html', 'r') as fh:        
+            html = fh.read()
+        return html
 
-    render_template('Chat.html', )
+@socketio.on('json')
+def handle_message(message):
 
+    emit("usermessage", {'data' : str(json)})
 
 #SigningUp
 @app.route("/SignUpCon", methods=['POST', 'GET'])
@@ -69,7 +76,7 @@ def logged():
             for items in cursor:
                 if(items[0] == request.form['LUsername']):
                     if(items[1] == request.form['LPassword']):
-                        return 'Database worked' 
+                        return redirect('BlahChat') 
                         cursor.close()      
     except:
         with open('Invalidlogin.html', 'r') as fh:        
