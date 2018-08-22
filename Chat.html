@@ -215,8 +215,10 @@
       </div>
       <h1 style="display: none;"class=chatitle id="Boldname"></h1>
       <div id="chatarea" class='chatarea'></div>
-        <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message /><input class="sendbutton" type=submit value=Send onclick='dothings()' />
-      
+      <form id='mes' method="POST" action='#'> 
+      <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message autocomplete=off /><input class="sendbutton" type=submit value=Send />
+      </form>
+
 </div>
 </div>
 <div class="options" id=OPback>
@@ -229,7 +231,7 @@
 			  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
         crossorigin="anonymous"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" charset="utf-8">
 var channelplace = null;
 var chatplace = null;
 var focelem = null;
@@ -242,25 +244,26 @@ var lstid = null;
 var number = 0;
 
 
-$.submit(function(){
-  var socket = io.connect('http://' + document.domain + ':' + location.port);
-  socket.on('usermessage', function(msg) {
-    $('#log').document.getElementById('chatarea').append(msg.data);
-  })
-})
-function dothings()
+$(document).ready(function()
 {
-  if(document.getElementById('usertext').value == null || document.getElementById('usertext').value == "")
-  {
 
-  }
-  else
+  namespace = '/test';
+
+  var socket = io.connect(location.protocol+ '//' + document.domain + ':' + location.port + namespace);
+  
+  socket.on('usermessage', function(msg) 
   {
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
-    socket.emit('message', {userdata: document.getElementById('usertext').value})
-  }
-  event.preventDefault();
-}
+    $('#chatarea').append('Chris: ' + msg.data.html());
+  });
+  
+  $('form#mes').submit(function(event)
+  {
+      socket.emit('json', {data: $('#usertext').val()});
+    event.preventDefault();
+  });
+  
+}); 
+
 function textcolor(TColor) 
 {
   var elem = document.getElementById('Boldname');

@@ -1,14 +1,10 @@
 from flask import Flask, request, redirect, url_for, session, render_template
-from redis import Redis, RedisError
+from flask_socketio import SocketIO, send, emit
 import os
 import socket
 import codecs
-from flask_socketio import SocketIO, send, emit
 import mysql.connector 
-import json
 
-# Connect to Redis
-redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "slwol;ayesal."
@@ -28,10 +24,15 @@ def chat():
             html = fh.read()
         return html
 
-@socketio.on('json')
-def handle_message(message):
 
-    emit("usermessage", {'data' : str(json)})
+
+@socketio.on('connection')
+def handle_message():
+    emit("connected", {'data': 'success'})
+
+@socketio.on('json', namespace='/test')
+def message_handle(message):
+    emit('usermessage', {'data': message['data']})
 
 #SigningUp
 @app.route("/SignUpCon", methods=['POST', 'GET'])
@@ -96,5 +97,4 @@ def index():
         
     return html
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)   
-    socketio.run(app)    
+    app.run(host='0.0.0.0', port=80)    
