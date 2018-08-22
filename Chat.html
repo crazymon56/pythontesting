@@ -186,7 +186,7 @@
 </style>
 <div style="background-color:rgb(68, 68, 68)">
   <div class=top>
-    <h1 id=text>Chris</h1>
+    <h1 id=text></h1>
     <form method="POST" action="/Logout">
       <input class=logoutbutton type="submit" value="Logout" />
     </form>
@@ -246,20 +246,29 @@ var number = 0;
 
 $(document).ready(function()
 {
-
+  
   namespace = '/test';
 
-  var socket = io.connect(location.protocol+ '//' + document.domain + ':' + location.port + namespace);
-  
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+  socket.on('connect', function(){
+    socket.emit('connected')
+  })
+
+
   socket.on('usermessage', function(msg) 
   {
-    $('#chatarea').append('Chris: ' + msg.data.html());
+    $('#chatarea').append('<br>' + document.getElementById('text').textContent + ': ' + msg.data);  
   });
+
+  socket.on('username', function(msg){
+    $('#text').append(msg.data);
+  })
   
   $('form#mes').submit(function(event)
   {
-      socket.emit('json', {data: $('#usertext').val()});
-    event.preventDefault();
+      socket.emit('useresponse', {data: $('#usertext').val()});
+      event.preventDefault();
+      $('#usertext').val('');
   });
   
 }); 

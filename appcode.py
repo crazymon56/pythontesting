@@ -1,5 +1,5 @@
 from flask import Flask, request, redirect, url_for, session, render_template
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, emit
 import os
 import socket
 import codecs
@@ -17,20 +17,22 @@ UserIn = mysql.connector.connect(user="root", db="userinformation", passwd="pass
 #Chat
 @app.route("/BlahChat", methods=['POST', 'GET'])
 def chat():
-    if(session['username'] == ''):
-        return 'Username already taken'
-    else:
-        with open('Chat.html', 'r') as fh:        
-            html = fh.read()
-        return html
+    try:
+        if(session['username'] == ''):
+            return 'Please insert a username'
+        else:
+            with open('Chat.html', 'r') as fh:        
+                html = fh.read()
+            return html
+    except:
+        return 'Here Be An Error'
 
 
-
-@socketio.on('connection')
+@socketio.on('connected', namespace='/test')
 def handle_message():
-    emit("connected", {'data': 'success'})
+    emit('username', {'data' : session['username']})
 
-@socketio.on('json', namespace='/test')
+@socketio.on('useresponse', namespace='/test')
 def message_handle(message):
     emit('usermessage', {'data': message['data']})
 
@@ -53,10 +55,10 @@ def signup():
     return html
 
 #Logout
-@app.route("/Logout", methods=['GET'])
+@app.route("/Logout", methods=['GET', 'POST'])
 def logout():
     session.pop('username', None)
-    return redirect(url_for('Login'))        
+    return redirect('Login')        
 
 #Loginpage
 @app.route("/Login", methods=['POST', 'GET'])
@@ -70,20 +72,26 @@ def login():
 @app.route("/Logged", methods=['POST', 'GET'])    
 def logged(): 
     cursor = UserIn.cursor()
-    try:
-        if request.method == 'POST':
-            session['username'] = request.form['LUsername'] 
-            cursor.execute("SELECT username, password FROM user")
-            for items in cursor:
-                if(items[0] == request.form['LUsername']):
-                    if(items[1] == request.form['LPassword']):
-                        return redirect('BlahChat') 
-                        cursor.close()      
-    except:
-        with open('Invalidlogin.html', 'r') as fh:        
-            html = fh.read() 
-            cursor.close()       
-        return html                   
+    if request.method == 'POST':
+        session['username'] = request.form['LUsername']
+        validlog = False 
+        cursor.execute("SELECT username, password FROM user label: LOOP IF user[0] == %s AND user[1] == %s THEN SET %s = TRUE END IF; LEAVE label; END LOOP label;", (request.form['LUsername'], request.form['LPassword'], validlog))
+        
+
+        # for items in cursor:
+        #     if(items[0] == request.form['LUsername'] and items[1] == request.form['LPassword']):
+        #         validlog = True
+
+        cursor.close()
+        print(validlog)        
+        if(validlog == True):
+            return redirect('BlahChat')
+                
+        else:        
+            with open('Invalidlogin.html', 'r') as fh:        
+                html = fh.read() 
+                cursor.close()       
+            return html                   
 
 #SignUp
 @app.route("/", methods=['GET', 'POST'])
@@ -94,6 +102,7 @@ def index():
     
     with open('Signup.html', 'r') as fh:
         html = fh.read()
+        print(html)
         
     return html
 if __name__ == "__main__":
