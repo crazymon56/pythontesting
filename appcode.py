@@ -75,7 +75,7 @@ def logged():
     if request.method == 'POST':
         session['username'] = request.form['LUsername']
         validlog = False 
-        cursor.execute("SELECT username, password FROM user label: LOOP IF user[0] == %s AND user[1] == %s THEN SET %s = TRUE END IF; LEAVE label; END LOOP label;", (request.form['LUsername'], request.form['LPassword'], validlog))
+        cursor.execute("SELECT username, password FROM user label: LOOP IF user[0] == %s AND user[1] == %s THEN SET %s = %s END IF; LEAVE label; END LOOP label;", (request.form['LUsername'], request.form['LPassword'], validlog, True))
         
 
         # for items in cursor:

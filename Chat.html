@@ -242,6 +242,7 @@ var num = 0;
 var firstchat = true;
 var lstid = null;
 var number = 0;
+var user = null;
 
 
 $(document).ready(function()
@@ -262,6 +263,7 @@ $(document).ready(function()
 
   socket.on('username', function(msg){
     $('#text').append(msg.data);
+    user = msg.data;
   })
   
   $('form#mes').submit(function(event)
@@ -272,6 +274,10 @@ $(document).ready(function()
   });
   
 }); 
+
+function Joining(){
+  socket.emit('userjoin', {data: user});
+}
 
 function textcolor(TColor) 
 {
