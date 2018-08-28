@@ -255,10 +255,16 @@ $(document).ready(function()
     socket.emit('connected')
   })
 
+  socket.on('confirmjoin', function(msg)
+  {
+    $('#chatarea').append('<br>' + msg.data);
+  })
+
+
 
   socket.on('usermessage', function(msg) 
   {
-    $('#chatarea').append('<br>' + document.getElementById('text').textContent + ': ' + msg.data);  
+    $('#chatarea').append('<br>' + msg.data);  
   });
 
   socket.on('username', function(msg){
@@ -268,16 +274,13 @@ $(document).ready(function()
   
   $('form#mes').submit(function(event)
   {
-      socket.emit('useresponse', {data: $('#usertext').val()});
+      socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val()});
       event.preventDefault();
       $('#usertext').val('');
   });
   
 }); 
 
-function Joining(){
-  socket.emit('userjoin', {data: channelname});
-}
 
 function textcolor(TColor) 
 {
@@ -346,7 +349,8 @@ function disp()
         x.style.display = "block";
         Chansets.style.display = "block";
         HLName.style.display = "block";
-        HLName.textContent = this.textContent + ": " + "#general"; 
+        HLName.textContent = this.textContent + ": " + "#general";
+         
     }
     else
     {   
@@ -386,7 +390,9 @@ function disp()
 }
 
 function newchannel() 
-{
+{ 
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
   var channelname = prompt("Name your new channel.", "");
   var channel = document.createElement("button");
   channelplace = document.createElement("div");
@@ -404,6 +410,7 @@ function newchannel()
     }
     else
     { 
+      
       element.appendChild(br);
       channelplace.className = cl;
       channelplace.setAttribute("id", x);
@@ -414,6 +421,7 @@ function newchannel()
       channel.appendChild(text);
       channelplace.appendChild(channel);
       lstid = channelplace.id;
+      socket.emit('userjoin', {data: channel.textContent});
       }
 
   }
