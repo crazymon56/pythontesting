@@ -187,9 +187,7 @@
 <div style="background-color:rgb(68, 68, 68)">
   <div class=top>
     <h1 id=text></h1>
-    <form method="POST" action="/Logout">
-      <input class=logoutbutton type="submit" value="Logout" />
-    </form>
+      <input class=logoutbutton type="submit" onclick='logginout()' value="Logout" />
     <h3><center>Blah Chat</center></h3>
   </div>      
   
@@ -314,6 +312,14 @@ function ToOP()
     options.style.display = "none";
     thefront.style.display = "block";
   }
+}
+function logginout()
+{
+  namespace = '/test';
+
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+  socket.emit('logout', {data: $("#chan").html});
 }
 function options()
 {

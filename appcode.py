@@ -30,7 +30,23 @@ def chat():
 
 @socketio.on('connected', namespace='/test')
 def handle_message():
-    emit('username', {'data' : session['username']})
+    cursor = UserIn.cursor()
+    try:
+        cursor.execute("SELECT data FROM userlastdata WHERE userid=(SELECT id FROM users WHERE username=%s)", (session['username'])) 
+        print(cursor)
+        cursor.close()
+    except:
+        pass
+
+
+
+@socketio.on('logout', namespace='/test')
+def handle_userdata(userdata):
+    # cursor = UserIn.cursor()
+    # cursor.execute("INSERT INTO data, userid FROM userlastdata VALUES(%s, (SELECT id FROM users WHERE username=%s))", (userdata['data'], session['username']))
+    # cursor.close()
+    print(userdata['data'])
+    redirect('Login')
 
 @socketio.on('useresponse', namespace='/test')
 def message_handle(message):
@@ -41,11 +57,11 @@ def join_handle(sentroom):
     cursor = UserIn.cursor()
     username = session['username']
     join_room(sentroom['data'])
-    cursor.execute("INSERT INTO chatname FROM chats VALUES(%s)", (sentroom['data']))
-    cursor.execute("INSERT INTO channelname, linkid FROM channels VALUES('general', (SELECT id FROM chats WHERE chatname=%s))", (sentroom['data']))
-    cursor.execute("INSERT INTO message, outid FROM messages VALUES(%s, (SELECT ))")
+    # cursor.execute("INSERT INTO chatname FROM chats VALUES(%s)", (sentroom['data']))
+    # cursor.execute("INSERT INTO channelname, linkid FROM channels VALUES('general', (SELECT id FROM chats WHERE chatname=%s))", (sentroom['data']))
+    # cursor.execute("INSERT INTO message, userid, chatid, channelid FROM messages VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s), (SELECT ))")
     emit('confirmjoin', {'data' : session['username'] + ' has joined'})
-
+    cursor.close()
 
 #SigningUp
 @app.route("/SignUpCon", methods=['POST', 'GET'])
