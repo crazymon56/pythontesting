@@ -17,36 +17,46 @@ UserIn = mysql.connector.connect(user="root", db="chatinformation", passwd="pass
 #Chat
 @app.route("/BlahChat", methods=['POST', 'GET'])
 def chat():
+    cursor = UserIn.cursor()
     try:
         if(session['username'] == ''):
             return 'Please insert a username'
+        
+        
+        
         else:
-            with open('Chat.html', 'r') as fh:        
-                html = fh.read()
-            return html
-    except:
-        return 'Here Be An Error'
+            htmltxt = ""
+            cursor.execute("SELECT data FROM userlastdata WHERE username=%s", (session['username'], ))
+            print('hello')
+            print(cursor.fetchall())
+            
+            # with open('Chat.html', 'r') as fh:        
+            #     html = fh.read()
+            # return html
+    except Exception as e:
+        return str(e)
 
 
 @socketio.on('connected', namespace='/test')
 def handle_message():
     cursor = UserIn.cursor()
     try:
-        cursor.execute("SELECT data FROM userlastdata WHERE userid=(SELECT id FROM users WHERE username=%s)", (session['username'])) 
+        cursor.execute("SELECT data FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s)", (session['username'])) 
         print(cursor)
         cursor.close()
     except:
-        pass
+        emit('username', {'data': session['username']})
 
 
 
 @socketio.on('logout', namespace='/test')
-def handle_userdata(userdata):
-    # cursor = UserIn.cursor()
-    # cursor.execute("INSERT INTO data, userid FROM userlastdata VALUES(%s, (SELECT id FROM users WHERE username=%s))", (userdata['data'], session['username']))
-    # cursor.close()
-    print(userdata['data'])
+def handle_userdata(message):
+    cursor = UserIn.cursor()
+    cursor.execute("INSERT INTO data, userid FROM userlastdata VALUES(%s, (SELECT id FROM users WHERE username=%s))", (message['data'], session['username']))
+    cursor.close()
+     
     redirect('Login')
+    
 
 @socketio.on('useresponse', namespace='/test')
 def message_handle(message):

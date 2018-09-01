@@ -318,8 +318,7 @@ function logginout()
   namespace = '/test';
 
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
-  socket.emit('logout', {data: $("#chan").html});
+  socket.emit('logout', {data: $("#chan").prop("outerHTML")});
 }
 function options()
 {
@@ -449,6 +448,7 @@ function newchannel()
       channel.addEventListener("click", disp);
       channel.appendChild(text);
       channelplace.appendChild(channel);
+      socket.emit('userjoin', {data: channel.textContent});
     }
 
   }
