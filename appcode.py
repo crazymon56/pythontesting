@@ -20,19 +20,18 @@ def chat():
     cursor = UserIn.cursor()
     try:
         if(session['username'] == ''):
-            return 'Please insert a username'
+            return redirect('Login')
         
         
         
         else:
-            htmltxt = ""
-            cursor.execute("SELECT data FROM userlastdata WHERE username=%s", (session['username'], ))
-            print('hello')
-            print(cursor.fetchall())
+            # htmltxt = ""
+            # cursor.execute("SELECT data FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s)", (session['username'], ))
+            # print(cursor.fetchall())
             
-            # with open('Chat.html', 'r') as fh:        
-            #     html = fh.read()
-            # return html
+            with open('Chat.html', 'r') as fh:        
+                html = fh.read()
+            return html
     except Exception as e:
         return str(e)
 
@@ -41,8 +40,13 @@ def chat():
 def handle_message():
     cursor = UserIn.cursor()
     try:
-        cursor.execute("SELECT data FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s)", (session['username'])) 
-        print(cursor)
+        cursor.execute("SELECT useid, channelid, chatid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s)", (session['username'])) 
+        print(cursor.fetchall)
+        # if(cursor.fetchall() == ""):
+        #     pass
+        # else:
+        #     emit('userdata', {'data': cursor.fetchall()})
+        
         cursor.close()
     except:
         emit('username', {'data': session['username']})
@@ -51,10 +55,6 @@ def handle_message():
 
 @socketio.on('logout', namespace='/test')
 def handle_userdata(message):
-    cursor = UserIn.cursor()
-    cursor.execute("INSERT INTO data, userid FROM userlastdata VALUES(%s, (SELECT id FROM users WHERE username=%s))", (message['data'], session['username']))
-    cursor.close()
-     
     redirect('Login')
     
 
@@ -67,9 +67,11 @@ def join_handle(sentroom):
     cursor = UserIn.cursor()
     username = session['username']
     join_room(sentroom['data'])
-    # cursor.execute("INSERT INTO chatname FROM chats VALUES(%s)", (sentroom['data']))
-    # cursor.execute("INSERT INTO channelname, linkid FROM channels VALUES('general', (SELECT id FROM chats WHERE chatname=%s))", (sentroom['data']))
-    # cursor.execute("INSERT INTO message, userid, chatid, channelid FROM messages VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s), (SELECT ))")
+    print(sentroom['data'])
+    cursor.execute("INSERT INTO chats (chatname) VALUES(%s)", (sentroom['data']))
+    cursor.execute("INSERT INTO channels (channelname, linkid) VALUES('general', (SELECT id FROM chats WHERE chatname=%s))", (sentroom['data']) )
+    # cursor.execute("INSERT INTO messages (message, userid, chatid, channelid) VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s), (SELECT ))")
+    cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE linkid=chats.id), (SELECT id FROM chats WHERE chatname=%s))", (username, sentroom['data'], sentroom['data']))
     emit('confirmjoin', {'data' : session['username'] + ' has joined'})
     cursor.close()
 

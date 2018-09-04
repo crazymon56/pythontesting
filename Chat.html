@@ -318,7 +318,7 @@ function logginout()
   namespace = '/test';
 
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  socket.emit('logout', {data: $("#chan").prop("outerHTML")});
+  socket.emit('logout');
 }
 function options()
 {
@@ -398,6 +398,7 @@ function newchannel()
 { 
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+  
   var channelname = prompt("Name your new channel.", "");
   var channel = document.createElement("button");
   channelplace = document.createElement("div");
@@ -457,6 +458,9 @@ function newchannel()
 
 function newchat()
 {
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+  
   var chatname = prompt("Name your new chat.", "");
   var chat = document.createElement("button");
   var chats = "chat" + focelem.id;
@@ -478,6 +482,7 @@ function newchat()
       chat.className = "smallchatbub";
       chat.appendChild(text);
       document.getElementById(chats).appendChild(chat);
+      socket.emit('userjoin', {data: 'chat', chatname})
     }
     else
     {
