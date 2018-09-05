@@ -349,6 +349,7 @@ function disp()
     {
         CHNN = this.textContent;
         focelem = this.closest("div");
+        channelplace = this
         chats = "chat" + focelem.id;
         elem = document.getElementById(chats);
         x.style.display = "block";
@@ -427,7 +428,7 @@ function newchannel()
       channel.appendChild(text);
       channelplace.appendChild(channel);
       lstid = channelplace.id;
-      socket.emit('userjoin', {data: channel.textContent});
+      socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
       }
 
   }
@@ -449,7 +450,7 @@ function newchannel()
       channel.addEventListener("click", disp);
       channel.appendChild(text);
       channelplace.appendChild(channel);
-      socket.emit('userjoin', {data: channel.textContent});
+      socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
     }
 
   }
@@ -482,7 +483,8 @@ function newchat()
       chat.className = "smallchatbub";
       chat.appendChild(text);
       document.getElementById(chats).appendChild(chat);
-      socket.emit('userjoin', {data: 'chat', chatname})
+      var c = focelem.childNodes;
+      socket.emit('userjoin', {channel: c[0].textContent, select: 'chat', chatname: chatname})
     }
     else
     {
@@ -496,6 +498,8 @@ function newchat()
       chat.className = "smallchatbub";
       chat.appendChild(text);
       chatplace.appendChild(chat);
+      var c = focelem.childNodes;
+      socket.emit('userjoin', {channel: c[0].textContent, select: 'chat', chatname: chatname})
     }
   }
 }

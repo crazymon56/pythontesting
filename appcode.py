@@ -66,13 +66,15 @@ def message_handle(message):
 def join_handle(sentroom):
     cursor = UserIn.cursor()
     username = session['username']
-    join_room(sentroom['data'])
-    print(sentroom['data'])
-    cursor.execute("INSERT INTO chats (chatname) VALUES(%s)", (sentroom['data']))
-    cursor.execute("INSERT INTO channels (channelname, linkid) VALUES('general', (SELECT id FROM chats WHERE chatname=%s))", (sentroom['data']) )
+    join_room(sentroom['channel'])
+    if sentroom['select'] == 'channel':
+        cursor.execute("INSERT INTO channels (channelname) VALUES(%s)", (sentroom['channel'], ))
+    else:
+        cursor.execute("INSERT INTO chats (chatname, linkid) VALUES('general', (SELECT id FROM channels WHERE channelname=%s))", (sentroom['channel'], ) )
+        cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE chats.linkid=(SELECT id FROM channels WHERE channelname=%s)))", (username, sentroom['channel'], sentroom['channel']))
     # cursor.execute("INSERT INTO messages (message, userid, chatid, channelid) VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s), (SELECT ))")
-    cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE linkid=chats.id), (SELECT id FROM chats WHERE chatname=%s))", (username, sentroom['data'], sentroom['data']))
     emit('confirmjoin', {'data' : session['username'] + ' has joined'})
+    UserIn.commit()
     cursor.close()
 
 #SigningUp
@@ -115,9 +117,7 @@ def logged():
         session['username'] = request.form['LUsername']
         validlog = 0 
         cursor.execute("SELECT username, password FROM users")
-        
-        #cursor.execute("label1: LOOP IF users[0] == %s AND users[1] == %s THEN SET %s = %s; ELSE ITERATE label1; END IF; LEAVE label1; END LOOP label1;", (request.form['LUsername'], request.form['LPassword'], validlog, True))
-        
+                
 
         for items in cursor:
             if(items[0] == request.form['LUsername'] and items[1] == request.form['LPassword']):
