@@ -54,7 +54,7 @@ def handle_message():
 
 
 @socketio.on('logout', namespace='/test')
-def handle_userdata(message):
+def handle_userdata():
     redirect('Login')
     
 
@@ -69,8 +69,8 @@ def join_handle(sentroom):
     join_room(sentroom['channel'])
     if sentroom['select'] == 'channel':
         cursor.execute("INSERT INTO channels (channelname) VALUES(%s)", (sentroom['channel'], ))
-    else:
         cursor.execute("INSERT INTO chats (chatname, linkid) VALUES('general', (SELECT id FROM channels WHERE channelname=%s))", (sentroom['channel'], ) )
+    else:
         cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE chats.linkid=(SELECT id FROM channels WHERE channelname=%s)))", (username, sentroom['channel'], sentroom['channel']))
     # cursor.execute("INSERT INTO messages (message, userid, chatid, channelid) VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s), (SELECT ))")
     emit('confirmjoin', {'data' : session['username'] + ' has joined'})

@@ -428,7 +428,7 @@ function newchannel()
       channel.appendChild(text);
       channelplace.appendChild(channel);
       lstid = channelplace.id;
-      socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+      //socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
       }
 
   }
@@ -450,7 +450,7 @@ function newchannel()
       channel.addEventListener("click", disp);
       channel.appendChild(text);
       channelplace.appendChild(channel);
-      socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+      //socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
     }
 
   }
@@ -483,8 +483,7 @@ function newchat()
       chat.className = "smallchatbub";
       chat.appendChild(text);
       document.getElementById(chats).appendChild(chat);
-      var c = focelem.childNodes;
-      socket.emit('userjoin', {channel: c[0].textContent, select: 'chat', chatname: chatname})
+      //socket.emit('userjoin', {channel: document.getElementById(chat + focelem.id).closest("button").textContent, select: 'chat', chatname: chat.textContent})
     }
     else
     {
@@ -499,7 +498,8 @@ function newchat()
       chat.appendChild(text);
       chatplace.appendChild(chat);
       var c = focelem.childNodes;
-      socket.emit('userjoin', {channel: c[0].textContent, select: 'chat', chatname: chatname})
+      console.log(focelem.closest("button"))
+      //socket.emit('userjoin', {channel: document.getElementById(chat + focelem.id).closest("button").textContent, select: 'chat', chatname: chat.textContent})
     }
   }
 }

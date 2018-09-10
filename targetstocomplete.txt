@@ -36,7 +36,7 @@ https://pythonprogramming.net/flask-homepage-completed/
     - Allow user to minimize the channels.
     - Make a possible animation for the chats when user clicks on the channel.
     - Fix the problem when the user does not click on the first channel they make.
-
+    - Loading individual chats each time a channel is selected.
 2. Changing chat interface.
     - Finish the chatting system so user can chat back and forth with another user.
     - Alter the look of the send button.
