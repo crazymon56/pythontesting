@@ -200,7 +200,7 @@
 <body >
 <div id=front>
 <div id=chan class="container-fluid, channels">
-  <button class=change style=float:left onclick=newchannel()>+</button>
+  <button class=change style=float:left onclick=newchannel(1)>+</button>
   
   <br>
 </div>
@@ -241,23 +241,27 @@ var firstchat = true;
 var lstid = null;
 var number = 0;
 var user = null;
-
-
+var load = false;
 $(document).ready(function()
 {
   
   namespace = '/test';
 
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  socket.on('connect', function(){
+  
+  socket.on('connect', function()
+  {
     socket.emit('connected')
   })
-
   socket.on('confirmjoin', function(msg)
   {
     $('#chatarea').append('<br>' + msg.data);
   })
-
+  socket.on('userdata', function(msg)
+  {
+    load = true;
+    newchannel(msg.data[0]); 
+  })
 
 
   socket.on('usermessage', function(msg) 
@@ -395,12 +399,21 @@ function disp()
   }
 }
 
-function newchannel() 
+function newchannel(response) 
 { 
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  
-  var channelname = prompt("Name your new channel.", "");
+  if(load = true)
+  {
+
+    var channelname = prompt("Name your new channel.", "");
+  }
+  else
+  {
+
+    var channelname = response;
+    load = false;
+  }
   var channel = document.createElement("button");
   channelplace = document.createElement("div");
   var br =  document.createElement("br");
@@ -413,7 +426,7 @@ function newchannel()
   {
     if(channelname == null || channelname == "")
     {
-
+      console.log("nothing here");
     }
     else
     { 
@@ -428,7 +441,7 @@ function newchannel()
       channel.appendChild(text);
       channelplace.appendChild(channel);
       lstid = channelplace.id;
-      //socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+      socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
       }
 
   }
@@ -450,7 +463,7 @@ function newchannel()
       channel.addEventListener("click", disp);
       channel.appendChild(text);
       channelplace.appendChild(channel);
-      //socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+      socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
     }
 
   }
@@ -483,7 +496,7 @@ function newchat()
       chat.className = "smallchatbub";
       chat.appendChild(text);
       document.getElementById(chats).appendChild(chat);
-      //socket.emit('userjoin', {channel: document.getElementById(chat + focelem.id).closest("button").textContent, select: 'chat', chatname: chat.textContent})
+      socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chat.textContent})
     }
     else
     {
@@ -498,8 +511,7 @@ function newchat()
       chat.appendChild(text);
       chatplace.appendChild(chat);
       var c = focelem.childNodes;
-      console.log(focelem.closest("button"))
-      //socket.emit('userjoin', {channel: document.getElementById(chat + focelem.id).closest("button").textContent, select: 'chat', chatname: chat.textContent})
+      socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chat.textContent})
     }
   }
 }
