@@ -200,7 +200,7 @@
 <body >
 <div id=front>
 <div id=chan class="container-fluid, channels">
-  <button class=change style=float:left onclick=newchannel(1)>+</button>
+  <button class=change style=float:left onclick=newchannel()>+</button>
   
   <br>
 </div>
@@ -241,7 +241,8 @@ var firstchat = true;
 var lstid = null;
 var number = 0;
 var user = null;
-var load = false;
+var channeload = false;
+var chatload = false;
 $(document).ready(function()
 {
   
@@ -259,8 +260,15 @@ $(document).ready(function()
   })
   socket.on('userdata', function(msg)
   {
-    load = true;
-    newchannel(msg.data[0]); 
+    if(msg.data == null)
+    {
+      channeload = true;
+    }
+    else
+    {
+      channeload = false;
+      newchannel(msg.data);
+    }
   })
 
 
@@ -330,6 +338,10 @@ function options()
 }
 function disp()
 {
+  namespace = '/test';
+
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
   var x = document.getElementById("small");
   var HLName = document.getElementById("Boldname");
   var Chansets = document.getElementById("settings");
@@ -347,20 +359,43 @@ function disp()
   }
   else
   {
-    
+    if(chatload == false)
+    {
+      focelem = this.closest("div");
+      lstid = focelem.id; 
+    }
     var chats = null;    
     if(this.closest("div").id == lstid)
     {
+      if(chatload == true)
+      {
         CHNN = this.textContent;
         focelem = this.closest("div");
-        channelplace = this
         chats = "chat" + focelem.id;
         elem = document.getElementById(chats);
         x.style.display = "block";
         Chansets.style.display = "block";
         HLName.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general";
-         
+      }
+      else
+      {
+        
+        socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
+        socket.on("chatsend", function(msg)
+        {
+          chatload = true;
+          newchat(msg.data[0]);
+
+        })
+        chatload = true;
+        CHNN = this.textContent;
+        focelem = this.closest("div");
+        x.style.display = "block";
+        Chansets.style.display = "block";
+        HLName.style.display = "block";
+        HLName.textContent = this.textContent + ": " + "#general";
+      }  
     }
     else
     {   
@@ -380,10 +415,29 @@ function disp()
       focelem = this.closest("div");
       if(focelem.getElementsByTagName("*").length == 1)
       {
-        CHNN = this.textContent;
-        HLName.textContent = this.textContent + ": " + "#general";
-        firstchat = true;
-        lstid = this.closest("div").id;
+        if(chatload == true)
+        {
+          CHNN = this.textContent;
+          HLName.textContent = this.textContent + ": " + "#general";
+          firstchat = true;
+          lstid = this.closest("div").id;
+        }
+        else
+        {
+          socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
+          socket.on('chatsend', function(msg)
+          {
+          chatload = true;
+          newchat(msg.data[0]);
+          
+          })
+          chatload = true;
+          CHNN = this.textContent;
+          HLName.textContent = this.textContent + ": " + "#general";
+          firstchat = true;
+          lstid = this.closest("div").id;
+        }
+        
       }
       else
       {
@@ -403,19 +457,19 @@ function newchannel(response)
 { 
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  if(load = true)
+  if(channeload == true)
   {
-
     var channelname = prompt("Name your new channel.", "");
   }
   else
   {
-
+    
     var channelname = response;
-    load = false;
+    channeload = true;
   }
   var channel = document.createElement("button");
   channelplace = document.createElement("div");
+  focelem = channelplace;
   var br =  document.createElement("br");
   var text = document.createTextNode(channelname);
   var element = document.getElementById("chan");
@@ -426,7 +480,7 @@ function newchannel(response)
   {
     if(channelname == null || channelname == "")
     {
-      console.log("nothing here");
+ 
     }
     else
     { 
@@ -470,12 +524,28 @@ function newchannel(response)
   
 }
 
-function newchat()
+function newchat(response)
 {
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  
-  var chatname = prompt("Name your new chat.", "");
+  if(chatload == false)
+  {
+    var chatname = prompt("Name your new chat.", "");
+    var chatname2 = chatname;
+  }
+  else
+  {
+    if(response == 'general')
+    {
+      chatload = false;
+    }
+    else
+    {
+      var chatname = response;
+      chatload = false;
+    }
+  }
+
   var chat = document.createElement("button");
   var chats = "chat" + focelem.id;
   
@@ -496,7 +566,7 @@ function newchat()
       chat.className = "smallchatbub";
       chat.appendChild(text);
       document.getElementById(chats).appendChild(chat);
-      socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chat.textContent})
+      socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chatname2})
     }
     else
     {
@@ -510,8 +580,7 @@ function newchat()
       chat.className = "smallchatbub";
       chat.appendChild(text);
       chatplace.appendChild(chat);
-      var c = focelem.childNodes;
-      socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chat.textContent})
+      socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chatname2})
     }
   }
 }
