@@ -260,8 +260,9 @@ $(document).ready(function()
   })
   socket.on('userdata', function(msg)
   {
-    if(msg.data == null)
+    if(msg.data == " ")
     {
+      console.log('it hit');
       channeload = true;
     }
     else
@@ -380,15 +381,13 @@ function disp()
       }
       else
       {
-        
         socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
         socket.on("chatsend", function(msg)
         {
-          chatload = true;
+          chatload = false;
           newchat(msg.data[0]);
 
         })
-        chatload = true;
         CHNN = this.textContent;
         focelem = this.closest("div");
         x.style.display = "block";
@@ -427,11 +426,9 @@ function disp()
           socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
           socket.on('chatsend', function(msg)
           {
-          chatload = true;
+          chatload = false;
           newchat(msg.data[0]);
-          
           })
-          chatload = true;
           CHNN = this.textContent;
           HLName.textContent = this.textContent + ": " + "#general";
           firstchat = true;
@@ -447,7 +444,6 @@ function disp()
         elem = document.getElementById(chats);
         elem.style.display = "block";
         lstid = this.closest("div").id;
-
       }   
     }
   }
@@ -463,9 +459,7 @@ function newchannel(response)
   }
   else
   {
-    
     var channelname = response;
-    channeload = true;
   }
   var channel = document.createElement("button");
   channelplace = document.createElement("div");
@@ -484,19 +478,35 @@ function newchannel(response)
     }
     else
     { 
-      
-      element.appendChild(br);
-      channelplace.className = cl;
-      channelplace.setAttribute("id", x);
-      x = x + 1;
-      element.appendChild(channelplace);
-      channel.setAttribute("class", "chatbub");
-      channel.addEventListener("click", disp);
-      channel.appendChild(text);
-      channelplace.appendChild(channel);
-      lstid = channelplace.id;
-      socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+      if(channeload == true)
+      {      
+        element.appendChild(br);
+        channelplace.className = cl;
+        channelplace.setAttribute("id", x);
+        x = x + 1;
+        element.appendChild(channelplace);
+        channel.setAttribute("class", "chatbub");
+        channel.addEventListener("click", disp);
+        channel.appendChild(text);
+        channelplace.appendChild(channel);
+        lstid = channelplace.id;
+        socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
       }
+      else
+      {
+        element.appendChild(br);
+        channelplace.className = cl;
+        channelplace.setAttribute("id", x);
+        x = x + 1;
+        element.appendChild(channelplace);
+        channel.setAttribute("class", "chatbub");
+        channel.addEventListener("click", disp);
+        channel.appendChild(text);
+        channelplace.appendChild(channel);
+        lstid = channelplace.id;
+        channeload = true;
+      }
+    }
 
   }
   else
@@ -508,16 +518,31 @@ function newchannel(response)
     }
     else
     {
-      element.appendChild(br);
-      channelplace.className = cl;
-      channelplace.setAttribute("id", x);
-      x = x + 1;
-      element.appendChild(channelplace);
-      channel.setAttribute("class", "chatbub");
-      channel.addEventListener("click", disp);
-      channel.appendChild(text);
-      channelplace.appendChild(channel);
-      socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+      if(channeload == true)
+      {
+        element.appendChild(br);
+        channelplace.className = cl;
+        channelplace.setAttribute("id", x);
+        x = x + 1;
+        element.appendChild(channelplace);
+        channel.setAttribute("class", "chatbub");
+        channel.addEventListener("click", disp);
+        channel.appendChild(text);
+        channelplace.appendChild(channel);
+      }
+      else
+      {
+        element.appendChild(br);
+        channelplace.className = cl;
+        channelplace.setAttribute("id", x);
+        x = x + 1;
+        element.appendChild(channelplace);
+        channel.setAttribute("class", "chatbub");
+        channel.addEventListener("click", disp);
+        channel.appendChild(text);
+        channelplace.appendChild(channel);
+        socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+      }
     }
 
   }
@@ -528,63 +553,86 @@ function newchat(response)
 {
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  if(chatload == false)
+  if(chatload == true)
   {
     var chatname = prompt("Name your new chat.", "");
-    var chatname2 = chatname;
   }
   else
   {
     if(response == 'general')
     {
-      chatload = false;
+      chatload = true;
     }
     else
     {
       var chatname = response;
-      chatload = false;
     }
   }
 
   var chat = document.createElement("button");
   var chats = "chat" + focelem.id;
   
-  
-  
   if(chatname == null || chatname == "")
   {
-
+    
   }
   else
   {
-    
-    if(firstchat == false)
+    if(chatload == true)
     {
-      chatname = "#" + chatname;
-      var text = document.createTextNode(chatname);
-      chat.addEventListener("click", disp);
-      chat.className = "smallchatbub";
-      chat.appendChild(text);
-      document.getElementById(chats).appendChild(chat);
-      socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chatname2})
+      if(firstchat == false)
+      {
+        chatname = "#" + chatname;
+        var text = document.createTextNode(chatname);
+        chat.addEventListener("click", disp);
+        chat.className = "smallchatbub";
+        chat.appendChild(text);
+        document.getElementById(chats).appendChild(chat);
+        socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chatname})
+      }
+      else
+      {
+        chatname = "#" + chatname;
+        var text = document.createTextNode(chatname);
+        chatplace = document.createElement("div");
+        chatplace.setAttribute("id", chats);
+        firstchat = false;
+        focelem.appendChild(chatplace);  
+        chat.addEventListener("click", disp);
+        chat.className = "smallchatbub";
+        chat.appendChild(text);
+        chatplace.appendChild(chat);
+        socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chatname})
+      }
     }
     else
     {
-      chatname = "#" + chatname;
-      var text = document.createTextNode(chatname);
-      chatplace = document.createElement("div");
-      chatplace.setAttribute("id", chats);
-      firstchat = false;
-      focelem.appendChild(chatplace);  
-      chat.addEventListener("click", disp);
-      chat.className = "smallchatbub";
-      chat.appendChild(text);
-      chatplace.appendChild(chat);
-      socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chatname2})
+      if(firstchat == false)
+      {
+        chatname = "#" + chatname;
+        var text = document.createTextNode(chatname);
+        chat.addEventListener("click", disp);
+        chat.className = "smallchatbub";
+        chat.appendChild(text);
+        document.getElementById(chats).appendChild(chat);
+        chatload = true;
+      }
+      else
+      {
+        chatname = "#" + chatname;
+        var text = document.createTextNode(chatname);
+        chatplace = document.createElement("div");
+        chatplace.setAttribute("id", chats);
+        firstchat = false;
+        focelem.appendChild(chatplace);  
+        chat.addEventListener("click", disp);
+        chat.className = "smallchatbub";
+        chat.appendChild(text);
+        chatplace.appendChild(chat);
+        chatload = true;
+      }
     }
   }
 }
 </script>
-
-
 </html>
