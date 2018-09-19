@@ -360,15 +360,10 @@ function disp()
   }
   else
   {
-    if(chatload == false)
-    {
-      focelem = this.closest("div");
-      lstid = focelem.id; 
-    }
     var chats = null;    
     if(this.closest("div").id == lstid)
     {
-      if(chatload == true)
+      if(this.closest("div").parentElement.id == 'true')
       {
         CHNN = this.textContent;
         focelem = this.closest("div");
@@ -386,7 +381,6 @@ function disp()
         {
           chatload = false;
           newchat(msg.data[0]);
-
         })
         CHNN = this.textContent;
         focelem = this.closest("div");
@@ -394,6 +388,7 @@ function disp()
         Chansets.style.display = "block";
         HLName.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general";
+        focelem.parentElement.id = 'true';
       }  
     }
     else
@@ -414,12 +409,15 @@ function disp()
       focelem = this.closest("div");
       if(focelem.getElementsByTagName("*").length == 1)
       {
-        if(chatload == true)
+        if(focelem.parentElement.id == 'true')
         {
           CHNN = this.textContent;
           HLName.textContent = this.textContent + ": " + "#general";
           firstchat = true;
           lstid = this.closest("div").id;
+          x.style.display = "block";
+          Chansets.style.display = "block";
+          
         }
         else
         {
@@ -433,8 +431,11 @@ function disp()
           HLName.textContent = this.textContent + ": " + "#general";
           firstchat = true;
           lstid = this.closest("div").id;
+          focelem.parentElement.id = 'true';
+          x.style.display = "block";
+          Chansets.style.display = "block";
+          HLName.style.display = "block";
         }
-        
       }
       else
       {
@@ -461,9 +462,9 @@ function newchannel(response)
   {
     var channelname = response;
   }
+  var load = document.createElement("div");
   var channel = document.createElement("button");
   channelplace = document.createElement("div");
-  focelem = channelplace;
   var br =  document.createElement("br");
   var text = document.createTextNode(channelname);
   var element = document.getElementById("chan");
@@ -481,29 +482,35 @@ function newchannel(response)
       if(channeload == true)
       {      
         element.appendChild(br);
+        element.appendChild(load);
+        load.setAttribute("id", "true");
+        load.setAttribute("class", "load");
         channelplace.className = cl;
         channelplace.setAttribute("id", x);
         x = x + 1;
-        element.appendChild(channelplace);
+        load.appendChild(channelplace);
         channel.setAttribute("class", "chatbub");
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         channelplace.appendChild(channel);
-        lstid = channelplace.id;
         socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
       }
       else
       {
         element.appendChild(br);
+        element.appendChild(load);
+        load.setAttribute("id", "false");
+        load.setAttribute("class", "load");
         channelplace.className = cl;
         channelplace.setAttribute("id", x);
         x = x + 1;
-        element.appendChild(channelplace);
+        load.appendChild(channelplace);
         channel.setAttribute("class", "chatbub");
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         channelplace.appendChild(channel);
         lstid = channelplace.id;
+        focelem = channelplace;
         channeload = true;
       }
     }
@@ -521,27 +528,37 @@ function newchannel(response)
       if(channeload == true)
       {
         element.appendChild(br);
+        element.appendChild(load);
+        load.setAttribute("id", "true");
+        load.setAttribute("class", "load");
         channelplace.className = cl;
         channelplace.setAttribute("id", x);
         x = x + 1;
-        element.appendChild(channelplace);
-        channel.setAttribute("class", "chatbub");
-        channel.addEventListener("click", disp);
-        channel.appendChild(text);
-        channelplace.appendChild(channel);
-      }
-      else
-      {
-        element.appendChild(br);
-        channelplace.className = cl;
-        channelplace.setAttribute("id", x);
-        x = x + 1;
-        element.appendChild(channelplace);
+        load.appendChild(channelplace);
         channel.setAttribute("class", "chatbub");
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         channelplace.appendChild(channel);
         socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+
+        }
+      else
+      {
+        element.appendChild(br);
+        element.appendChild(load);
+        load.setAttribute("id", "false");
+        load.setAttribute("class", "load");
+        channelplace.className = cl;
+        channelplace.setAttribute("id", x);
+        x = x + 1;
+        load.appendChild(channelplace);
+        channel.setAttribute("class", "chatbub");
+        channel.addEventListener("click", disp);
+        channel.appendChild(text);
+        channelplace.appendChild(channel);
+        lstid = channelplace.id;
+        focelem = channelplace;
+        channeload = true;
       }
     }
 
@@ -559,7 +576,7 @@ function newchat(response)
   }
   else
   {
-    if(response == 'general')
+    if(response == '#general')
     {
       chatload = true;
     }
@@ -578,7 +595,7 @@ function newchat(response)
   }
   else
   {
-    if(chatload == true)
+    if(focelem.parentElement.id == true)
     {
       if(firstchat == false)
       {
@@ -609,17 +626,14 @@ function newchat(response)
     {
       if(firstchat == false)
       {
-        chatname = "#" + chatname;
         var text = document.createTextNode(chatname);
         chat.addEventListener("click", disp);
         chat.className = "smallchatbub";
         chat.appendChild(text);
         document.getElementById(chats).appendChild(chat);
-        chatload = true;
       }
       else
       {
-        chatname = "#" + chatname;
         var text = document.createTextNode(chatname);
         chatplace = document.createElement("div");
         chatplace.setAttribute("id", chats);
@@ -629,7 +643,6 @@ function newchat(response)
         chat.className = "smallchatbub";
         chat.appendChild(text);
         chatplace.appendChild(chat);
-        chatload = true;
       }
     }
   }
