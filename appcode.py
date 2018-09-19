@@ -55,17 +55,19 @@ def handle_message():
 @socketio.on('logout', namespace='/test')
 def handle_userdata():
     redirect('Login')
-    
+
+
 @socketio.on('chatpull', namespace='/test')
 def handle_chats(response):
-    cursor = UserIn.cursor()
-    cursor.execute("SELECT chatid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (session['username'], response['channelname']))
-    chats = cursor.fetchall()
-    for items in chats:
-        cursor.execute("SELECT chatname FROM chats WHERE id=%s", (items[0], ))
-        stuff = cursor.fetchone()
-        emit('chatsend', {'data': stuff})
-    cursor.close()
+    # cursor = UserIn.cursor()
+    # cursor.execute("SELECT chatid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (session['username'], response['channelname']))
+    # chats = cursor.fetchall()
+    # for items in chats:
+    #     cursor.execute("SELECT chatname FROM chats WHERE id=%s", (items[0], ))
+    #     stuff = cursor.fetchone()
+    #     emit('send', {'data': stuff})
+    # cursor.close()
+    emit('done', {'data': 'true'})
     
 @socketio.on('useresponse', namespace='/test')
 def message_handle(message):
