@@ -274,7 +274,8 @@ $(document).ready(function()
 
   socket.on('usermessage', function(msg) 
   {
-    $('#chatarea').append('<br>' + msg.data);  
+    $('#chatarea').append('<br>' + msg.data);
+      
   });
 
   socket.on('username', function(msg){
@@ -288,7 +289,15 @@ $(document).ready(function()
       event.preventDefault();
       $('#usertext').val('');
   });
-  
+
+  socket.on('send', function(msg)
+  {
+    newchat(msg.data[0]);
+  });
+  socket.on('done', function()
+  {
+    focelem.parentElement.id = 'true';
+  })
 }); 
 
 
@@ -375,22 +384,13 @@ function disp()
       }
       else
       {
-        
         socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
-        socket.on("chatsend", function(msg)
-        {
-          newchat(msg.data[0]);
-        });
         CHNN = this.textContent;
         focelem = this.closest("div");
         x.style.display = "block";
         Chansets.style.display = "block";
         HLName.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general";
-        socket.on('senddone', function(msg)
-        {
-          focelem.parentElement.id = msg.data;
-        });
       }
       
     }
@@ -425,11 +425,6 @@ function disp()
         else
         {
           socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
-          socket.on('done', function(dd)
-          {
-            console.log(dd.data);
-            // focelem.parentElement.id = dd.data;
-          });
           
           CHNN = this.textContent;
           HLName.textContent = this.textContent + ": " + "#general";
@@ -438,10 +433,9 @@ function disp()
           x.style.display = "block";
           Chansets.style.display = "block";
           HLName.style.display = "block";
-          focelem.parentElement.id = 'true';          
+                    
           
         }
-        
       }
       else
       {
@@ -455,7 +449,6 @@ function disp()
     }
   }
 }
-
 function newchannel(response) 
 { 
   namespace = '/test';

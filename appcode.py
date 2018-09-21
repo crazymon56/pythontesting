@@ -45,6 +45,7 @@ def handle_message():
         for items in channels:
             cursor.execute("SELECT channelname FROM channels WHERE id=%s", (items[0], ))   
             stuff = cursor.fetchone()
+            join_room(stuff[0] + '#general')
             if stuff:
                 emit('userdata', {'data': stuff[0]})       
     else:
@@ -59,14 +60,14 @@ def handle_userdata():
 
 @socketio.on('chatpull', namespace='/test')
 def handle_chats(response):
-    # cursor = UserIn.cursor()
-    # cursor.execute("SELECT chatid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (session['username'], response['channelname']))
-    # chats = cursor.fetchall()
-    # for items in chats:
-    #     cursor.execute("SELECT chatname FROM chats WHERE id=%s", (items[0], ))
-    #     stuff = cursor.fetchone()
-    #     emit('send', {'data': stuff})
-    # cursor.close()
+    cursor = UserIn.cursor()
+    cursor.execute("SELECT chatid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (session['username'], response['channelname']))
+    chats = cursor.fetchall()
+    for items in chats:
+        cursor.execute("SELECT chatname FROM chats WHERE id=%s", (items[0], ))
+        stuff = cursor.fetchone()
+        emit('send', {'data': stuff})
+    cursor.close()
     emit('done', {'data': 'true'})
     
 @socketio.on('useresponse', namespace='/test')
@@ -79,7 +80,6 @@ def join_handle_made(sentroom):
     username = session['username']
     join_room(sentroom['channel'])
     if sentroom['select'] == 'channel':
-        print('hit it')
         cursor.execute("INSERT INTO channels (channelname) VALUES(%s)", (sentroom['channel'], ))
         cursor.execute("INSERT INTO chats (chatname, linkid) VALUES('#general', (SELECT id FROM channels WHERE channelname=%s))", (sentroom['channel'], ))
         cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s))", (username, sentroom['channel']))
