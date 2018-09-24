@@ -106,6 +106,63 @@
     overflow: scroll;
     background-color: rgb(49, 49, 49);
   }
+  .channelback{
+    background-color: rgb(206, 206, 206);
+    height: 100%;
+    width: 100%; 
+    border-top-style: solid;
+    border-top-color: black;
+    display: none;
+  }
+  .channelselect{
+    width: 50%;
+    height: 50%;
+    background-color: rgb(71, 71, 71);
+    position: absolute;
+    top: 40%;
+    bottom: 50%;
+    left: 25%;
+    border-color: black;
+    border-style: solid;
+  }
+  .channelselectmain{
+    position: absolute;
+    bottom: 40%;
+    right: 65%;
+    line-height: 400%;
+  }
+  .channelselecttop{
+    color:white;
+    position: absolute;
+    top: 5%;
+    right: 40%;
+  }
+  .channelselectmid{
+    background-color: white;
+    position: absolute;
+    right: 50%;
+    color: white;
+  }
+  .channelselectbutton{
+    border-style:solid;
+    width: 400%;
+    height: 400%;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+  }
+  .channelselectbutton:hover{
+    border-style:solid;
+    width: 400%;
+    height: 400%;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+  }
+  
   .optionbutton{
     border-style:solid;
     border-radius: 12px;
@@ -200,7 +257,7 @@
 <body >
 <div id=front>
 <div id=chan class="container-fluid, channels">
-  <button class=change style=float:left onclick=newchannel()>+</button>
+  <button class=change style=float:left onclick="channelbox()">+</button>
   
   <br>
 </div>
@@ -208,7 +265,7 @@
 <div id="back" class="container-fluid, chat">
   
       <div>
-        <button onclick=newchat() style=display:none class=change id="small" >+chat</button>
+        <button onclick="newchat()" style=display:none class=change id="small" >+chat</button>
         <button id="settings" onclick="ToOP()" style="display: none" class="change">Channel Settings</button>
       </div>
       <h1 style="display: none;"class=chatitle id="Boldname"></h1>
@@ -222,6 +279,18 @@
 <div class="options" id=OPback>
 <button id=Close onclick="ToOP()">Close</button>
 
+</div>
+<div class="channelback" id="channelbox">
+  <div class="channelselect">
+    <p class="channelselecttop">CHANNEL</p>
+    <div class="channelselectmain">  
+      <button class="channelselectbutton" onclick="joinchannel()">Join</button>
+      <div class"channelselectmid">
+        <p style="color:white">Or</p>
+      </div> 
+      <button class="channelselectbutton" onclick="newchannelbut()">Create</button>
+    </div>
+  </div>
 </div>
 </body>
 <script
@@ -449,10 +518,32 @@ function disp()
     }
   }
 }
-function newchannel(response) 
-{ 
+function channelbox(){
+  var channelbox = document.getElementById("channelbox");
+  var front = document.getElementById("front");
+  front.style.display = "none";
+  channelbox.style.display = "block";
+}
+function joinchannel()
+{
+  var userchannelcode = prompt("Insert channel link to join.", "")
+}
+function newchannelbut()
+{
+  var channelbox = document.getElementById("channelbox");
+  var front = document.getElementById("front");
+  channelbox.style.display = "none";
+  front.style.display = "block";
+  newchannel();
+}
+function newlink() 
+{
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+  socket.emit('channelinkgen');
+}
+function newchannel(response) 
+{ 
   if(channeload == true)
   {
     var channelname = prompt("Name your new channel.", "");
@@ -469,6 +560,7 @@ function newchannel(response)
   var element = document.getElementById("chan");
   var cl = channelname + "channel";
   firstchat = true;
+  var channellink = joinchannel
 
   if(x == 0)
   {
@@ -495,6 +587,7 @@ function newchannel(response)
         focelem = channelplace;
         lstid = channelplace.id;
         socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+        
       }
       else
       {
@@ -564,7 +657,7 @@ function newchannel(response)
     }
 
   }
-  
+  newlink()
 }
 
 function newchat(response)

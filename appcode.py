@@ -5,6 +5,7 @@ import socket
 import codecs
 import mysql.connector 
 import re
+import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "slwol;ayesal."
@@ -69,7 +70,19 @@ def handle_chats(response):
         emit('send', {'data': stuff})
     cursor.close()
     emit('done', {'data': 'true'})
-    
+
+@socketio.on('channelinkgen', namespace="/test")
+def link_handle():
+    cursor = UserIn.cursor()
+    text = ""
+    possible ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+    for x in range(8):
+        num = random.randint(0, 62)
+        text = text + possible[num]
+    cursor.execute("SELECT link FROM channels WHERE link=%s", (text, ))
+    if cursor == "":
+        cursor.execute("INSERT INTO channels (link) WHERE channelname=%s VALUES(%s)", (text, ))
+
 @socketio.on('useresponse', namespace='/test')
 def message_handle(message):
     emit('usermessage', {'data': message['data']})
