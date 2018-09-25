@@ -305,13 +305,12 @@ var focelem = null;
 var x = 0;
 var CHNN = null;
 var check = false;
-var num = 0;
 var firstchat = true;
 var lstid = null;
-var number = 0;
 var user = null;
 var channeload = false;
 var chatload = false;
+var activechat = null;
 $(document).ready(function()
 {
   
@@ -323,9 +322,23 @@ $(document).ready(function()
   {
     socket.emit('connected')
   })
-  socket.on('confirmjoin', function(msg)
+  socket.on('confirmjoinmessage', function(msg)
   {
     $('#chatarea').append('<br>' + msg.data);
+  })
+  socket.on('confirmjoin', function(msg)
+  {
+    if(msg.select == 'nochannel')
+    {
+      console.log('channel does not exist');
+    }
+    else
+    {
+      var channelbox = document.getElementById("channelbox");
+      var front = document.getElementById("front");
+      channelbox.style.display = "none";
+      front.style.display = "block";
+    }
   })
   socket.on('userdata', function(msg)
   {
@@ -341,10 +354,9 @@ $(document).ready(function()
   })
 
 
-  socket.on('usermessage', function(msg) 
+  socket.on('useresponse', function(msg) 
   {
-    $('#chatarea').append('<br>' + msg.data);
-      
+    $('#chatarea').append('<br>' + msg.data); 
   });
 
   socket.on('username', function(msg){
@@ -354,14 +366,14 @@ $(document).ready(function()
   
   $('form#mes').submit(function(event)
   {
-      socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val()});
+      socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), channel: CHNN, chat: activechat});
       event.preventDefault();
       $('#usertext').val('');
   });
 
   socket.on('send', function(msg)
   {
-    newchat(msg.data[0]);
+      newchat(msg.data[0]);
   });
   socket.on('done', function()
   {
@@ -434,6 +446,7 @@ function disp()
     x.style.display = "none";
     HLName.textContent = CHNN + ": " + this.textContent;
     Chansets.style.display = "none";
+    activechat = this.textContent;
   }
   else
   {
@@ -450,6 +463,7 @@ function disp()
         Chansets.style.display = "block";
         HLName.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general";
+        activechat = '#general';
       }
       else
       {
@@ -460,6 +474,7 @@ function disp()
         Chansets.style.display = "block";
         HLName.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general";
+        activechat = '#general';
       }
       
     }
@@ -489,7 +504,7 @@ function disp()
           lstid = this.closest("div").id;
           x.style.display = "block";
           Chansets.style.display = "block";
-          
+          activechat = '#general';
         }
         else
         {
@@ -502,7 +517,7 @@ function disp()
           x.style.display = "block";
           Chansets.style.display = "block";
           HLName.style.display = "block";
-                    
+          activechat = '#general';         
           
         }
       }
@@ -514,6 +529,7 @@ function disp()
         elem = document.getElementById(chats);
         elem.style.display = "block";
         lstid = this.closest("div").id;
+        activechat = '#general';
       }   
     }
   }
@@ -526,7 +542,12 @@ function channelbox(){
 }
 function joinchannel()
 {
-  var userchannelcode = prompt("Insert channel link to join.", "")
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+  var userchannelink = prompt("Insert channel link to join.", "")
+  socket.emit('userjoin', {select: 'join', link: userchannelink})
+ 
 }
 function newchannelbut()
 {
@@ -536,14 +557,11 @@ function newchannelbut()
   front.style.display = "block";
   newchannel();
 }
-function newlink() 
-{
+function newchannel(response) 
+{   
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  socket.emit('channelinkgen');
-}
-function newchannel(response) 
-{ 
+
   if(channeload == true)
   {
     var channelname = prompt("Name your new channel.", "");
@@ -587,7 +605,6 @@ function newchannel(response)
         focelem = channelplace;
         lstid = channelplace.id;
         socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
-        
       }
       else
       {
@@ -634,8 +651,7 @@ function newchannel(response)
         channel.appendChild(text);
         channelplace.appendChild(channel);
         socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
-
-        }
+      }
       else
       {
         element.appendChild(br);
@@ -657,7 +673,8 @@ function newchannel(response)
     }
 
   }
-  newlink()
+  
+
 }
 
 function newchat(response)

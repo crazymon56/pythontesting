@@ -72,36 +72,63 @@ def handle_chats(response):
     emit('done', {'data': 'true'})
 
 @socketio.on('channelinkgen', namespace="/test")
-def link_handle():
+def link_handle(name):
     cursor = UserIn.cursor()
-    text = ""
-    possible ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-    for x in range(8):
-        num = random.randint(0, 62)
-        text = text + possible[num]
-    cursor.execute("SELECT link FROM channels WHERE link=%s", (text, ))
     if cursor == "":
-        cursor.execute("INSERT INTO channels (link) WHERE channelname=%s VALUES(%s)", (text, ))
+        cursor.execute("INSERT INTO channels (link) WHERE channelname=%s VALUES(%s)", (name['data'], text))
+
 
 @socketio.on('useresponse', namespace='/test')
 def message_handle(message):
+    cursor.execute("INSERT INTO messages (message, userid, chatid, channelid) VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (message['data'], username, message['chat'], message['channel'], message['channel']))
     emit('usermessage', {'data': message['data']})
 
 @socketio.on('userjoin', namespace='/test')
 def join_handle_made(sentroom):
     cursor = UserIn.cursor()
     username = session['username']
-    join_room(sentroom['channel'])
+    check = False
     if sentroom['select'] == 'channel':
-        cursor.execute("INSERT INTO channels (channelname) VALUES(%s)", (sentroom['channel'], ))
-        cursor.execute("INSERT INTO chats (chatname, linkid) VALUES('#general', (SELECT id FROM channels WHERE channelname=%s))", (sentroom['channel'], ))
-        cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s))", (username, sentroom['channel']))
-        cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE chats.linkid=(SELECT id FROM channels WHERE channelname=%s)))", (username, sentroom['channel'], sentroom['channel']))
+        join_room(sentroom['channel'] + 'general')
+        text = ""
+        possible ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+        while check == False:    
+            for x in range(8):
+                num = random.randint(0, 61)
+                text = text + possible[num]
+            cursor.execute("SELECT link FROM channels WHERE link=%s", (text, ))
+            if not cursor.fetchall():    
+                cursor.execute("INSERT INTO channels (channelname, link) VALUES(%s, %s)", (sentroom['channel'], text))
+                cursor.execute("INSERT INTO chats (chatname, linkid) VALUES('#general', (SELECT id FROM channels WHERE channelname=%s))", (sentroom['channel'], ))
+                cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s))", (username, sentroom['channel']))
+                cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s)))", (username, sentroom['channel'], sentroom['channel']))
+                check = True
+                cursor.execute("INSERT INTO messages (message, userid, chatid, channelid) VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (username + ' has joined', username, 'general', sentroom['channel'], sentroom['channel']))
+
+        emit('confirmjoinmessage', {'data' : session['username'] + ' has joined'})
+    elif sentroom['select'] == 'join':
+        cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
+        if not cursor.fetchall():
+            emit('confirmjoin', {'select': 'nochannel'})
+        else:
+            emit('confirmjoin', {'select': 'channel'})
+            cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
+            stuff = cursor.fetchone()
+            join_room(stuff[0])
+            cursor.execute("SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE link=%s)", (sentroom['link'], ))
+            chats = cursor.fetchall()
+            for items in chats:
+                cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE link=%s), %s)", (username, sentroom['link'], items[0]))
+            cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE link=%s))", (username, sentroom['link']))
+            cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
+            stuff = cursor.fetchone()
+            emit('userdata', {'data': stuff[0]})
     else:
         cursor.execute("INSERT INTO chats (chatname, linkid) VALUES(%s, (SELECT id FROM channels WHERE channelname=%s))", (sentroom['chatname'], sentroom['channel']))
         cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s) AND chatname=%s))", (username, sentroom['channel'], sentroom['channel'], sentroom['chatname']))
+        
+        #join_room(sentroom('chatname'))    
     #cursor.execute("INSERT INTO messages (message, userid, chatid, channelid) VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s), (SELECT ))")
-    emit('confirmjoin', {'data' : session['username'] + ' has joined'})
     UserIn.commit()
     cursor.close()
 
