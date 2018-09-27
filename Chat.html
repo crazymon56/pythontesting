@@ -354,9 +354,10 @@ $(document).ready(function()
   })
 
 
-  socket.on('useresponse', function(msg) 
+  socket.on('usermessage', function(msg) 
   {
-    $('#chatarea').append('<br>' + msg.data); 
+    console.log('it hit');
+    $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
   });
 
   socket.on('username', function(msg){
@@ -443,10 +444,12 @@ function disp()
   }
   if(this.className == "smallchatbub")
   {
-    x.style.display = "none";
-    HLName.textContent = CHNN + ": " + this.textContent;
-    Chansets.style.display = "none";
-    activechat = this.textContent;
+      x.style.display = "none";
+      HLName.textContent = CHNN + ": " + this.textContent;
+      Chansets.style.display = "none";
+      activechat = this.textContent;
+      $('#chatarea').empty();
+      socket.emit('messagepull', {chat: activechat, channel: CHNN})
   }
   else
   {
@@ -464,6 +467,8 @@ function disp()
         HLName.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general";
         activechat = '#general';
+        $('#chatarea').empty();
+        socket.emit('messagepull', {chat: activechat, channel: CHNN})
       }
       else
       {
@@ -475,6 +480,8 @@ function disp()
         HLName.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general";
         activechat = '#general';
+        $('#chatarea').empty();
+        socket.emit('messagepull', {chat: activechat, channel: CHNN})
       }
       
     }
@@ -505,11 +512,12 @@ function disp()
           x.style.display = "block";
           Chansets.style.display = "block";
           activechat = '#general';
+          $('#chatarea').empty();
+          socket.emit('messagepull', {chat: activechat, channel: CHNN})
         }
         else
         {
           socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
-          
           CHNN = this.textContent;
           HLName.textContent = this.textContent + ": " + "#general";
           firstchat = true;
@@ -518,7 +526,8 @@ function disp()
           Chansets.style.display = "block";
           HLName.style.display = "block";
           activechat = '#general';         
-          
+          $('#chatarea').empty();
+          socket.emit('messagepull', {chat: activechat, channel: CHNN})
         }
       }
       else
@@ -530,6 +539,8 @@ function disp()
         elem.style.display = "block";
         lstid = this.closest("div").id;
         activechat = '#general';
+        $('#chatarea').empty();
+        socket.emit('messagepull', {chat: activechat, channel: CHNN})
       }   
     }
   }

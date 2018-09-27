@@ -6,6 +6,7 @@ import codecs
 import mysql.connector 
 import re
 import random
+import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "slwol;ayesal."
@@ -58,6 +59,13 @@ def handle_message():
 def handle_userdata():
     redirect('Login')
 
+@socketio.on('messagepull', namespace='/test')
+def mespull_handle(message):
+    cursor = UserIn.cursor()
+    cursor.execute("SELECT message, datetime FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (message['chat'], message['channel'], message['channel']))
+    messages = cursor.fetchall()
+    for items in messages:
+        emit('usermessage', {'userm': items[0], 'DT': items[1]}, room=message['channel'] + message['chat'])
 
 @socketio.on('chatpull', namespace='/test')
 def handle_chats(response):
@@ -71,17 +79,14 @@ def handle_chats(response):
     cursor.close()
     emit('done', {'data': 'true'})
 
-@socketio.on('channelinkgen', namespace="/test")
-def link_handle(name):
-    cursor = UserIn.cursor()
-    if cursor == "":
-        cursor.execute("INSERT INTO channels (link) WHERE channelname=%s VALUES(%s)", (name['data'], text))
-
-
 @socketio.on('useresponse', namespace='/test')
 def message_handle(message):
-    cursor.execute("INSERT INTO messages (message, userid, chatid, channelid) VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (message['data'], username, message['chat'], message['channel'], message['channel']))
-    emit('usermessage', {'data': message['data']})
+    cursor = UserIn.cursor()
+    username = session['username']
+    cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (time.asctime(time.localtime()), message['data'], username, message['chat'], message['channel'], message['channel']))
+    emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()) }, room=message['channel'] + message['chat'])
+    UserIn.commit()
+    cursor.close()
 
 @socketio.on('userjoin', namespace='/test')
 def join_handle_made(sentroom):
@@ -89,7 +94,8 @@ def join_handle_made(sentroom):
     username = session['username']
     check = False
     if sentroom['select'] == 'channel':
-        join_room(sentroom['channel'] + 'general')
+        join_room(sentroom['channel'])
+        join_room(sentroom['channel'] + '#general')
         text = ""
         possible ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
         while check == False:    
@@ -115,10 +121,14 @@ def join_handle_made(sentroom):
             cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
             stuff = cursor.fetchone()
             join_room(stuff[0])
+            join_room(stuff[0] + "#general")
             cursor.execute("SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE link=%s)", (sentroom['link'], ))
             chats = cursor.fetchall()
             for items in chats:
                 cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE link=%s), %s)", (username, sentroom['link'], items[0]))
+                cursor.execute("SELECT chatname FROM chats WHERE id=%s", (sentroom['link'], ))
+                thechat = cursor.fetchone()
+                join_room(stuff[0] + thechat[0])
             cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE link=%s))", (username, sentroom['link']))
             cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
             stuff = cursor.fetchone()
