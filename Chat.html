@@ -186,6 +186,14 @@
     height: 50%;
     display: none;
   }
+  .sharelinkbox{
+    width: 20%;
+    height: 5%;
+    border-style: solid;
+    border-color: black;
+    background-color: rgb(71, 71, 71);
+    display: none;
+  }
   .chatbub{
     height: 90px;
     width: 90px;
@@ -266,6 +274,8 @@
   
       <div>
         <button onclick="newchat()" style=display:none class=change id="small" >+chat</button>
+        <button class=change onclick="sharelinkbut()" id="sharelinkbut" style="display: none">+Invite</button>
+        <div class="sharelinkbox" id="sharelinkbox"></div>
         <button id="settings" onclick="ToOP()" style="display: none" class="change">Channel Settings</button>
       </div>
       <h1 style="display: none;"class=chatitle id="Boldname"></h1>
@@ -292,6 +302,9 @@
     </div>
   </div>
 </div>
+
+
+
 </body>
 <script
 			  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -311,6 +324,8 @@ var user = null;
 var channeload = false;
 var chatload = false;
 var activechat = null;
+var load = false;
+var connect = false;
 $(document).ready(function()
 {
   
@@ -318,10 +333,15 @@ $(document).ready(function()
 
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
   
-  socket.on('connect', function()
+  if(connect == false)
   {
-    socket.emit('connected')
-  })
+    socket.on('connect', function()
+      {
+        connect = true;
+        socket.emit('connectdone')
+      })
+  }
+  
   socket.on('confirmjoinmessage', function(msg)
   {
     $('#chatarea').append('<br>' + msg.data);
@@ -353,18 +373,35 @@ $(document).ready(function()
     }
   })
 
+  socket.on('sharelinksend', function(msg)
+  {
+    $('#sharelinkbox').textContent = msg.data;
+  })
 
   socket.on('usermessage', function(msg) 
   {
-    console.log('it hit');
     $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
   });
 
-  socket.on('username', function(msg){
+  socket.on('username', function(msg)
+  {
     $('#text').append(msg.data);
     user = msg.data;
   })
   
+  socket.on('messageload', function(msg)
+  {
+    if(load == false)
+    {
+      $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
+    }
+  })
+
+  socket.on('messageloaddone', function()
+  {
+    load = true;
+  })
+
   $('form#mes').submit(function(event)
   {
       socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), channel: CHNN, chat: activechat});
@@ -433,6 +470,7 @@ function disp()
 
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
+  load = false;
   var x = document.getElementById("small");
   var HLName = document.getElementById("Boldname");
   var Chansets = document.getElementById("settings");
@@ -444,6 +482,7 @@ function disp()
   }
   if(this.className == "smallchatbub")
   {
+      socket.emit('leave', {chat: activechat, channel: CHNN, first: 'false'});
       x.style.display = "none";
       HLName.textContent = CHNN + ": " + this.textContent;
       Chansets.style.display = "none";
@@ -458,6 +497,7 @@ function disp()
     {
       if(this.closest("div").parentElement.id == 'true')
       {
+        socket.emit('leave', {chat: activechat, channel: CHNN, first: 'false'});
         CHNN = this.textContent;
         focelem = this.closest("div");
         chats = "chat" + focelem.id;
@@ -468,10 +508,10 @@ function disp()
         HLName.textContent = this.textContent + ": " + "#general";
         activechat = '#general';
         $('#chatarea').empty();
-        socket.emit('messagepull', {chat: activechat, channel: CHNN})
       }
       else
       {
+        socket.emit('leave', {chat: activechat, channel: CHNN, first: 'true'});
         socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
         CHNN = this.textContent;
         focelem = this.closest("div");
@@ -481,9 +521,9 @@ function disp()
         HLName.textContent = this.textContent + ": " + "#general";
         activechat = '#general';
         $('#chatarea').empty();
-        socket.emit('messagepull', {chat: activechat, channel: CHNN})
       }
-      
+      socket.emit('messagepull', {chat: activechat, channel: CHNN})
+
     }
     else
     {   
@@ -505,6 +545,7 @@ function disp()
       {
         if(focelem.parentElement.id == 'true')
         {
+          socket.emit('leave', {chat: activechat, channel: CHNN, first: 'false'});
           CHNN = this.textContent;
           HLName.textContent = this.textContent + ": " + "#general";
           firstchat = true;
@@ -513,10 +554,11 @@ function disp()
           Chansets.style.display = "block";
           activechat = '#general';
           $('#chatarea').empty();
-          socket.emit('messagepull', {chat: activechat, channel: CHNN})
+          load = true;
         }
         else
         {
+          socket.emit('leave', {chat: activechat, channel: CHNN, first: 'true'});
           socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
           CHNN = this.textContent;
           HLName.textContent = this.textContent + ": " + "#general";
@@ -527,11 +569,13 @@ function disp()
           HLName.style.display = "block";
           activechat = '#general';         
           $('#chatarea').empty();
-          socket.emit('messagepull', {chat: activechat, channel: CHNN})
-        }
+          load = true;
+        }         
+        socket.emit('messagepull', {chat: activechat, channel: CHNN})
       }
       else
       {
+        socket.emit('leave', {chat: activechat, channel: CHNN, first: 'false'});
         CHNN = this.textContent;
         HLName.textContent = this.textContent + ": " + "#general";
         chats = "chat" + focelem.id;
@@ -543,6 +587,25 @@ function disp()
         socket.emit('messagepull', {chat: activechat, channel: CHNN})
       }   
     }
+  }
+}
+function sharelinkbut()
+{
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+  var sharelink = document.getElementById('sharelinkbut');
+  var sharelinkbox = document.getElementById('sharelinkbox');
+  if(this.id == 'close')
+  {
+    sharelinkbox.style.display = 'none';   
+    sharelink.style.display = 'block';
+  }
+  else
+  {
+    sharelink.style.display = 'none';
+    sharelinkbox.style.display = 'block';
+    socket.emit("channelinkget", {channel: CHNN});
   }
 }
 function channelbox(){

@@ -38,7 +38,7 @@ def chat():
         return str(e)
 
 
-@socketio.on('connected', namespace='/test')
+@socketio.on('connectdone', namespace='/test')
 def handle_message():
     cursor = UserIn.cursor()
     cursor.execute("SELECT channelid FROM userchannels WHERE useid=(SELECT id FROM users WHERE username=%s);", (session['username'], )) 
@@ -55,18 +55,35 @@ def handle_message():
     emit('username', {'data': session['username']})
     cursor.close()
 
+@socketio.on('channelinkget', namespace='/test')
+def handel_link(msg):
+    cursor = UserIn.cursor()
+    cursor.execute("SELECT link FROM channels WHERE channelname=%s", (msg['channel'], ))    
+    link = cursor.fetchone()
+    emit('sharelinksend', {'data': link[0]})
+    cursor.close()
+
 @socketio.on('logout', namespace='/test')
 def handle_userdata():
     redirect('Login')
+
+@socketio.on('leave', namespace='/test')
+def handle_leave(msg):
+    if msg['first'] == 'true':
+        pass
+    else:
+        leave_room(msg['channel'] + msg['chat'])
 
 @socketio.on('messagepull', namespace='/test')
 def mespull_handle(message):
     cursor = UserIn.cursor()
     cursor.execute("SELECT message, datetime FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (message['chat'], message['channel'], message['channel']))
+    join_room(message['channel'] + message['chat'])
     messages = cursor.fetchall()
     for items in messages:
-        emit('usermessage', {'userm': items[0], 'DT': items[1]}, room=message['channel'] + message['chat'])
-
+        emit('messageload', {'userm': items[0], 'DT': items[1]}, room=message['channel'] + message['chat'])
+    emit('messageloaddone')
+    cursor.close()
 @socketio.on('chatpull', namespace='/test')
 def handle_chats(response):
     cursor = UserIn.cursor()
@@ -75,6 +92,7 @@ def handle_chats(response):
     for items in chats:
         cursor.execute("SELECT chatname FROM chats WHERE id=%s", (items[0], ))
         stuff = cursor.fetchone()
+        join_room(response['channelname'] + stuff[0])
         emit('send', {'data': stuff})
     cursor.close()
     emit('done', {'data': 'true'})
@@ -126,7 +144,7 @@ def join_handle_made(sentroom):
             chats = cursor.fetchall()
             for items in chats:
                 cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE link=%s), %s)", (username, sentroom['link'], items[0]))
-                cursor.execute("SELECT chatname FROM chats WHERE id=%s", (sentroom['link'], ))
+                cursor.execute("SELECT chatname FROM chats WHERE id=%s", (items[0], ))
                 thechat = cursor.fetchone()
                 join_room(stuff[0] + thechat[0])
             cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE link=%s))", (username, sentroom['link']))
