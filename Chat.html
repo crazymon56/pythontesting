@@ -124,6 +124,7 @@
     left: 25%;
     border-color: black;
     border-style: solid;
+    text-align: center;
   }
   .channelselectmain{
     position: absolute;
@@ -162,7 +163,52 @@
     color: white;
     cursor: pointer;
   }
+  .PMuserfind{
+    width: 100%;
+    height: 100%;
+    background-color: rgb(206, 206, 206);
+    display: block;
+    position: relative;
+  }
+  .PMuserfindbox{
+    width: 50%;
+    height: 30%;
+    background-color: rgb(71, 71, 71);
+    position: absolute;
+    left: 25%;
+    bottom: 50%;
+    border-style: solid;
+    border-color: black;
+
+  }
+  .usersearchinput{
+    position: absolute;
+    left: 25%;
+    top: 25%;
+    color: white;
+    text-align: center;
+  }
+  .userfinddropdown{
+    position: absolute;
+    display: inline-block;
+    background-color: rgb(201, 201, 201);
+    color: white;
+    overflow: auto;
+    border-style: solid;
+    padding: 12px 16px;
+    border-color: black;
+    left: 25%;
+    top: 55%;
+    width: 45%;
+    list-style-type: none;
+    text-align: center;
+  }
+  .dropdowncontent{
+    border-style: solid;
+  }
   .channeltab{
+    width: 50%;
+    line-height: 300%;
     font-size: 75%;
     color: white;
     position: absolute;
@@ -172,6 +218,7 @@
     background-color: gray;
   }
   .PMtab{
+    width: 50%;
     font-size: 75%;
     color: white;
     position: absolute;
@@ -179,6 +226,60 @@
     border-style: solid;
     border-color: black;
     background-color: gray;
+  }
+  .channeltab:hover{
+    width: 50%;
+    line-height: 300%;
+    font-size: 75%;
+    color: gray;
+    position: absolute;
+    left: 0%;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+  }
+  .PMtab:hover{
+    width: 50%;
+    font-size: 75%;
+    color: gray;
+    position: absolute;
+    right: 0%;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+  }
+  .channeltab:focus{
+    width: 50%;
+    line-height: 300%;
+    font-size: 75%;
+    color: gray;
+    position: absolute;
+    left: 0%;
+    border-style: solid;
+    border-bottom-style: none;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+  }
+  .PMtab:focus{
+    width: 50%;
+    font-size: 75%;
+    color: gray;
+    position: absolute;
+    right: 0%;
+    border-style: solid;
+    border-bottom-style: none;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+  }
+  .channelsmenu{
+    display: block;
+  }
+  .PMmenu{
+    display: none;
   }
   .optionbutton{
     border-style:solid;
@@ -307,7 +408,7 @@
   <div class=top>
     <h1 id=text></h1>
       <input class=logoutbutton type="submit" onclick='logginout()' value="Logout" />
-    <h3><center>Blah Chat</center></h3>
+    <h3><center>B<sup>3</sup></center></h3>
   </div>      
   
     <div class=topbottom style="background-color:rgb(68, 68, 68)">
@@ -317,17 +418,27 @@
 </div>
 
 <body >
-<div id=front>
+<div id=front style=display:none>
 <div id=chan class="container-fluid, channels">
   <div style=position:relative>
-    <div class=channeltab>Channels</div>
-    <div class=PMtab>Private Messages</div>
-  </div>
+    <button class=channeltab onclick="tabbutton(0)">Channels</button>
+    <button class=PMtab onclick="tabbutton(1)">Private 
+      <br>
+      Messages</button>
+  </div >
   <!-- <button class=change style=float:left>Channels</button>
   <button class=change style=float:right>Private Messages</button> -->
-  <br>
-  <button class=change style=float:left onclick="channelbox(false)">+</button>
-  <br>
+  <div class="channelsmenu" id="channelsmenu">
+    <br>
+    <br>
+    <button class=change style=float:left onclick="channelbox(false)">+</button>
+    <br>
+  </div>
+  <div class="PMmenu" id="PMmenu">
+    <br>
+    <br>
+    <button class=change style=float:left onclick="PMsearchbox(false)">+PM</button> 
+  </div>
 </div>
 
 <div id="back" class="container-fluid, chat">
@@ -370,6 +481,20 @@
   </div>
 </div>
 
+<div class="PMuserfind" id="PMuserfind">
+  <div class="PMuserfindbox"> 
+    <button class=change onclick="PMsearchbox(true)">x</button>
+    <div class="usersearchinput">
+      Find Users:
+      <br>
+      <input type=text name=usersearch id=userinput placeholder="Enter friend's username" onkeyup="usersearch()" onclick="search()"/> 
+      <br>
+    </div>
+    <ul class="userfinddropdown" id="userfinddropdown">
+      <li>Hi world</li>
+    </ul>  
+  </div>
+</div>
 
 
 </body>
@@ -439,7 +564,10 @@ $(document).ready(function()
       newchannel(msg.data);
     }
   })
-
+  socket.on('userssend', function(msg)
+  {
+    $('#userfinddropdown').append('<p>' + msg.user + '</p>')
+  })
   socket.on('sharelinksend', function(msg)
   {
     $('#linkinsert').append(msg.data);
@@ -532,6 +660,21 @@ function logginout()
 function options()
 {
 
+}
+function tabbutton(flip)
+{
+  var allchannels = document.getElementById("channelsmenu");
+  var allPM = document.getElementById("PMmenu");
+  if(flip == 1)
+  {
+    allchannels.style.display = 'none';
+    allPM.style.display = 'block';
+  }
+  else
+  {
+    allPM.style.display = 'none';
+    allchannels.style.display = 'block';
+  }
 }
 function disp()
 {
@@ -667,6 +810,43 @@ function disp()
     }
   }
 }
+function PMsearchbox(close)
+{
+  var PM = document.getElementById("PMuserfind");
+  var front = document.getElementById("front");
+  if(close == true)
+  {
+    PM.style.display = 'none';
+    front.style.display = 'block';
+  }
+  else
+  {
+    front.style.display = 'none';
+    PM.style.display = 'block';
+  }
+}
+function usersearch()
+{
+  var input = document.getElementById("userinput");
+
+}
+function search()
+{
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+  console.log('hit it');
+  socket.emit("userspull");
+}
+function newPM()
+{
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+
+
+  var PMbub = document.createElement("button");
+  var element = document.getElementById("PMmenu");
+}
 function sharelinkbut(close)
 {
   namespace = '/test';
@@ -736,7 +916,7 @@ function newchannel(response)
   channelplace = document.createElement("div");
   var br =  document.createElement("br");
   var text = document.createTextNode(channelname);
-  var element = document.getElementById("chan");
+  var element = document.getElementById("channelsmenu");
   var cl = channelname + "channel";
   firstchat = true;
   var channellink = joinchannel
@@ -848,8 +1028,7 @@ function newchat(response)
   }
   else
   {
-    ////Fix the general name in one of the channels later
-    if(response == '#general' || response =='general')
+    if(response == '#general')
     {
       
     }

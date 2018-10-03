@@ -76,6 +76,15 @@ def handle_leave(msg):
     else:
         pass
 
+@socketio.on('userspull', namespace='/test')
+def handle_users():
+    cursor = UserIn.cursor()
+    cursor.execute("SELECT username FROM users LIMIT 20")
+    users = cursor.fetchall()
+    for items in users:
+        emit('userssend', {'user': items})
+    cursor.close()
+
 @socketio.on('messagepull', namespace='/test')
 def mespull_handle(message):
     cursor = UserIn.cursor()
