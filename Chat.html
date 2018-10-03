@@ -140,7 +140,7 @@
   .channelselectmid{
     background-color: white;
     position: absolute;
-    right: 50%;
+    right: 0%;
     color: white;
   }
   .channelselectbutton{
@@ -162,7 +162,24 @@
     color: white;
     cursor: pointer;
   }
-  
+  .channeltab{
+    font-size: 75%;
+    color: white;
+    position: absolute;
+    left: 0%;
+    border-style: solid;
+    border-color: black;
+    background-color: gray;
+  }
+  .PMtab{
+    font-size: 75%;
+    color: white;
+    position: absolute;
+    right: 0%;
+    border-style: solid;
+    border-color: black;
+    background-color: gray;
+  }
   .optionbutton{
     border-style:solid;
     border-radius: 12px;
@@ -186,13 +203,50 @@
     height: 50%;
     display: none;
   }
+  .sharelinkbut{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    position: absolute;
+    right: 0%;
+    top: 0%;
+  }
+  .sharelinkbut:hover{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    position: absolute;
+    right: 0%;
+    top: 0%;
+    cursor: pointer;
+  }
   .sharelinkbox{
-    width: 20%;
-    height: 5%;
-    border-style: solid;
+    width: 30%;
+    height: 10%;
+    border-right-style: none;
+    border-top-style: none;
+    border-left-style: solid;
+    border-bottom-style: solid;
     border-color: black;
     background-color: rgb(71, 71, 71);
     display: none;
+    position: absolute;
+    right: 0%;
+    top: 0%;
+  }
+  .innersharelinkbox{
+    width: 75%;
+    height: 50%;
+    background-color: white;
+    position: absolute;
+    right: 10%;
+    top: 20%;
   }
   .chatbub{
     height: 90px;
@@ -265,21 +319,33 @@
 <body >
 <div id=front>
 <div id=chan class="container-fluid, channels">
-  <button class=change style=float:left onclick="channelbox()">+</button>
-  
+  <div style=position:relative>
+    <div class=channeltab>Channels</div>
+    <div class=PMtab>Private Messages</div>
+  </div>
+  <!-- <button class=change style=float:left>Channels</button>
+  <button class=change style=float:right>Private Messages</button> -->
+  <br>
+  <button class=change style=float:left onclick="channelbox(false)">+</button>
   <br>
 </div>
 
 <div id="back" class="container-fluid, chat">
   
       <div>
-        <button onclick="newchat()" style=display:none class=change id="small" >+chat</button>
-        <button class=change onclick="sharelinkbut()" id="sharelinkbut" style="display: none">+Invite</button>
-        <div class="sharelinkbox" id="sharelinkbox"></div>
-        <button id="settings" onclick="ToOP()" style="display: none" class="change">Channel Settings</button>
+        <button onclick="newchat()" style=display:none class=change id="small" >+Chat</button>
+        <button class="change, sharelinkbut" onclick="sharelinkbut(false)" id="sharelinkbut" style='display: none'>+Invite</button>
+        <div class="sharelinkbox" id="sharelinkbox" style='display: none'>
+          <button class='change' id='linkclose' onclick='sharelinkbut(true)'>x</button>
+          <u>Channel Code</u>
+          <div class="innersharelinkbox" id='linkinsert'> 
+          </div>
+        </div>
+        <button id="settings" onclick="ToOP(false)" style="display: none" class="change">Channel Settings</button>
       </div>
       <h1 style="display: none;"class=chatitle id="Boldname"></h1>
-      <div id="chatarea" class='chatarea'></div>
+      <div id="chatarea" class='chatarea'>
+      </div>
       <form id='mes' method="POST" action='#'> 
       <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message autocomplete=off /><input class="sendbutton" type=submit value=Send />
       </form>
@@ -287,11 +353,12 @@
 </div>
 </div>
 <div class="options" id=OPback>
-<button id=Close onclick="ToOP()">Close</button>
+<button class='change' id=Close onclick="ToOP(true)">X</button>
 
 </div>
 <div class="channelback" id="channelbox">
   <div class="channelselect">
+    <button class='change' id='' onclick='channelbox(true)'>x</button>
     <p class="channelselecttop">CHANNEL</p>
     <div class="channelselectmain">  
       <button class="channelselectbutton" onclick="joinchannel()">Join</button>
@@ -375,7 +442,7 @@ $(document).ready(function()
 
   socket.on('sharelinksend', function(msg)
   {
-    $('#sharelinkbox').textContent = msg.data;
+    $('#linkinsert').append(msg.data);
   })
 
   socket.on('usermessage', function(msg) 
@@ -392,7 +459,7 @@ $(document).ready(function()
   socket.on('messageload', function(msg)
   {
     if(load == false)
-    {
+    { 
       $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
     }
   })
@@ -423,7 +490,9 @@ $(document).ready(function()
 function textcolor(TColor) 
 {
   var elem = document.getElementById('Boldname');
+  var chat_text = document.getElementById("chatarea");
   elem.style.color = TColor;
+  chat_text.style.color = TColor;
 }
 function backgroundcolor(BKcolor)
 {
@@ -436,21 +505,21 @@ function smallchan()
   c.setAttribute("class", "smallchatbub");
   c.setAttribute("id", "small");
 }
-function ToOP()
+function ToOP(close)
 {
   var chosen = document.getElementById("settings");
   var thefront = document.getElementById("front");
   var options = document.getElementById("OPback");
   
-  if(this.className == chosen.className)
-  {
-    thefront.style.display = "none";
-    options.style.display = "block";
-  }
-  else
+  if(close == true)
   {
     options.style.display = "none";
     thefront.style.display = "block";
+  }
+  else
+  {
+    thefront.style.display = "none";
+    options.style.display = "block";
   }
 }
 function logginout()
@@ -474,18 +543,20 @@ function disp()
   var x = document.getElementById("small");
   var HLName = document.getElementById("Boldname");
   var Chansets = document.getElementById("settings");
-  
+  var thelink = document.getElementById("sharelinkbut");
   var elem = null;
+
   if(check == false){
     CHNN = this.textContent;
     check = true;
   }
   if(this.className == "smallchatbub")
   {
-      socket.emit('leave', {chat: activechat, channel: CHNN, first: 'false'});
+      socket.emit('leave', {chat: activechat, channel: CHNN});
       x.style.display = "none";
       HLName.textContent = CHNN + ": " + this.textContent;
       Chansets.style.display = "none";
+      thelink.style.display = "none";
       activechat = this.textContent;
       $('#chatarea').empty();
       socket.emit('messagepull', {chat: activechat, channel: CHNN})
@@ -497,7 +568,7 @@ function disp()
     {
       if(this.closest("div").parentElement.id == 'true')
       {
-        socket.emit('leave', {chat: activechat, channel: CHNN, first: 'false'});
+        socket.emit('leave', {chat: activechat, channel: CHNN});
         CHNN = this.textContent;
         focelem = this.closest("div");
         chats = "chat" + focelem.id;
@@ -505,19 +576,21 @@ function disp()
         x.style.display = "block";
         Chansets.style.display = "block";
         HLName.style.display = "block";
+        thelink.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general";
         activechat = '#general';
         $('#chatarea').empty();
       }
       else
       {
-        socket.emit('leave', {chat: activechat, channel: CHNN, first: 'true'});
+        socket.emit('leave', {chat: activechat, channel: CHNN});
         socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
         CHNN = this.textContent;
         focelem = this.closest("div");
         x.style.display = "block";
         Chansets.style.display = "block";
         HLName.style.display = "block";
+        thelink.style.display = "block";
         HLName.textContent = this.textContent + ": " + "#general";
         activechat = '#general';
         $('#chatarea').empty();
@@ -531,6 +604,7 @@ function disp()
       {
         x.style.display = "block";
         Chansets.style.display = "block";
+        thelink.style.display = "block";
       }
       else
       {
@@ -539,26 +613,30 @@ function disp()
         x.style.display = "block";
         elem.style.display = "none";
         Chansets.style.display = "block";
+        thelink.style.display = "block";
       }
       focelem = this.closest("div");
       if(focelem.getElementsByTagName("*").length == 1)
       {
         if(focelem.parentElement.id == 'true')
         {
-          socket.emit('leave', {chat: activechat, channel: CHNN, first: 'false'});
+          
+          socket.emit('leave', {chat: activechat, channel: CHNN});
+          activechat = '#general';
           CHNN = this.textContent;
           HLName.textContent = this.textContent + ": " + "#general";
           firstchat = true;
           lstid = this.closest("div").id;
           x.style.display = "block";
-          Chansets.style.display = "block";
-          activechat = '#general';
+          Chansets.style.display = "block"; 
+          thelink.style.display = "block";
           $('#chatarea').empty();
-          load = true;
         }
         else
         {
-          socket.emit('leave', {chat: activechat, channel: CHNN, first: 'true'});
+           
+          socket.emit('leave', {chat: activechat, channel: CHNN});
+          activechat = '#general';
           socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
           CHNN = this.textContent;
           HLName.textContent = this.textContent + ": " + "#general";
@@ -566,10 +644,10 @@ function disp()
           lstid = this.closest("div").id;
           x.style.display = "block";
           Chansets.style.display = "block";
-          HLName.style.display = "block";
-          activechat = '#general';         
+          HLName.style.display = "block"; 
+          thelink.style.display = "block";
           $('#chatarea').empty();
-          load = true;
+
         }         
         socket.emit('messagepull', {chat: activechat, channel: CHNN})
       }
@@ -589,30 +667,39 @@ function disp()
     }
   }
 }
-function sharelinkbut()
+function sharelinkbut(close)
 {
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
-  var sharelink = document.getElementById('sharelinkbut');
+  var sharelinkbut = document.getElementById('sharelinkbut');
   var sharelinkbox = document.getElementById('sharelinkbox');
-  if(this.id == 'close')
+  if(close == true)
   {
     sharelinkbox.style.display = 'none';   
-    sharelink.style.display = 'block';
+    sharelinkbut.style.display = 'block';
+    $("#linkinsert").empty();
   }
   else
   {
-    sharelink.style.display = 'none';
+    sharelinkbut.style.display = 'none';
     sharelinkbox.style.display = 'block';
     socket.emit("channelinkget", {channel: CHNN});
   }
 }
-function channelbox(){
+function channelbox(close){
   var channelbox = document.getElementById("channelbox");
   var front = document.getElementById("front");
-  front.style.display = "none";
-  channelbox.style.display = "block";
+  if(close == true)
+  {
+    channelbox.style.display = "none";
+    front.style.display = "block";
+  }
+  else
+  {
+    front.style.display = "none";
+    channelbox.style.display = "block";
+  }
 }
 function joinchannel()
 {

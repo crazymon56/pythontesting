@@ -69,10 +69,12 @@ def handle_userdata():
 
 @socketio.on('leave', namespace='/test')
 def handle_leave(msg):
-    if msg['first'] == 'true':
-        pass
+    channel = msg['channel']
+    chat = msg['chat']
+    if chat and channel:
+        leave_room(channel + chat)
     else:
-        leave_room(msg['channel'] + msg['chat'])
+        pass
 
 @socketio.on('messagepull', namespace='/test')
 def mespull_handle(message):
@@ -84,6 +86,7 @@ def mespull_handle(message):
         emit('messageload', {'userm': items[0], 'DT': items[1]}, room=message['channel'] + message['chat'])
     emit('messageloaddone')
     cursor.close()
+
 @socketio.on('chatpull', namespace='/test')
 def handle_chats(response):
     cursor = UserIn.cursor()
@@ -115,7 +118,7 @@ def join_handle_made(sentroom):
         join_room(sentroom['channel'])
         join_room(sentroom['channel'] + '#general')
         text = ""
-        possible ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+        possible ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
         while check == False:    
             for x in range(8):
                 num = random.randint(0, 61)
