@@ -124,7 +124,6 @@
     left: 25%;
     border-color: black;
     border-style: solid;
-    text-align: center;
   }
   .channelselectmain{
     position: absolute;
@@ -167,7 +166,7 @@
     width: 100%;
     height: 100%;
     background-color: rgb(206, 206, 206);
-    display: block;
+    display: none;
     position: relative;
   }
   .PMuserfindbox{
@@ -183,7 +182,7 @@
   }
   .usersearchinput{
     position: absolute;
-    left: 25%;
+    left: 27%;
     top: 25%;
     color: white;
     text-align: center;
@@ -192,20 +191,28 @@
     position: absolute;
     display: inline-block;
     background-color: rgb(201, 201, 201);
-    color: white;
     overflow: auto;
     border-style: solid;
     padding: 12px 16px;
     border-color: black;
-    left: 25%;
-    top: 55%;
-    width: 45%;
+    left: 15%;
+    top: 45%;
+    width: 70%;
     list-style-type: none;
     text-align: center;
-    
   }
-  .dropdowncontent{
+  .userfinddropdown li{
     border-style: solid;
+    border-color: black;
+    color: white;
+    background-color: rgb(48, 46, 46);
+  }
+  .userfinddropdown li:hover{
+    border-style: solid;
+    border-color: black;
+    color:rgb(48, 46, 46);
+    background-color: white;
+    cursor: pointer;
   }
   .channeltab{
     width: 50%;
@@ -288,7 +295,7 @@
     width: 15%;
     background-color: white;
     text-align: center;
-    color: gray;
+    color: black;
     border: solid;
   }
   .optionbutton:hover{
@@ -419,7 +426,7 @@
 </div>
 
 <body >
-<div id=front style=display:none>
+<div id=front>
 <div id=chan class="container-fluid, channels">
   <div style=position:relative>
     <button class=channeltab onclick="tabbutton(0)">Channels</button>
@@ -439,6 +446,8 @@
     <br>
     <br>
     <button class=change style=float:left onclick="PMsearchbox(false)">+PM</button> 
+    <br>
+    <br>
   </div>
 </div>
 
@@ -471,12 +480,10 @@
 <div class="channelback" id="channelbox">
   <div class="channelselect">
     <button class='change' id='' onclick='channelbox(true)'>x</button>
-    <p class="channelselecttop">CHANNEL</p>
+    <p class="channelselecttop" style=text-align:center>CHANNEL</p>
     <div class="channelselectmain">  
       <button class="channelselectbutton" onclick="joinchannel()">Join</button>
-      <div class"channelselectmid">
-        <p style="color:white">Or</p>
-      </div> 
+        <p style="color:white; text-align:center">Or</p>
       <button class="channelselectbutton" onclick="newchannelbut()">Create</button>
     </div>
   </div>
@@ -488,11 +495,11 @@
     <div class="usersearchinput">
       Find Users:
       <br>
-      <input type=text name=usersearch id=userinput placeholder="Enter friend's username" onkeyup="usersearch()" onclick="search()"/> 
+      <input type=text name=usersearch id=userinput placeholder="Enter friend's username" onkeyup="usersearch()" /> 
       <br>
     </div>
     <ul class="userfinddropdown" id="userfinddropdown">
-      <li>Hi world</li>
+      
     </ul>  
   </div>
 </div>
@@ -519,6 +526,8 @@ var chatload = false;
 var activechat = null;
 var load = false;
 var connect = false;
+var userinput = null;
+var PM = false;
 $(document).ready(function()
 {
   
@@ -567,7 +576,10 @@ $(document).ready(function()
   })
   socket.on('userssend', function(msg)
   {
-    $('#userfinddropdown').append('<p>' + msg.user + '</p>')
+    var li = document.createElement("li");
+    li.textContent = msg.user;
+    li.addEventListener('click', newPM)
+    $('#userfinddropdown').append(li)
   })
   socket.on('sharelinksend', function(msg)
   {
@@ -600,9 +612,18 @@ $(document).ready(function()
 
   $('form#mes').submit(function(event)
   {
-      socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), channel: CHNN, chat: activechat});
-      event.preventDefault();
-      $('#usertext').val('');
+      if(PM == true)
+      {
+        socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), PM: 'true'});
+        event.preventDefault();
+        $('#usertext').val('');
+      }
+      else
+      {
+        socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), channel: CHNN, chat: activechat});
+        event.preventDefault();
+        $('#usertext').val('');
+      }
   });
 
   socket.on('send', function(msg)
@@ -670,11 +691,13 @@ function tabbutton(flip)
   {
     allchannels.style.display = 'none';
     allPM.style.display = 'block';
+    PM = true;
   }
   else
   {
     allPM.style.display = 'none';
     allchannels.style.display = 'block';
+    PM = false;
   }
 }
 function disp()
@@ -689,125 +712,134 @@ function disp()
   var Chansets = document.getElementById("settings");
   var thelink = document.getElementById("sharelinkbut");
   var elem = null;
-
-  if(check == false){
-    CHNN = this.textContent;
-    check = true;
-  }
-  if(this.className == "smallchatbub")
+  if(PM == true)
   {
-      socket.emit('leave', {chat: activechat, channel: CHNN});
-      x.style.display = "none";
-      HLName.textContent = CHNN + ": " + this.textContent;
-      Chansets.style.display = "none";
-      thelink.style.display = "none";
-      activechat = this.textContent;
-      $('#chatarea').empty();
-      socket.emit('messagepull', {chat: activechat, channel: CHNN})
+    if(PM)
+    {
+
+    }
   }
   else
   {
-    var chats = null;    
-    if(this.closest("div").id == lstid)
+    if(check == false){
+      CHNN = this.textContent;
+      check = true;
+    }
+    if(this.className == "smallchatbub")
     {
-      if(this.closest("div").parentElement.id == 'true')
-      {
         socket.emit('leave', {chat: activechat, channel: CHNN});
-        CHNN = this.textContent;
-        focelem = this.closest("div");
-        chats = "chat" + focelem.id;
-        elem = document.getElementById(chats);
-        x.style.display = "block";
-        Chansets.style.display = "block";
-        HLName.style.display = "block";
-        thelink.style.display = "block";
-        HLName.textContent = this.textContent + ": " + "#general";
-        activechat = '#general';
+        x.style.display = "none";
+        HLName.textContent = CHNN + ": " + this.textContent;
+        Chansets.style.display = "none";
+        thelink.style.display = "none";
+        activechat = this.textContent;
         $('#chatarea').empty();
-      }
-      else
-      {
-        socket.emit('leave', {chat: activechat, channel: CHNN});
-        socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
-        CHNN = this.textContent;
-        focelem = this.closest("div");
-        x.style.display = "block";
-        Chansets.style.display = "block";
-        HLName.style.display = "block";
-        thelink.style.display = "block";
-        HLName.textContent = this.textContent + ": " + "#general";
-        activechat = '#general';
-        $('#chatarea').empty();
-      }
-      socket.emit('messagepull', {chat: activechat, channel: CHNN})
-
+        socket.emit('messagepull', {chat: activechat, channel: CHNN})
     }
     else
-    {   
-      if(focelem.getElementsByTagName("*").length == 1)
+    {
+      var chats = null;    
+      if(this.closest("div").id == lstid)
       {
-        x.style.display = "block";
-        Chansets.style.display = "block";
-        thelink.style.display = "block";
-      }
-      else
-      {
-        chats = "chat" + focelem.id;
-        elem = document.getElementById(chats);
-        x.style.display = "block";
-        elem.style.display = "none";
-        Chansets.style.display = "block";
-        thelink.style.display = "block";
-      }
-      focelem = this.closest("div");
-      if(focelem.getElementsByTagName("*").length == 1)
-      {
-        if(focelem.parentElement.id == 'true')
+        if(this.closest("div").parentElement.id == 'true')
         {
-          
           socket.emit('leave', {chat: activechat, channel: CHNN});
-          activechat = '#general';
           CHNN = this.textContent;
-          HLName.textContent = this.textContent + ": " + "#general";
-          firstchat = true;
-          lstid = this.closest("div").id;
+          focelem = this.closest("div");
+          chats = "chat" + focelem.id;
+          elem = document.getElementById(chats);
           x.style.display = "block";
-          Chansets.style.display = "block"; 
+          Chansets.style.display = "block";
+          HLName.style.display = "block";
           thelink.style.display = "block";
+          HLName.textContent = this.textContent + ": " + "#general";
+          activechat = '#general';
           $('#chatarea').empty();
         }
         else
         {
-           
           socket.emit('leave', {chat: activechat, channel: CHNN});
-          activechat = '#general';
           socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
           CHNN = this.textContent;
-          HLName.textContent = this.textContent + ": " + "#general";
-          firstchat = true;
-          lstid = this.closest("div").id;
+          focelem = this.closest("div");
           x.style.display = "block";
           Chansets.style.display = "block";
-          HLName.style.display = "block"; 
+          HLName.style.display = "block";
           thelink.style.display = "block";
+          HLName.textContent = this.textContent + ": " + "#general";
+          activechat = '#general';
           $('#chatarea').empty();
-
-        }         
+        }
         socket.emit('messagepull', {chat: activechat, channel: CHNN})
+
       }
       else
-      {
-        socket.emit('leave', {chat: activechat, channel: CHNN, first: 'false'});
-        CHNN = this.textContent;
-        HLName.textContent = this.textContent + ": " + "#general";
-        chats = "chat" + focelem.id;
-        elem = document.getElementById(chats);
-        elem.style.display = "block";
-        lstid = this.closest("div").id;
-        activechat = '#general';
-        $('#chatarea').empty();
-        socket.emit('messagepull', {chat: activechat, channel: CHNN})
-      }   
+      {   
+        if(focelem.getElementsByTagName("*").length == 1)
+        {
+          x.style.display = "block";
+          Chansets.style.display = "block";
+          thelink.style.display = "block";
+        }
+        else
+        {
+          chats = "chat" + focelem.id;
+          elem = document.getElementById(chats);
+          x.style.display = "block";
+          elem.style.display = "none";
+          Chansets.style.display = "block";
+          thelink.style.display = "block";
+        }
+        focelem = this.closest("div");
+        if(focelem.getElementsByTagName("*").length == 1)
+        {
+          if(focelem.parentElement.id == 'true')
+          {
+            
+            socket.emit('leave', {chat: activechat, channel: CHNN});
+            activechat = '#general';
+            CHNN = this.textContent;
+            HLName.textContent = this.textContent + ": " + "#general";
+            firstchat = true;
+            lstid = this.closest("div").id;
+            x.style.display = "block";
+            Chansets.style.display = "block"; 
+            thelink.style.display = "block";
+            $('#chatarea').empty();
+          }
+          else
+          {
+            
+            socket.emit('leave', {chat: activechat, channel: CHNN});
+            activechat = '#general';
+            socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
+            CHNN = this.textContent;
+            HLName.textContent = this.textContent + ": " + "#general";
+            firstchat = true;
+            lstid = this.closest("div").id;
+            x.style.display = "block";
+            Chansets.style.display = "block";
+            HLName.style.display = "block"; 
+            thelink.style.display = "block";
+            $('#chatarea').empty();
+
+          }         
+          socket.emit('messagepull', {chat: activechat, channel: CHNN})
+        }
+        else
+        {
+          socket.emit('leave', {chat: activechat, channel: CHNN, first: 'false'});
+          CHNN = this.textContent;
+          HLName.textContent = this.textContent + ": " + "#general";
+          chats = "chat" + focelem.id;
+          elem = document.getElementById(chats);
+          elem.style.display = "block";
+          lstid = this.closest("div").id;
+          activechat = '#general';
+          $('#chatarea').empty();
+          socket.emit('messagepull', {chat: activechat, channel: CHNN})
+        }   
+      }
     }
   }
 }
@@ -817,6 +849,7 @@ function PMsearchbox(close)
   var front = document.getElementById("front");
   if(close == true)
   {
+    $("ul").empty();
     PM.style.display = 'none';
     front.style.display = 'block';
   }
@@ -828,25 +861,41 @@ function PMsearchbox(close)
 }
 function usersearch()
 {
-  var input = document.getElementById("userinput");
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
+  
+  $('ul').empty();
+  var input = $('#userinput').val();
+  socket.emit('userspull', {data: input});
 }
 function search()
 {
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  console.log('hit it');
   socket.emit("userspull");
 }
-function newPM()
+function newPM(x)
 {
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
-
-
+  
+  var PM = document.getElementById("PMuserfind");
+  var front = document.getElementById("front");
   var PMbub = document.createElement("button");
   var element = document.getElementById("PMmenu");
+  var chatuser = x.target.textContent;
+  
+  
+  PMbub.className = "chatbub";
+  PMbub.addEventListener("click", disp)
+  PMbub.append(chatuser);
+  element.append(PMbub);
+  PM.style.display = "none";
+  front.style.display = "block";
+  $("ul").empty();
+  $("#userinput").empty();
+  socket.emit('PMjoin', {targetuser: chatuser});
 }
 function sharelinkbut(close)
 {

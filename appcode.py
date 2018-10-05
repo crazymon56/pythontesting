@@ -77,12 +77,13 @@ def handle_leave(msg):
         pass
 
 @socketio.on('userspull', namespace='/test')
-def handle_users():
+def handle_users(msg):
     cursor = UserIn.cursor()
-    cursor.execute("SELECT username FROM users LIMIT 20")
+    cursor.execute("SELECT username FROM users")
     users = cursor.fetchall()
     for items in users:
-        emit('userssend', {'user': items})
+        if msg['data'] in str(items):
+            emit('userssend', {'user': items})
     cursor.close()
 
 @socketio.on('messagepull', namespace='/test')
@@ -117,6 +118,11 @@ def message_handle(message):
     emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()) }, room=message['channel'] + message['chat'])
     UserIn.commit()
     cursor.close()
+
+@socketio.on('PMjoin', namespace='/test')
+def PMjoining_handle(msg):
+    join_room(msg['targetuser'] + 'PM')
+
 
 @socketio.on('userjoin', namespace='/test')
 def join_handle_made(sentroom):
