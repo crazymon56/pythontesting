@@ -53,7 +53,10 @@ def handle_message():
     else:
         emit('userdata', {'data': " "})
     emit('username', {'data': session['username']})
+    cursor.execute("UPDATE users SET userPMid=%s WHERE username=%s", (request.sid, session['username']))
+    UserIn.commit()
     cursor.close()
+    
 
 @socketio.on('channelinkget', namespace='/test')
 def handel_link(msg):
@@ -70,11 +73,12 @@ def handle_userdata():
 @socketio.on('leave', namespace='/test')
 def handle_leave(msg):
     channel = msg['channel']
-    chat = msg['chat']
+    chat = msg['chat']    
     if chat and channel:
         leave_room(channel + chat)
     else:
-        pass
+        leave_room()
+
 
 @socketio.on('userspull', namespace='/test')
 def handle_users(msg):
@@ -89,13 +93,17 @@ def handle_users(msg):
 @socketio.on('messagepull', namespace='/test')
 def mespull_handle(message):
     cursor = UserIn.cursor()
-    cursor.execute("SELECT message, datetime FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (message['chat'], message['channel'], message['channel']))
-    join_room(message['channel'] + message['chat'])
-    messages = cursor.fetchall()
-    for items in messages:
-        emit('messageload', {'userm': items[0], 'DT': items[1]}, room=message['channel'] + message['chat'])
-    emit('messageloaddone')
-    cursor.close()
+    if message['PM']:
+        cursor.execute("SELECT message, datetime FROM PMmessages WHERE senderuserid=(SELECT id FROM users WHERE username=%s) AND recieveruserid=(SELECT id FROM users WHERE username=%s)", (message['sender'], message['reciever']))
+        ######WAIT
+    else:
+        cursor.execute("SELECT message, datetime FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (message['chat'], message['channel'], message['channel']))
+        join_room(message['channel'] + message['chat'])
+        messages = cursor.fetchall()
+        for items in messages:
+            emit('messageload', {'userm': items[0], 'DT': items[1]}, room=message['channel'] + message['chat'])
+        emit('messageloaddone')
+        cursor.close()
 
 @socketio.on('chatpull', namespace='/test')
 def handle_chats(response):
@@ -121,8 +129,17 @@ def message_handle(message):
 
 @socketio.on('PMjoin', namespace='/test')
 def PMjoining_handle(msg):
-    join_room(msg['targetuser'] + 'PM')
-
+    cursor = UserIn.cursor()
+    
+    if msg['recieve'] == 'true':
+        join_room(msg['sender'] + session['username'] + 'PM')
+    else:
+        join_room(msg['sender'] + msg['reciever'] + 'PM')
+        cursor.execute("SELECT userPMid FROM users WHERE username=%s", (msg['reciever'], ))
+        PMid = cursor.fetchone()
+        emit('PMinfo', {'sending': msg['sender']}, room=PMid[0])
+    cursor.close()
+    
 
 @socketio.on('userjoin', namespace='/test')
 def join_handle_made(sentroom):

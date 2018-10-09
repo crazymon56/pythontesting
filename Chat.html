@@ -483,7 +483,7 @@
     <p class="channelselecttop" style=text-align:center>CHANNEL</p>
     <div class="channelselectmain">  
       <button class="channelselectbutton" onclick="joinchannel()">Join</button>
-        <p style="color:white; text-align:center">Or</p>
+      <p style="color:white; text-align:center">Or</p>
       <button class="channelselectbutton" onclick="newchannelbut()">Create</button>
     </div>
   </div>
@@ -561,6 +561,10 @@ $(document).ready(function()
       channelbox.style.display = "none";
       front.style.display = "block";
     }
+  })
+  socket.on('PMinfo', function(msg){
+    newPM(msg.sending, true);
+    socket.emit('PMjoin', {sender: msg.sending, recieve: 'true'})
   })
   socket.on('userdata', function(msg)
   {
@@ -714,10 +718,27 @@ function disp()
   var elem = null;
   if(PM == true)
   {
-    if(PM)
+    if(this.id = lstid)
     {
-
+      socket.emit('leave', {chat: activechat, channel: CHNN, sender: user, reciever: this.textContent});
+      x.style.display = "none";
+      HLName.textContent = this.textContent;
+      Chansets.style.display = "none";
+      activechat = null;
+      CHNN = null;
+      lstid = this.id;
     }
+    else
+    {
+      socket.emit('leave', {chat: activechat, channel: CHNN, sender: user, reciever: this.textContent});
+      x.style.display = "none";
+      HLName.textContent = this.textContent;
+      Chansets.style.display = "none";
+      activechat = null;
+      CHNN = null;
+      lstid = this.id;
+    }
+    socket.emit('messagepull', {PM: 'true', sender: user, reciever: this.textContent});
   }
   else
   {
@@ -875,7 +896,7 @@ function search()
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
   socket.emit("userspull");
 }
-function newPM(x)
+function newPM(x, PMcheck)
 {
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
@@ -884,8 +905,16 @@ function newPM(x)
   var front = document.getElementById("front");
   var PMbub = document.createElement("button");
   var element = document.getElementById("PMmenu");
-  var chatuser = x.target.textContent;
   
+  if(PMcheck == true)
+  {
+    var chatuser = x;
+  }
+  else
+  {
+    var chatuser = x.target.textContent;  
+    socket.emit('PMjoin', {sender: user, reciever: chatuser, recieve: ""});
+  }
   
   PMbub.className = "chatbub";
   PMbub.addEventListener("click", disp)
@@ -895,7 +924,6 @@ function newPM(x)
   front.style.display = "block";
   $("ul").empty();
   $("#userinput").empty();
-  socket.emit('PMjoin', {targetuser: chatuser});
 }
 function sharelinkbut(close)
 {
