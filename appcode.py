@@ -70,16 +70,16 @@ def handel_link(msg):
 def handle_userdata():
     redirect('Login')
 
-@socketio.on('leave', namespace='/test')
-def handle_leave(msg):
-    channel = msg['channel']
-    chat = msg['chat']
-    if chat and channel:
-        leave_room(channel + chat)
-    else:
-        sender = msg['sender']
-        reciever = msg['reciever']
-        leave_room(sender + reciever + 'PM')
+# @socketio.on('leave', namespace='/test')
+# def handle_leave(msg):
+#     channel = msg['channel']
+#     chat = msg['chat']
+#     if chat and channel:
+#         leave_room(channel + chat)
+#     else:
+#         sender = msg['sender']
+#         reciever = msg['reciever']
+#         leave_room(sender + reciever + 'PM')
 
 
 @socketio.on('userspull', namespace='/test')
@@ -125,11 +125,11 @@ def message_handle(message):
     cursor = UserIn.cursor()
     username = session['username']
     if message['PM'] == 'true':
-        emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'PM': 'true'}, room=message['sender'] + message['reciever'] + 'PM')
+        emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'PM': 'true', 'reciever': message['reciever']}, room=message['sender'] + message['reciever'] + 'PM')
         cursor.close()
     else:
         cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (time.asctime(time.localtime()), message['data'], username, message['chat'], message['channel'], message['channel']))
-        emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'channel': message['channel'], 'chat': message['chat'], 'PM': 'true', 'reciever': message['reciever']}, room=message['channel'] + message['chat'])
+        emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'channel': message['channel'], 'chat': message['chat']}, room=message['channel'] + message['chat'])
         UserIn.commit()
         cursor.close()
 

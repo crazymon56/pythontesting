@@ -370,7 +370,7 @@
     cursor: pointer;
     margin: auto;
   }
-  .notificationmark{
+  .notificationmarkchat{
     color: white;
     background-color: red;
     border-radius: 40%;
@@ -380,6 +380,19 @@
     position: absolute;
     top: 0%;
     right: 0%;
+    display: none;
+  }
+  .notificationmarkSchat{
+    color: white;
+    background-color: red;
+    border-radius: 40%;
+    text-align: center;
+    width: 20%;
+    height: 35%;
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    display: none;
   }
   .smallchatbub{
     height: 40px;
@@ -613,7 +626,7 @@ $(document).ready(function()
       }
       else
       {
-
+        
       }
     }
     else
@@ -626,12 +639,37 @@ $(document).ready(function()
         }
         else
         {
-
+          // fix notifying general chat
+          // fix when multiple chats are present how to notify each one
+          var notifiedC = document.getElementsByClassName(msg.channel + "channel");
+          notifiedC = notifiedC[0].childNodes;
+          notifiedC = notifiedC[1].childNodes;
+          notifiedC = notifiedC[0].getElementsByTagName('div');
+          notifiedC[0].style.display = "block";
         }
       }
       else
       {
+        if(document.getElementsByClassName(msg.channel + "channel").parentElement.id == 'true')
+        {
+          if(msg.chat == activechat)
+          {
+            var notifiedC = document.getElementsByClassName(msg.channel + "channel");
+            notifiedC = notifiedC[0].getElementsByTagName("button");
+            notifiedC = notifiedC[0].childNodes;
+            notifiedC[1].style.display = "block";  
+          }
+          else
+          //fix when another chat besides general is notified
+          {
+            
+          }
+        }
+        else
+        //fix when channel has not loaded chats
+        {
 
+        }
       }
 
     }
@@ -682,7 +720,6 @@ $(document).ready(function()
     focelem.parentElement.id = 'true';
   })
 }); 
-
 
 function textcolor(TColor) 
 {
@@ -785,19 +822,24 @@ function disp()
   else
   {
     if(check == false){
-      CHNN = this.textContent;
+      CHNN = this.textContent.slice(0, this.textContent.length - 5)
       check = true;
     }
     if(this.className == "smallchatbub")
     {
-        socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
+        // socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
         x.style.display = "none";
-        HLName.textContent = CHNN + ": " + this.textContent;
+        HLName.textContent = CHNN + ": " + this.textContent.slice(0, this.textContent.length - 5);
         Chansets.style.display = "none";
         thelink.style.display = "none";
-        activechat = this.textContent;
+        activechat = this.textContent.slice(0, this.textContent.length - 5);
         $('#chatarea').empty();
         socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false', sender: "", reciever: ""})
+        var notify = this.childNodes;
+        if(notify[1].style.display = 'block')
+        {
+          notify[1].style.display = 'none';
+        }
     }
     else
     {
@@ -806,8 +848,8 @@ function disp()
       {
         if(this.closest("div").parentElement.id == 'true')
         {
-          socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: "" });
-          CHNN = this.textContent;
+          // socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: "" });
+          CHNN = this.textContent.slice(0, this.textContent.length - 5)
           focelem = this.closest("div");
           chats = "chat" + focelem.id;
           elem = document.getElementById(chats);
@@ -815,30 +857,40 @@ function disp()
           Chansets.style.display = "block";
           HLName.style.display = "block";
           thelink.style.display = "block";
-          HLName.textContent = this.textContent + ": " + "#general";
+          HLName.textContent = CHNN + ": " + "#general";
           activechat = '#general';
           $('#chatarea').empty();
+          var notify = this.childNodes;
+          if(notify[1].style.display = 'block')
+          {
+            notify[1].style.display = 'none';
+          }
         }
         else
         {
-          socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
+          // socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
           socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
-          CHNN = this.textContent;
+          CHNN = this.textContent.slice(0, this.textContent.length - 5)
           focelem = this.closest("div");
           x.style.display = "block";
           Chansets.style.display = "block";
           HLName.style.display = "block";
           thelink.style.display = "block";
-          HLName.textContent = this.textContent + ": " + "#general";
+          HLName.textContent = CHNN + ": " + "#general";
           activechat = '#general';
           $('#chatarea').empty();
+          var notify = this.childNodes;
+          if(notify[1].style.display = 'block')
+          {
+            notify[1].style.display = 'none';
+          }
         }
         socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false'})
 
       }
       else
       {   
-        if(focelem.getElementsByTagName("*").length == 1)
+        if(focelem.getElementsByTagName("*").length == 2)
         {
           x.style.display = "block";
           Chansets.style.display = "block";
@@ -854,30 +906,35 @@ function disp()
           thelink.style.display = "block";
         }
         focelem = this.closest("div");
-        if(focelem.getElementsByTagName("*").length == 1)
+        if(focelem.getElementsByTagName("*").length == 2)
         {
           if(focelem.parentElement.id == 'true')
           {
             
-            socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
+            // socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
             activechat = '#general';
-            CHNN = this.textContent;
-            HLName.textContent = this.textContent + ": " + "#general";
+            CHNN = this.textContent.slice(0, this.textContent.length - 5);
+            HLName.textContent = CHNN + ": " + "#general";
             firstchat = true;
             lstid = this.closest("div").id;
             x.style.display = "block";
             Chansets.style.display = "block"; 
             thelink.style.display = "block";
             $('#chatarea').empty();
+            var notify = this.childNodes;
+            if(notify[1].style.display = 'block')
+            {
+              notify[1].style.display = 'none';
+            }
           }
           else
           {
             
-            socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
+            // socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
             activechat = '#general';
-            socket.emit("chatpull", {channelname: focelem.firstChild.textContent});
-            CHNN = this.textContent;
-            HLName.textContent = this.textContent + ": " + "#general";
+            socket.emit("chatpull", {channelname: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5)});
+            CHNN = this.textContent.slice(0, this.textContent.length - 5);
+            HLName.textContent = CHNN + ": " + "#general";
             firstchat = true;
             lstid = this.closest("div").id;
             x.style.display = "block";
@@ -885,21 +942,30 @@ function disp()
             HLName.style.display = "block"; 
             thelink.style.display = "block";
             $('#chatarea').empty();
-
+            var notify = this.childNodes;
+            if(notify[1].style.display = 'block')
+            {
+              notify[1].style.display = 'none';
+            }
           }         
           socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false'})
         }
         else
         {
-          socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
-          CHNN = this.textContent;
-          HLName.textContent = this.textContent + ": " + "#general";
+          // socket.emit('leave', {chat: activechat, channel: CHNN, sender: "", reciever: ""});
+          CHNN = this.textContent.slice(0, this.textContent.length - 5);
+          HLName.textContent = CHNN + ": " + "#general";
           chats = "chat" + focelem.id;
           elem = document.getElementById(chats);
           elem.style.display = "block";
           lstid = this.closest("div").id;
           activechat = '#general';
           $('#chatarea').empty();
+          var notify = this.childNodes;
+          if(notify[1].style.display = 'block')
+          {
+            notify[1].style.display = 'none';
+          }
           socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false'})
         }   
       }
@@ -1069,7 +1135,7 @@ function newchannel(response)
         channel.appendChild(text);
         var str = 'blah!';
         notification.textContent = str.sup();
-        notification.className = "notificationmark";
+        notification.className = "notificationmarkchat";
         channelplace.appendChild(channel);
         channelplace.appendChild(notification);
         focelem = channelplace;
@@ -1090,7 +1156,7 @@ function newchannel(response)
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmark";
+        notification.className = "notificationmarkchat";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
         lstid = channelplace.id;
@@ -1123,7 +1189,7 @@ function newchannel(response)
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmark";
+        notification.className = "notificationmarkchat";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
         socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
@@ -1142,7 +1208,7 @@ function newchannel(response)
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmark";
+        notification.className = "notificationmarkchat";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
         lstid = channelplace.id;
@@ -1178,6 +1244,7 @@ function newchat(response)
 
   var chat = document.createElement("button");
   var chats = "chat" + focelem.id;
+  var notification = document.createElement("div");
   
   if(chatname == null || chatname == "")
   {
@@ -1194,6 +1261,9 @@ function newchat(response)
         chat.addEventListener("click", disp);
         chat.className = "smallchatbub";
         chat.appendChild(text);
+        notification.textContent = 'blah!';
+        notification.className = "notificationmarkSchat";
+        chat.appendChild(notification);
         document.getElementById(chats).appendChild(chat);
         socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chatname})
       }
@@ -1208,6 +1278,9 @@ function newchat(response)
         chat.addEventListener("click", disp);
         chat.className = "smallchatbub";
         chat.appendChild(text);
+        notification.textContent = 'blah!';
+        notification.className = "notificationmarkSchat";
+        chat.appendChild(notification);
         chatplace.appendChild(chat);
         socket.emit('userjoin', {channel: focelem.firstChild.textContent, select: 'chat', chatname: chatname})
       }
@@ -1220,6 +1293,9 @@ function newchat(response)
         chat.addEventListener("click", disp);
         chat.className = "smallchatbub";
         chat.appendChild(text);
+        notification.textContent = 'blah!';
+        notification.className = "notificationmarkSchat";
+        chat.appendChild(notification);
         document.getElementById(chats).appendChild(chat);
       }
       else
@@ -1232,6 +1308,9 @@ function newchat(response)
         chat.addEventListener("click", disp);
         chat.className = "smallchatbub";
         chat.appendChild(text);
+        notification.textContent = 'blah!';
+        notification.className = "notificationmarkSchat";
+        chat.appendChild(notification);
         chatplace.appendChild(chat);
       }
     }
