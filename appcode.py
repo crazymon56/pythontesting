@@ -73,11 +73,13 @@ def handle_userdata():
 @socketio.on('leave', namespace='/test')
 def handle_leave(msg):
     channel = msg['channel']
-    chat = msg['chat']    
+    chat = msg['chat']
     if chat and channel:
         leave_room(channel + chat)
     else:
-        leave_room()
+        sender = msg['sender']
+        reciever = msg['reciever']
+        leave_room(sender + reciever + 'PM')
 
 
 @socketio.on('userspull', namespace='/test')
@@ -93,7 +95,7 @@ def handle_users(msg):
 @socketio.on('messagepull', namespace='/test')
 def mespull_handle(message):
     cursor = UserIn.cursor()
-    if message['PM']:
+    if message['PM'] == 'true':
         cursor.execute("SELECT message, datetime FROM PMmessages WHERE senderuserid=(SELECT id FROM users WHERE username=%s) AND recieveruserid=(SELECT id FROM users WHERE username=%s)", (message['sender'], message['reciever']))
         ######WAIT
     else:
@@ -122,10 +124,14 @@ def handle_chats(response):
 def message_handle(message):
     cursor = UserIn.cursor()
     username = session['username']
-    cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (time.asctime(time.localtime()), message['data'], username, message['chat'], message['channel'], message['channel']))
-    emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()) }, room=message['channel'] + message['chat'])
-    UserIn.commit()
-    cursor.close()
+    if message['PM'] == 'true':
+        emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'PM': 'true'}, room=message['sender'] + message['reciever'] + 'PM')
+        cursor.close()
+    else:
+        cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (time.asctime(time.localtime()), message['data'], username, message['chat'], message['channel'], message['channel']))
+        emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'channel': message['channel'], 'chat': message['chat'], 'PM': 'true', 'reciever': message['reciever']}, room=message['channel'] + message['chat'])
+        UserIn.commit()
+        cursor.close()
 
 @socketio.on('PMjoin', namespace='/test')
 def PMjoining_handle(msg):
