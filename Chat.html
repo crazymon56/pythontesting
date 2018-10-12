@@ -638,30 +638,59 @@ $(document).ready(function()
           $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
         }
         else
-        {
-          // fix notifying general chat
-          // fix when multiple chats are present how to notify each one
-          var notifiedC = document.getElementsByClassName(msg.channel + "channel");
-          notifiedC = notifiedC[0].childNodes;
-          notifiedC = notifiedC[1].childNodes;
-          notifiedC = notifiedC[0].getElementsByTagName('div');
-          notifiedC[0].style.display = "block";
-        }
-      }
-      else
-      {
-        if(document.getElementsByClassName(msg.channel + "channel").parentElement.id == 'true')
-        {
-          if(msg.chat == activechat)
+        { 
+          if(msg.chat == "#general")
           {
             var notifiedC = document.getElementsByClassName(msg.channel + "channel");
-            notifiedC = notifiedC[0].getElementsByTagName("button");
+            notifiedC = notifiedC[0].childNodes;
             notifiedC = notifiedC[0].childNodes;
             notifiedC[1].style.display = "block";  
           }
           else
-          //fix when another chat besides general is notified
           {
+            var notifiedC = document.getElementsByClassName(msg.channel + "channel");
+            notifiedC = notifiedC[0].childNodes;
+            notifiedC = notifiedC[1].childNodes;
+            for(var i = 0; notifiedC.length != i; i++)
+            {
+              var tempname = notifiedC[i].textContent.slice(0, notifiedC[i].textContent.length - 5);
+              if(tempname == msg.chat)
+              {
+                var temp = notifiedC[i].childNodes;
+                temp[1].style.display = "block";
+              }
+            }           
+          }
+
+        }
+      }
+      else
+      {
+        var tempchan = document.getElementsByClassName(msg.channel + "channel");
+        if(tempchan[0].parentElement.id == 'true')
+        {
+          if(msg.chat == "#general")
+          {
+            var notifiedC = tempchan;
+            notifiedC = notifiedC[0].childNodes;
+            notifiedC = notifiedC[0].childNodes;
+            notifiedC[1].style.display = "block";  
+          }
+          else
+          {
+            var notifiedC = tempchan;
+            notifiedC = notifiedC[0].childNodes;
+            notifiedC[0].childNodes[1].style.display = "block";
+            notifiedC = notifiedC[1].childNodes;
+            for(var i = 0; notifiedC.length != i; i++)
+            {
+              var tempname = notifiedC[i].textContent.slice(0, notifiedC[i].textContent.length - 5);
+              if(tempname == msg.chat)
+              {
+                var temp = notifiedC[i].childNodes;
+                temp[1].style.display = "block";
+              }
+            }
             
           }
         }
