@@ -107,16 +107,23 @@ def mespull_handle(message):
         emit('messageloaddone')
         cursor.close()
 
+
 @socketio.on('chatpull', namespace='/test')
 def handle_chats(response):
     cursor = UserIn.cursor()
+    username = session['username']
     cursor.execute("SELECT chatid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (session['username'], response['channelname']))
     chats = cursor.fetchall()
     for items in chats:
         cursor.execute("SELECT chatname FROM chats WHERE id=%s", (items[0], ))
         stuff = cursor.fetchone()
         join_room(response['channelname'] + stuff[0])
-        emit('send', {'data': stuff})
+        cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, response[], stuff[0], message['channel']))
+        lastmesid = cursor.fetchone()
+        if lastmesid != 0:
+            emit('send', {'data': stuff, 'notify': 'true'})
+        else:
+            emit('send', {'data': stuff, 'notify': 'false'})
     cursor.close()
     emit('done', {'data': 'true'})
 
@@ -128,8 +135,18 @@ def message_handle(message):
         emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'PM': 'true', 'reciever': message['reciever']}, room=message['sender'] + message['reciever'] + 'PM')
         cursor.close()
     else:
-        cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (time.asctime(time.localtime()), message['data'], username, message['chat'], message['channel'], message['channel']))
-        emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'channel': message['channel'], 'chat': message['chat']}, room=message['channel'] + message['chat'])
+        time = time.asctime(time.localtime())
+        if message['data']:
+            cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (time, message['data'], username, message['chat'], message['channel'], message['channel']))
+        if message['DOWNchannel'] != message['UPchannel']:
+            cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['channel'], message['chat'], message['channel']))
+            result = cursor.fetchone()
+            if result[0] == 0:
+                #Finish applying notification update
+                cursor.execute()
+                cursor.execute("UPDATE userlastdata SET lastmesid WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chat WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) VALUES((SELECT id FROM messages WHERE userid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chat WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND datetime=%s)", (username, message['UPchannel'], message['UPchat'], message['UPchannel'], username, message['UPchannel'], message['UPchat'], message['UPchannel'], message['DT']))  
+        else:
+            emit('usermessage', {'userm': message['data'], 'DT': time, 'UPchannel': message['DOWNchannel'], 'UPchat': message['DOWNchat']}, room=message['channel'] + message['chat'])
         UserIn.commit()
         cursor.close()
 

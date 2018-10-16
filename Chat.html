@@ -625,36 +625,37 @@ $(document).ready(function()
         $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
       }
       else
+      //fix when the reciever is not the active PM
       {
         
       }
     }
     else
     {
-      if(msg.channel == CHNN)
+      if(msg.UPchannel == CHNN)
       {
-        if(msg.chat == activechat)
+        if(msg.UPchat == activechat)
         {
           $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
         }
         else
         { 
-          if(msg.chat == "#general")
+          if(msg.UPchat == "#general")
           {
-            var notifiedC = document.getElementsByClassName(msg.channel + "channel");
+            var notifiedC = document.getElementsByClassName(msg.UPchannel + "channel");
             notifiedC = notifiedC[0].childNodes;
             notifiedC = notifiedC[0].childNodes;
             notifiedC[1].style.display = "block";  
           }
           else
           {
-            var notifiedC = document.getElementsByClassName(msg.channel + "channel");
+            var notifiedC = document.getElementsByClassName(msg.UPchannel + "channel");
             notifiedC = notifiedC[0].childNodes;
             notifiedC = notifiedC[1].childNodes;
             for(var i = 0; notifiedC.length != i; i++)
             {
               var tempname = notifiedC[i].textContent.slice(0, notifiedC[i].textContent.length - 5);
-              if(tempname == msg.chat)
+              if(tempname == msg.UPchat)
               {
                 var temp = notifiedC[i].childNodes;
                 temp[1].style.display = "block";
@@ -669,7 +670,7 @@ $(document).ready(function()
         var tempchan = document.getElementsByClassName(msg.channel + "channel");
         if(tempchan[0].parentElement.id == 'true')
         {
-          if(msg.chat == "#general")
+          if(msg.UPchat == "#general")
           {
             var notifiedC = tempchan;
             notifiedC = notifiedC[0].childNodes;
@@ -685,7 +686,7 @@ $(document).ready(function()
             for(var i = 0; notifiedC.length != i; i++)
             {
               var tempname = notifiedC[i].textContent.slice(0, notifiedC[i].textContent.length - 5);
-              if(tempname == msg.chat)
+              if(tempname == msg.UPchat)
               {
                 var temp = notifiedC[i].childNodes;
                 temp[1].style.display = "block";
@@ -697,7 +698,7 @@ $(document).ready(function()
         else
         //fix when channel has not loaded chats
         {
-
+          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, userm: "", DOWNchannel: CHNN, DOWNchat: activechat, PM: 'false', DT: msg.DT})
         }
       }
 
@@ -734,7 +735,7 @@ $(document).ready(function()
       }
       else
       {
-        socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), channel: CHNN, chat: activechat, PM: 'false'});
+        socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), DOWNchannel: CHNN, DOWNchat: activechat, UPchannel: CHNN, UPchat: activechat, PM: 'false'});
         event.preventDefault();
         $('#usertext').val('');
       }
@@ -742,7 +743,14 @@ $(document).ready(function()
 
   socket.on('send', function(msg)
   {
-      newchat(msg.data[0]);
+    if(msg.notify == 'true')
+    {
+      newchat(msg.data[0], true)
+    }
+    else
+    {
+      newchat(msg.data[0], false);
+    }
   });
   socket.on('done', function()
   {
@@ -1251,7 +1259,7 @@ function newchannel(response)
 
 }
 
-function newchat(response)
+function newchat(response, notify)
 {
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
@@ -1326,6 +1334,10 @@ function newchat(response)
         notification.className = "notificationmarkSchat";
         chat.appendChild(notification);
         document.getElementById(chats).appendChild(chat);
+        if(notify == true)
+        {
+          notification.style.display = 'block';
+        }
       }
       else
       {
@@ -1341,6 +1353,10 @@ function newchat(response)
         notification.className = "notificationmarkSchat";
         chat.appendChild(notification);
         chatplace.appendChild(chat);
+        if(notify == true)
+        {
+          notification.style.display = 'block';
+        }
       }
     }
   }
