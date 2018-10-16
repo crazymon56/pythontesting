@@ -93,6 +93,7 @@
     height: 76%;
     position: absolute;
     bottom: 6%;
+    overflow: scroll;
   }
   .channels{
     padding-top: 10px;
@@ -479,7 +480,7 @@
 
 <div id="back" class="container-fluid, chat">
   
-      <div>
+      <div id=chatbuttons>
         <button onclick="newchat()" style=display:none class=change id="small" >+Chat</button>
         <button class="change, sharelinkbut" onclick="sharelinkbut(false)" id="sharelinkbut" style='display: none'>+Invite</button>
         <div class="sharelinkbox" id="sharelinkbox" style='display: none'>
@@ -589,8 +590,8 @@ $(document).ready(function()
     }
   })
   socket.on('PMinfo', function(msg){
-    newPM(msg.sending, true);
-    socket.emit('PMjoin', {sender: msg.sending, recieve: 'true'})
+    newPM(msg.sender, true);
+    socket.emit('PMjoin', {sender: msg.sender, recieve: 'true'})
   })
   socket.on('userdata', function(msg)
   {
@@ -640,6 +641,7 @@ $(document).ready(function()
         }
         else
         { 
+          
           if(msg.UPchat == "#general")
           {
             var notifiedC = document.getElementsByClassName(msg.UPchannel + "channel");
@@ -662,12 +664,11 @@ $(document).ready(function()
               }
             }           
           }
-
         }
       }
       else
       {
-        var tempchan = document.getElementsByClassName(msg.channel + "channel");
+        var tempchan = document.getElementsByClassName(msg.UPchannel + "channel");
         if(tempchan[0].parentElement.id == 'true')
         {
           if(msg.UPchat == "#general")
@@ -692,13 +693,15 @@ $(document).ready(function()
                 temp[1].style.display = "block";
               }
             }
-            
           }
         }
         else
-        //fix when channel has not loaded chats
         {
-          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, userm: "", DOWNchannel: CHNN, DOWNchat: activechat, PM: 'false', DT: msg.DT})
+          var notifiedC = document.getElementsByClassName(msg.UPchannel + "channel");
+          notifiedC = notifiedC[0].childNodes;
+          notifiedC = notifiedC[0].childNodes;
+          notifiedC[1].style.display = 'block';          
+          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: activechat, PM: 'false', DT: msg.DT, sender: msg.sender})
         }
       }
 
@@ -812,6 +815,19 @@ function tabbutton(flip)
   {
     allchannels.style.display = 'none';
     allPM.style.display = 'block';
+    $("#chatarea").empty();
+    if($("#PMmenu").find(".chatbub").length > 0)
+    {
+      var Selchat = $("#Boldname").find(".chatbub")[0];
+      $("#Boldname").html(Selchat.textContent);
+      $("#chatbuttons").children().css('display', 'none');
+    }
+    else
+    {
+      $("#Boldname").empty();
+      $("#chatbuttons").children().css('display', 'none');
+    }
+    
     PM = true;
   }
   else
@@ -820,7 +836,17 @@ function tabbutton(flip)
     allchannels.style.display = 'block';
     PM = false;
     var clickchannel = document.getElementsByClassName(CHNN + "channel");
-    clickchannel[0].click()
+    if(activechat == "#general")
+    {
+      clickchannel = clickchannel[0].childNodes;
+      clickchannel[0].click();
+    }
+    else
+    {
+      clickchannel = clickchannel[0].childNodes;
+      clickchannel = clickchannel[1].childNodes;
+      //Get activechat
+    }
   }
 }
 function disp()

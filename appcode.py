@@ -48,6 +48,7 @@ def handle_message():
             cursor.execute("SELECT channelname FROM channels WHERE id=%s", (items[0], ))   
             stuff = cursor.fetchone()
             join_room(stuff[0] + '#general')
+            join_room(stuff[0])
             if stuff:
                 emit('userdata', {'data': stuff[0]})       
     else:
@@ -95,16 +96,22 @@ def handle_users(msg):
 @socketio.on('messagepull', namespace='/test')
 def mespull_handle(message):
     cursor = UserIn.cursor()
+    username = session['username']
     if message['PM'] == 'true':
         cursor.execute("SELECT message, datetime FROM PMmessages WHERE senderuserid=(SELECT id FROM users WHERE username=%s) AND recieveruserid=(SELECT id FROM users WHERE username=%s)", (message['sender'], message['reciever']))
         ######WAIT
     else:
+        cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['channel'], message['chat'], message['channel']))
+        result = cursor.fetchone()
+        if result[0] != 0:
+            cursor.execute("UPDATE userlastdata SET lastmesid=0 WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['channel'], message['chat'], message['channel']))
         cursor.execute("SELECT message, datetime FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (message['chat'], message['channel'], message['channel']))
         join_room(message['channel'] + message['chat'])
         messages = cursor.fetchall()
         for items in messages:
             emit('messageload', {'userm': items[0], 'DT': items[1]}, room=message['channel'] + message['chat'])
         emit('messageloaddone')
+        UserIn.commit()
         cursor.close()
 
 
@@ -118,9 +125,9 @@ def handle_chats(response):
         cursor.execute("SELECT chatname FROM chats WHERE id=%s", (items[0], ))
         stuff = cursor.fetchone()
         join_room(response['channelname'] + stuff[0])
-        cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, response[], stuff[0], message['channel']))
+        cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, response['channelname'], stuff[0], response['channelname']))
         lastmesid = cursor.fetchone()
-        if lastmesid != 0:
+        if lastmesid[0] != 0:
             emit('send', {'data': stuff, 'notify': 'true'})
         else:
             emit('send', {'data': stuff, 'notify': 'false'})
@@ -135,18 +142,18 @@ def message_handle(message):
         emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'PM': 'true', 'reciever': message['reciever']}, room=message['sender'] + message['reciever'] + 'PM')
         cursor.close()
     else:
-        time = time.asctime(time.localtime())
+        Mestime = time.asctime(time.localtime())
         if message['data']:
-            cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (time, message['data'], username, message['chat'], message['channel'], message['channel']))
+            cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, message['data'], username, message['DOWNchat'], message['DOWNchannel'], message['DOWNchannel']))
         if message['DOWNchannel'] != message['UPchannel']:
-            cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['channel'], message['chat'], message['channel']))
+            cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['UPchannel'], message['UPchat'], message['UPchannel']))
             result = cursor.fetchone()
             if result[0] == 0:
-                #Finish applying notification update
-                cursor.execute()
-                cursor.execute("UPDATE userlastdata SET lastmesid WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chat WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) VALUES((SELECT id FROM messages WHERE userid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chat WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND datetime=%s)", (username, message['UPchannel'], message['UPchat'], message['UPchannel'], username, message['UPchannel'], message['UPchat'], message['UPchannel'], message['DT']))  
+                cursor.execute("SELECT id FROM messages WHERE userid=(SELECT id FROM users WHERE username=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND datetime=%s", ( message['sender'], message['UPchat'], message['UPchannel'], message['UPchannel'], message['DT'] ))
+                result = cursor.fetchone()
+                cursor.execute("UPDATE userlastdata SET lastmesid=%s WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (result[0] ,username, message['UPchannel'], message['UPchat'], message['UPchannel']))  
         else:
-            emit('usermessage', {'userm': message['data'], 'DT': time, 'UPchannel': message['DOWNchannel'], 'UPchat': message['DOWNchat']}, room=message['channel'] + message['chat'])
+            emit('usermessage', {'userm': message['data'], 'DT': Mestime, 'UPchannel': message['DOWNchannel'], 'UPchat': message['DOWNchat'], 'sender': username, 'PM': 'false'}, room=message['DOWNchannel'])
         UserIn.commit()
         cursor.close()
 
@@ -160,7 +167,7 @@ def PMjoining_handle(msg):
         join_room(msg['sender'] + msg['reciever'] + 'PM')
         cursor.execute("SELECT userPMid FROM users WHERE username=%s", (msg['reciever'], ))
         PMid = cursor.fetchone()
-        emit('PMinfo', {'sending': msg['sender']}, room=PMid[0])
+        emit('PMinfo', {'sender': msg['sender']}, room=PMid[0])
     cursor.close()
     
 
