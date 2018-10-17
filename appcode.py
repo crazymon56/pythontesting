@@ -41,6 +41,7 @@ def chat():
 @socketio.on('connectdone', namespace='/test')
 def handle_message():
     cursor = UserIn.cursor()
+    username = session['username']
     cursor.execute("SELECT channelid FROM userchannels WHERE useid=(SELECT id FROM users WHERE username=%s);", (session['username'], )) 
     channels = cursor.fetchall()
     if channels:
@@ -53,6 +54,12 @@ def handle_message():
                 emit('userdata', {'data': stuff[0]})       
     else:
         emit('userdata', {'data': " "})
+    cursor.execute("SELECT openedPM FROM PMopen WHERE userid=(SELECT id FROM users WHERE username=%s)", (username, ))
+    PMS = cursor.fetchall()
+    if PMS:
+        for items in PMS:
+            cursor.execute("SELECT username FROM users WHERE id=%s", (items[0]))
+            #Send PM data to userdata.
     emit('username', {'data': session['username']})
     cursor.execute("UPDATE users SET userPMid=%s WHERE username=%s", (request.sid, session['username']))
     UserIn.commit()
@@ -71,18 +78,6 @@ def handel_link(msg):
 def handle_userdata():
     redirect('Login')
 
-# @socketio.on('leave', namespace='/test')
-# def handle_leave(msg):
-#     channel = msg['channel']
-#     chat = msg['chat']
-#     if chat and channel:
-#         leave_room(channel + chat)
-#     else:
-#         sender = msg['sender']
-#         reciever = msg['reciever']
-#         leave_room(sender + reciever + 'PM')
-
-
 @socketio.on('userspull', namespace='/test')
 def handle_users(msg):
     cursor = UserIn.cursor()
@@ -98,8 +93,10 @@ def mespull_handle(message):
     cursor = UserIn.cursor()
     username = session['username']
     if message['PM'] == 'true':
-        cursor.execute("SELECT message, datetime FROM PMmessages WHERE senderuserid=(SELECT id FROM users WHERE username=%s) AND recieveruserid=(SELECT id FROM users WHERE username=%s)", (message['sender'], message['reciever']))
-        ######WAIT
+        cursor.execute("SELECT message, datetime FROM PMmessages WHERE (senderuserid=(SELECT id FROM users WHERE username=%s) OR senderuserid=(SELECT id FROM users WHERE username=%s)) AND (recieveruserid=(SELECT id FROM users WHERE username=%s) OR recieveruserid=(SELECT id FROM users WHERE username=%s))", (message['sender'], message['reciever'], message['sender'], message['reciever']))
+        mesdata = cursor.fetchall()
+        for items in mesdata:
+            emit('messageload', {'userm': items[0], 'DT': items[1]})
     else:
         cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['channel'], message['chat'], message['channel']))
         result = cursor.fetchone()
@@ -109,7 +106,7 @@ def mespull_handle(message):
         join_room(message['channel'] + message['chat'])
         messages = cursor.fetchall()
         for items in messages:
-            emit('messageload', {'userm': items[0], 'DT': items[1]}, room=message['channel'] + message['chat'])
+            emit('messageload', {'userm': items[0], 'DT': items[1]})
         emit('messageloaddone')
         UserIn.commit()
         cursor.close()
@@ -139,8 +136,12 @@ def message_handle(message):
     cursor = UserIn.cursor()
     username = session['username']
     if message['PM'] == 'true':
-        emit('usermessage', {'userm': message['data'], 'DT': time.asctime(time.localtime()), 'PM': 'true', 'reciever': message['reciever']}, room=message['sender'] + message['reciever'] + 'PM')
-        cursor.close()
+        Mestime = time.asctime(time.localtime())
+        cursor.execute("INSERT INTO PMmessages (datetime, message, senderuserid, recieveruserid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM users WHERE username=%s))", (Mestime, message['data'], message['sender'], message['reciever']))
+        cursor.execute("SELECT userPMid FROM users WHERE username=%s", (message['reciever'], ))
+        recieverid = cursor.fetchone()
+        emit('usermessage', {'userm': message['data'], 'DT': Mestime, 'PM': 'true', 'sender': message['sender'], 'reciever': "_"}, room=recieverid[0])
+        emit('usermessage', {'userm': message['data'], 'DT': Mestime, 'PM': 'true', 'sender': "_", 'reciever': message['reciever']})
     else:
         Mestime = time.asctime(time.localtime())
         if message['data']:
@@ -154,17 +155,27 @@ def message_handle(message):
                 cursor.execute("UPDATE userlastdata SET lastmesid=%s WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (result[0] ,username, message['UPchannel'], message['UPchat'], message['UPchannel']))  
         else:
             emit('usermessage', {'userm': message['data'], 'DT': Mestime, 'UPchannel': message['DOWNchannel'], 'UPchat': message['DOWNchat'], 'sender': username, 'PM': 'false'}, room=message['DOWNchannel'])
-        UserIn.commit()
-        cursor.close()
+    UserIn.commit()
+    cursor.close()
 
 @socketio.on('PMjoin', namespace='/test')
 def PMjoining_handle(msg):
     cursor = UserIn.cursor()
-    
+    username = session['username']
     if msg['recieve'] == 'true':
         join_room(msg['sender'] + session['username'] + 'PM')
+        cursor.execute("SELECT id FROM users WHERE username=%s", (username, ))
+        recieverid = cursor.fetchone()
+        cursor.execute("SELECT id FROM users WHERE username=%s", (message['sender'], ))       
+        senderid = cursor.fetchone()
+        cursor.execut("INSERT INTO PMopen (userid, openedPM) VALUES(%s, %s)", (recieverid[0]), senderid[0])
     else:
         join_room(msg['sender'] + msg['reciever'] + 'PM')
+        cursor.execute("SELECT id FROM users WHERE username=%s", (msg['reciever'], ))
+        recieverid = cursor.fetchone()
+        cursor.execute("SELECT id FROM users WHERE username=%s", (username, ))       
+        senderid = cursor.fetchone()
+        cursor.execut("INSERT INTO PMopen (userid, openedPM) VALUES(%s, %s)", (senderid[0], recieverid[0]))
         cursor.execute("SELECT userPMid FROM users WHERE username=%s", (msg['reciever'], ))
         PMid = cursor.fetchone()
         emit('PMinfo', {'sender': msg['sender']}, room=PMid[0])
