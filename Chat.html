@@ -217,7 +217,6 @@
   }
   .channeltab{
     width: 50%;
-    line-height: 300%;
     font-size: 75%;
     color: white;
     position: absolute;
@@ -238,7 +237,6 @@
   }
   .channeltab:hover{
     width: 50%;
-    line-height: 300%;
     font-size: 75%;
     color: gray;
     position: absolute;
@@ -261,7 +259,6 @@
   }
   .channeltab:focus{
     width: 50%;
-    line-height: 300%;
     font-size: 75%;
     color: gray;
     position: absolute;
@@ -395,6 +392,18 @@
     right: 0%;
     display: none;
   }
+  .notificationmarktab{
+    color: white;
+    background-color: red;
+    text-align: center;
+    font-size: 95%;
+    width: 10%;
+    height: 100%;
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    display: none;
+  }
   .smallchatbub{
     height: 40px;
     width: 100%;
@@ -436,6 +445,15 @@
   .chatbub:hover{
     transform: scale(1.2)
   }
+  @media only screen and (min-width: 600px)
+  {
+    .channels{
+      width: 15%;
+    }
+    .chat{
+      width: 85%;
+    }
+  }
 </style>
 <div style="background-color:rgb(68, 68, 68)">
   <div class=top>
@@ -445,8 +463,6 @@
   </div>      
   
     <div class=topbottom style="background-color:rgb(68, 68, 68)">
-        <button class=change onclick="backgroundcolor('rgb(68, 68, 68)'), textcolor('white')">Dark background</button>
-        <button class=change onclick="backgroundcolor('white'), textcolor('rgb(68, 68, 68)')">Light background</button>
     </div>
 </div>
 
@@ -454,13 +470,14 @@
 <div id=front>
 <div id=chan class="container-fluid, channels">
   <div style=position:relative>
-    <button class=channeltab onclick="tabbutton(0)">Channels</button>
-    <button class=PMtab onclick="tabbutton(1)">Private 
+    <button id=channeltab class=channeltab onclick="tabbutton(0)"><div style="position: absolute; top: 25%; right:17%">Channels</div>
+    <br>
+    <br>
+    <div class="notificationmarktab"><div style="transform: rotate(90deg)">blah!</div></div></button>
+    <button id=PMtab class=PMtab onclick="tabbutton(1)">Private<div class="notificationmarktab"><div style="transform: rotate(90deg)">blah!</div></div> 
       <br>
       Messages</button>
   </div >
-  <!-- <button class=change style=float:left>Channels</button>
-  <button class=change style=float:right>Private Messages</button> -->
   <div class="channelsmenu" id="channelsmenu">
     <br>
     <br>
@@ -502,7 +519,9 @@
 </div>
 <div class="options" id=OPback>
 <button class='change' id=Close onclick="ToOP(true)">X</button>
-
+<br>
+<button class=change onclick="backgroundcolor('rgb(68, 68, 68)'), textcolor('white')">Dark background</button>
+<button class=change onclick="backgroundcolor('white'), textcolor('rgb(68, 68, 68)')">Light background</button>
 </div>
 <div class="channelback" id="channelbox">
   <div class="channelselect">
@@ -531,7 +550,6 @@
   </div>
 </div>
 
-<!-- <button class="chatbub">HI</button><sup class="notificationmark">blah!</sup> -->
 </body>
 <script
 			  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -550,11 +568,13 @@ var lstid = null;
 var user = null;
 var channeload = false;
 var chatload = false;
+var PMload = false;
 var activechat = null;
 var load = false;
 var connect = false;
 var userinput = null;
 var PM = false;
+var activePM = null;
 $(document).ready(function()
 {
   
@@ -597,14 +617,27 @@ $(document).ready(function()
   {
     if(msg.data == " ")
     {
-      channeload = true;
+      if(msg.sentdata == 'channel')
+      {
+        channeload = true;
+      }
+      if(msg.sentdata == 'PM')
+      {
+        PMload = true;
+      }
     }
     else
     {
-      channeload = false;
-      newchannel(msg.data);
+      if(msg.sentdata == "channel")
+      {
+        channeload = false;
+        newchannel(msg.data);
+      }
+      if(msg.sentdata == "PM")
+      {
+        newPM(msg.data, true);
+      }
     }
-    //Fix it to have accept PMopened
   })
   socket.on('userssend', function(msg)
   {
@@ -620,13 +653,39 @@ $(document).ready(function()
 
   socket.on('usermessage', function(msg) 
   {
+    if(PM == true)
+    {
+      if(msg.PM == 'false')
+      {
+        $("#channeltab").find("div").css("display", "block");
+      }
+    }
+    if(PM == false)
+    {
+      if(msg.PM == 'true')
+      {
+        $("#PMtab").find("div").css("display", "block");
+      }
+    }
     if(msg.PM == 'true')
     {
       if(msg.reciever == "_")
       {
-        if(msg.sender == document.getElementById("Boldname").textContent)
+        if(activePM != msg.sender)
         {
-          $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
+          var PMS = $("#PMmenu").find("button");
+          for(var i = 0; PMS.length != i; i++)
+          {
+            var NM = PMS[i].childNodes;
+            if(PMS[i].textContent.slice(0, PMS[i].textContent.length - 5) == msg.sender)
+            {
+              NM[1].style.display = "block";
+            }
+          }
+        }
+        else
+        {
+          $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm);  
         }
       }
       if(msg.sender == "_")
@@ -710,7 +769,6 @@ $(document).ready(function()
           socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: activechat, PM: 'false', DT: msg.DT, sender: msg.sender})
         }
       }
-
     }
   });
 
@@ -813,36 +871,40 @@ function options()
 {
 
 }
-//Put Notifications on tabs
-//Have it pre-click the recent PM when PM tab clicked.
 function tabbutton(flip)
 {
   var allchannels = document.getElementById("channelsmenu");
   var allPM = document.getElementById("PMmenu");
   if(flip == 1)
   {
+    PM = true;
     allchannels.style.display = 'none';
     allPM.style.display = 'block';
     $("#chatarea").empty();
+    $("#PMtab").find("div").css("display", "none");
     if($("#PMmenu").find(".chatbub").length > 0)
     {
       var Selchat = $("#PMmenu").find(".chatbub")[0];
       var tempname = Selchat.textContent.slice(0, Selchat.textContent.length - 5);
       $("#Boldname").text(tempname);
       $("#chatbuttons").children().css('display', 'none');
+      var PMS = $("#PMmenu").find("button");
+      PMS[1].click();
     }
     else
     {
+      PM = true;
       $("#Boldname").empty();
       $("#chatbuttons").children().css('display', 'none');
     }
     
-    PM = true;
   }
   else
   {
     allPM.style.display = 'none';
     allchannels.style.display = 'block';
+    var NM = $("#channeltab").find("div");
+    NM[1].style.display = "none";
     PM = false;
     var clickchannel = document.getElementsByClassName(CHNN + "channel");
     if(activechat == "#general")
@@ -883,24 +945,39 @@ function disp()
     {
       x.style.display = "none";
       HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
+      HLName.style.height = '20%';
       Chansets.style.display = "none";
       lstid = this.id;
       focelem = this;
+      activePM = this.textContent.slice(0, this.textContent.length - 5);
+      var notify = this.childNodes;
+      if(notify[1].style.display = 'block')
+      {
+        notify[1].style.display = 'none';
+      }
     }
     else
     {
       socket.emit('leave', {chat: "", channel: "", sender: user, reciever: this.textContent});
       x.style.display = "none";
       HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
+      HLName.style.height = '20%';
       Chansets.style.display = "none";
       lstid = this.id;
       focelem = this;
+      activePM = this.textContent.slice(0, this.textContent.length - 5);
+      var notify = this.childNodes;
+      if(notify[1].style.display = 'block')
+      {
+        notify[1].style.display = 'none';
+      }
     }
     socket.emit('messagepull', {PM: 'true', sender: user, reciever: this.textContent.slice(0, this.textContent.length - 5)});
   }
   else
   {
-    if(check == false){
+    if(check == false)
+    {
       CHNN = this.textContent.slice(0, this.textContent.length - 5)
       check = true;
     }
@@ -908,6 +985,7 @@ function disp()
     {
         x.style.display = "none";
         HLName.textContent = CHNN + ": " + this.textContent.slice(0, this.textContent.length - 5);
+        HLName.style.height = '20%';
         Chansets.style.display = "none";
         thelink.style.display = "none";
         activechat = this.textContent.slice(0, this.textContent.length - 5);
@@ -933,6 +1011,7 @@ function disp()
           x.style.display = "block";
           Chansets.style.display = "block";
           HLName.style.display = "block";
+          HLName.style.height = '9%';
           thelink.style.display = "block";
           HLName.textContent = CHNN + ": " + "#general";
           activechat = '#general';
@@ -951,6 +1030,7 @@ function disp()
           x.style.display = "block";
           Chansets.style.display = "block";
           HLName.style.display = "block";
+          HLName.style.height = '9%';
           thelink.style.display = "block";
           HLName.textContent = CHNN + ": " + "#general";
           activechat = '#general';
@@ -971,6 +1051,7 @@ function disp()
           x.style.display = "block";
           Chansets.style.display = "block";
           thelink.style.display = "block";
+          HLName.style.height = '9%';
         }
         else
         {
@@ -980,6 +1061,7 @@ function disp()
           elem.style.display = "none";
           Chansets.style.display = "block";
           thelink.style.display = "block";
+          HLName.style.height = '9%';
         }
         focelem = this.closest("div");
         if(focelem.getElementsByTagName("*").length == 2)
@@ -1085,6 +1167,7 @@ function newPM(x, PMcheck)
   var PMbub = document.createElement("button");
   var element = document.getElementById("PMmenu");
   var head = document.getElementById("Boldname");
+  var br = document.createElement("br");
   var notification = document.createElement("div");
 
   if(PMcheck == true)
@@ -1096,11 +1179,17 @@ function newPM(x, PMcheck)
     var chatuser = x.target.textContent;  
     socket.emit('PMjoin', {sender: user, reciever: chatuser, recieve: ""});
   }
+  if(activePM != chatuser)
+  {
+
+  }
   PMbub.className = "chatbub";
   PMbub.id = chatuser + 'PM';
   PMbub.addEventListener("click", disp)
   PMbub.append(chatuser);
   element.append(PMbub);
+  element.append(br);
+  element.append(br);
   notification.textContent = 'blah!';
   notification.className = "notificationmarkchat";
   PMbub.appendChild(notification);
@@ -1109,8 +1198,11 @@ function newPM(x, PMcheck)
   $("ul").empty();
   $("#userinput").empty();
   head.style.display = "block";
-  head.textContent = chatuser;
   lstid = chatuser + 'PM';
+  if(PMload == true)
+  {
+    notification.style.display = "block";
+  }
 }
 function sharelinkbut(close)
 {

@@ -51,15 +51,17 @@ def handle_message():
             join_room(stuff[0] + '#general')
             join_room(stuff[0])
             if stuff:
-                emit('userdata', {'data': stuff[0]})       
+                emit('userdata', {'data': stuff[0], 'sentdata': 'channel'})       
     else:
-        emit('userdata', {'data': " "})
+        emit('userdata', {'data': " ", 'sentdata': 'channel'})
     cursor.execute("SELECT openedPM FROM PMopen WHERE userid=(SELECT id FROM users WHERE username=%s)", (username, ))
     PMS = cursor.fetchall()
     if PMS:
         for items in PMS:
-            cursor.execute("SELECT username FROM users WHERE id=%s", (items[0]))
-            #Send PM data to userdata.
+            cursor.execute("SELECT username FROM users WHERE id=%s", (items[0], ))
+            stuff = cursor.fetchone()
+            emit('userdata', {'data': stuff[0], 'sentdata': 'PM'})
+    emit('userdata', {'data': " ", 'sentdata': 'PM'})
     emit('username', {'data': session['username']})
     cursor.execute("UPDATE users SET userPMid=%s WHERE username=%s", (request.sid, session['username']))
     UserIn.commit()
@@ -81,11 +83,13 @@ def handle_userdata():
 @socketio.on('userspull', namespace='/test')
 def handle_users(msg):
     cursor = UserIn.cursor()
+    username = session['username']
     cursor.execute("SELECT username FROM users")
     users = cursor.fetchall()
     for items in users:
         if msg['data'] in str(items):
-            emit('userssend', {'user': items})
+            if items[0] != username: 
+                emit('userssend', {'user': items})
     cursor.close()
 
 @socketio.on('messagepull', namespace='/test')
@@ -93,7 +97,7 @@ def mespull_handle(message):
     cursor = UserIn.cursor()
     username = session['username']
     if message['PM'] == 'true':
-        cursor.execute("SELECT message, datetime FROM PMmessages WHERE (senderuserid=(SELECT id FROM users WHERE username=%s) OR senderuserid=(SELECT id FROM users WHERE username=%s)) AND (recieveruserid=(SELECT id FROM users WHERE username=%s) OR recieveruserid=(SELECT id FROM users WHERE username=%s))", (message['sender'], message['reciever'], message['sender'], message['reciever']))
+        cursor.execute("SELECT message, datetime FROM PMmessages WHERE (senderuserid=(SELECT id FROM users WHERE username=%s) OR senderuserid=(SELECT id FROM users WHERE username=%s)) AND (recieveruserid=(SELECT id FROM users WHERE username=%s) OR recieveruserid=(SELECT id FROM users WHERE username=%s)) LIMIT 40", (message['sender'], message['reciever'], message['sender'], message['reciever']))
         mesdata = cursor.fetchall()
         for items in mesdata:
             emit('messageload', {'userm': items[0], 'DT': items[1]})
@@ -102,7 +106,7 @@ def mespull_handle(message):
         result = cursor.fetchone()
         if result[0] != 0:
             cursor.execute("UPDATE userlastdata SET lastmesid=0 WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['channel'], message['chat'], message['channel']))
-        cursor.execute("SELECT message, datetime FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s)", (message['chat'], message['channel'], message['channel']))
+        cursor.execute("SELECT message, datetime FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s) LIMIT 40", (message['chat'], message['channel'], message['channel']))
         join_room(message['channel'] + message['chat'])
         messages = cursor.fetchall()
         for items in messages:
@@ -163,22 +167,21 @@ def PMjoining_handle(msg):
     cursor = UserIn.cursor()
     username = session['username']
     if msg['recieve'] == 'true':
-        join_room(msg['sender'] + session['username'] + 'PM')
         cursor.execute("SELECT id FROM users WHERE username=%s", (username, ))
         recieverid = cursor.fetchone()
-        cursor.execute("SELECT id FROM users WHERE username=%s", (message['sender'], ))       
+        cursor.execute("SELECT id FROM users WHERE username=%s", (msg['sender'], ))       
         senderid = cursor.fetchone()
-        cursor.execut("INSERT INTO PMopen (userid, openedPM) VALUES(%s, %s)", (recieverid[0]), senderid[0])
+        cursor.execute("INSERT INTO PMopen (userid, openedPM) VALUES(%s, %s)", (recieverid[0], senderid[0]))
     else:
-        join_room(msg['sender'] + msg['reciever'] + 'PM')
         cursor.execute("SELECT id FROM users WHERE username=%s", (msg['reciever'], ))
         recieverid = cursor.fetchone()
         cursor.execute("SELECT id FROM users WHERE username=%s", (username, ))       
         senderid = cursor.fetchone()
-        cursor.execut("INSERT INTO PMopen (userid, openedPM) VALUES(%s, %s)", (senderid[0], recieverid[0]))
+        cursor.execute("INSERT INTO PMopen (userid, openedPM) VALUES(%s, %s)", (senderid[0], recieverid[0]))
         cursor.execute("SELECT userPMid FROM users WHERE username=%s", (msg['reciever'], ))
         PMid = cursor.fetchone()
         emit('PMinfo', {'sender': msg['sender']}, room=PMid[0])
+    UserIn.commit()
     cursor.close()
     
 
@@ -230,9 +233,6 @@ def join_handle_made(sentroom):
     else:
         cursor.execute("INSERT INTO chats (chatname, linkid) VALUES(%s, (SELECT id FROM channels WHERE channelname=%s))", (sentroom['chatname'], sentroom['channel']))
         cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s) AND chatname=%s))", (username, sentroom['channel'], sentroom['channel'], sentroom['chatname']))
-        
-        #join_room(sentroom('chatname'))    
-    #cursor.execute("INSERT INTO messages (message, userid, chatid, channelid) VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s), (SELECT ))")
     UserIn.commit()
     cursor.close()
 
