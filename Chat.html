@@ -49,6 +49,7 @@
     border-radius: 12px;
     width: 10%;
     height: 20%;
+    font-size: 75%;
   }
   .logoutbutton:hover{
     border-style: solid;
@@ -68,7 +69,9 @@
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 10%
+    width: 10%;
+    height: 8.3% auto;
+    font-size: 65%;
   }
   .chatitle{
     border-style: solid;
@@ -214,6 +217,9 @@
     color:rgb(48, 46, 46);
     background-color: white;
     cursor: pointer;
+  }
+  .tabs{
+    position: relative;
   }
   .channeltab{
     width: 50%;
@@ -445,17 +451,165 @@
   .chatbub:hover{
     transform: scale(1.2)
   }
-  @media only screen and (min-width: 600px)
+  @media only screen and (min-width: 551px)
   {
-    .channels{
-      width: 15%;
-    }
-    .chat{
-      width: 85%;
-    }
+  .tabs{
+    position: relative;
   }
+  .channeltabtext{
+      position: absolute;
+      top: 23%;
+      right: 30%;
+  }
+  .channeltab{
+    width: 50%;
+    font-size: 75%;
+    color: white;
+    position: absolute;
+    left: 0%;
+    border-style: solid;
+    border-color: black;
+    background-color: gray;
+  }
+  .PMtab{
+    width: 50%;
+    font-size: 75%;
+    color: white;
+    position: absolute;
+    right: 0%;
+    border-style: solid;
+    border-color: black;
+    background-color: gray;
+  }
+  .channels{
+      width: 25%;
+  }
+  .chat{
+      width: 75%;
+  }  
+  }
+  @media only screen and (max-width: 550px)
+  {
+    .tabs{
+      top: 5%;
+    }
+    .channeltab
+    {
+      width: 100%;
+      position: absolute;
+      top: 0%;
+      font-size: 60%;
+    }
+    .channeltabtext{
+      position: absolute;
+      top: 23%;
+      right: 23%;
+    }
+    .PMtab
+    {
+      width: 100%;
+      font-size: 60%;
+      position: absolute;
+      bottom: 0%;
+    }
+    .channeltab:hover{
+    width: 100%;
+    font-size: 60%;
+    top: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+    
+  }
+  .channeltab:focus{
+    width: 100%;
+    font-size: 60%;
+    top: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+    border-bottom-style: none;
+  }
+  .PMtab:hover{
+    width: 100%;
+    font-size: 60%;
+    bottom: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+  }
+  .PMtab:focus{
+    width: 100%;
+    font-size: 60%;
+    bottom: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+    border-bottom-style: none;
+  }
+  .top{
+    height: 15%;
+  }
+  .logoutbutton{
+    border: solid;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    float: left;
+    border-radius: 12px;
+    width: 20%;
+    height: 30%;
+    font-size: 75%;
+  }
+  .front{
+    height: 85%;
+  }
+  .channelsmenu{
+    position: absolute;
+    top: 5%;
+  }
+  .PMmenu{
+    position: absolute;
+    top: 5%;
+  }
+  .channels{
+    position: relative;
+    width: 25%;
+  }
+  .chat{
+    width: 75%;
+  }
+  .sendbutton{
+    font-size: 75%;
+    bottom: 0%;
+    width: 100%;
+    height: 7%;
+  }
+  .chattext{
+    bottom: 6.5%;
+    width: 100%;
+  }
+  .chatarea{
+    font-size: 85%;
+  }
+  .chatitle{
+    font-size: 150%;
+  }
+}
 </style>
-<div style="background-color:rgb(68, 68, 68)">
+<div class="topbackground" style="background-color:rgb(68, 68, 68)">
   <div class=top>
     <h1 id=text></h1>
       <input class=logoutbutton type="submit" onclick='logginout()' value="Logout" />
@@ -469,8 +623,8 @@
 <body >
 <div id=front>
 <div id=chan class="container-fluid, channels">
-  <div style=position:relative>
-    <button id=channeltab class=channeltab onclick="tabbutton(0)"><div style="position: absolute; top: 25%; right:17%">Channels</div>
+  <div class=tabs style=position:relative>
+    <button id=channeltab class=channeltab onclick="tabbutton(0)"><div class="channeltabtext">Channels</div>
     <br>
     <br>
     <div class="notificationmarktab"><div style="transform: rotate(90deg)">blah!</div></div></button>
