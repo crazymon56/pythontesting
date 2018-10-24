@@ -206,7 +206,8 @@ def join_handle_made(sentroom):
                 cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s))", (username, sentroom['channel']))
                 cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s)))", (username, sentroom['channel'], sentroom['channel']))
                 check = True
-                cursor.execute("INSERT INTO messages (message, userid, chatid, channelid) VALUES(%s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (username + ' has joined', username, 'general', sentroom['channel'], sentroom['channel']))
+                Mestime = time.asctime(time.localtime())
+                cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, username + ' has joined', username, '#general', sentroom['channel'], sentroom['channel']))
 
         emit('confirmjoinmessage', {'data' : session['username'] + ' has joined'})
     elif sentroom['select'] == 'join':
@@ -229,7 +230,7 @@ def join_handle_made(sentroom):
             cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE link=%s))", (username, sentroom['link']))
             cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
             stuff = cursor.fetchone()
-            emit('userdata', {'data': stuff[0]})
+            emit('userdata', {'data': stuff[0], 'sentdata': 'channel'})
     else:
         cursor.execute("INSERT INTO chats (chatname, linkid) VALUES(%s, (SELECT id FROM channels WHERE channelname=%s))", (sentroom['chatname'], sentroom['channel']))
         cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s) AND chatname=%s))", (username, sentroom['channel'], sentroom['channel'], sentroom['chatname']))
@@ -244,8 +245,7 @@ def signup():
         with open('Signup.html', 'r') as fh:        
             html = fh.read()
         return html
-    
-    cursor.execute("INSERT INTO users (username, password, confirmpassword) VALUES(%s, %s, %s);", (request.form["SUsername"], request.form["SPassword"], request.form["SCPassword"]))
+    cursor.execute("INSERT INTO users (username, password, confirmpassword, userPMid) VALUES(%s, %s, %s, %s);", (request.form["SUsername"], request.form["SPassword"], request.form["SCPassword"], 0))
     UserIn.commit()
     cursor.close()
 
@@ -302,7 +302,6 @@ def index():
     
     with open('Signup.html', 'r') as fh:
         html = fh.read()
-        print(html)
         
     return html
 if __name__ == "__main__":
