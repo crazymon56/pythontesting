@@ -60,9 +60,26 @@
     cursor: pointer;
     border-radius: 12px;
   }
+  .DeleteChannelbutton{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: black;
+    text-align: center;
+    color: rgb(207, 207, 207);
+    border: solid;
+  }
+  .DeleteChannelbutton:hover{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: rgb(207, 207, 207);
+    text-align: center;
+    color: black;
+    border: solid;
+    cursor: pointer;
+  }
   .chattext{
     position: absolute;
-    bottom: 0;
+    bottom: 0%;
     width: 90%;
   }
   .sendbutton{
@@ -70,7 +87,7 @@
     bottom: 0;
     right: 0;
     width: 10%;
-    height: 8.3% auto;
+    height: 20px auto;
     font-size: 65%;
   }
   .chatitle{
@@ -92,8 +109,7 @@
     border-color: black;
   }
   .chatarea{
-    width: 100%;
-    height: 76%;
+    height: 80%;
     position: absolute;
     bottom: 6%;
     overflow: scroll;
@@ -327,8 +343,6 @@
     color: gray;
     border: solid;
     position: absolute;
-    right: 0%;
-    top: 0%;
   }
   .sharelinkbut:hover{
     border-style:solid;
@@ -338,22 +352,15 @@
     color: white;
     border: solid;
     position: absolute;
-    right: 0%;
-    top: 0%;
     cursor: pointer;
   }
   .sharelinkbox{
     width: 30%;
     height: 10%;
-    border-right-style: none;
-    border-top-style: none;
-    border-left-style: solid;
-    border-bottom-style: solid;
+    border-style: solid;
     border-color: black;
     background-color: rgb(71, 71, 71);
     position: absolute;
-    right: 0%;
-    top: 0%;
   }
   .innersharelinkbox{
     width: 75%;
@@ -488,6 +495,9 @@
   }
   .chat{
       width: 75%;
+  }
+  .chatarea{
+    width: 100%;
   }  
   }
   @media only screen and (max-width: 550px)
@@ -605,6 +615,7 @@
   }
   .chatarea{
     font-size: 85%;
+    width: 100%;
   }
   .chatitle{
     font-size: 150%;
@@ -652,19 +663,11 @@
 
 
 <div id="back" class="container-fluid, chat">
-  
-      <div id=chatbuttons>
-        <button onclick="newchat()" class=change id="small" >+Chat</button>
-        <button class="change, sharelinkbut" onclick="sharelinkbut(false)" id="sharelinkbut">+Invite</button>
-        <div class="sharelinkbox" id="sharelinkbox" style='display: none'>
-          <button class='change' id='linkclose' onclick='sharelinkbut(true)'>x</button>
-          <u>Channel Code</u>
-          <div class="innersharelinkbox" id='linkinsert'> 
-          </div>
-        </div>
-        <button id="settings" onclick="ToOP(false)" class="change">Channel Settings</button>
-      </div>
-      <h1 class=chatitle id="Boldname"></h1>
+    <div>  
+    <button id="settings" onclick="ToOP(false)" class="change">Channel Settings</button>
+      <h1 class=chatitle id="Boldname">THIS IS A CHAT</h1>
+    </div>
+      
       <div id="chatarea" class='chatarea'>
       </div>
       <form id='mes' method="POST" action='#'> 
@@ -678,6 +681,19 @@
 <br>
 <button class=change onclick="backgroundcolor('rgb(68, 68, 68)'), textcolor('white')">Dark background</button>
 <button class=change onclick="backgroundcolor('white'), textcolor('rgb(68, 68, 68)')">Light background</button>
+<br>
+<button onclick="newchat()" class=change id="small" >+Chat</button>
+<br>
+<button class="change, sharelinkbut" onclick="sharelinkbut(false)" id="sharelinkbut">+Invite</button>
+<div class="sharelinkbox" id="sharelinkbox" style='display: none'>
+  <button class='change' id='linkclose' onclick='sharelinkbut(true)'>x</button>
+  <div class="innersharelinkbox" id='linkinsert'> 
+  </div>
+  <br>
+</div>
+<br>
+<br>
+<button class="DeleteChannelbutton" id="DelChanBut" onclick="DeleteChannel()">Delete Channel</button>
 </div>
 
 <div class="channelback" id="channelbox">
@@ -735,6 +751,7 @@ var connect = false;
 var userinput = null;
 var PM = false;
 var activePM = null;
+var elem = null;
 $(document).ready(function()
 {
   
@@ -1007,7 +1024,10 @@ $(document).ready(function()
         thechats[i].click();
       } 
     }
-     firstchat = true; 
+    firstchat = true; 
+    var chats = null;          
+    chats = "chat" + focelem.id;
+    elem = document.getElementById(chats);
   })
 }); 
 
@@ -1089,6 +1109,8 @@ function tabbutton(flip)
   {
     allPM.style.display = 'none';
     allchannels.style.display = 'block';
+    var chansettings = document.getElementById('settings');
+    chansettings.style.display = "block";
     var NM = $("#channeltab").find("div");
     NM[1].style.display = "none";
     PM = false;
@@ -1123,18 +1145,18 @@ function disp()
   var HLName = document.getElementById("Boldname");
   var Chansets = document.getElementById("settings");
   var thelink = document.getElementById("sharelinkbut");
-  var elem = null;
   if(PM == true)
   {
+    HLName.style.height = '15%';
     $("#chatarea").empty()
-    if(this.id = lstid)
+    if(this.id == lstid)
     {
       x.style.display = "none";
       HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
-      HLName.style.height = '20%';
       Chansets.style.display = "none";
       lstid = this.id;
       focelem = this;
+      elem = null;
       activePM = this.textContent.slice(0, this.textContent.length - 5);
       var notify = this.childNodes;
       if(notify[1].style.display = 'block')
@@ -1144,12 +1166,11 @@ function disp()
     }
     else
     {
-      socket.emit('leave', {chat: "", channel: "", sender: user, reciever: this.textContent});
       x.style.display = "none";
       HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
-      HLName.style.height = '20%';
       Chansets.style.display = "none";
       lstid = this.id;
+      elem = null;
       focelem = this;
       activePM = this.textContent.slice(0, this.textContent.length - 5);
       var notify = this.childNodes;
@@ -1186,6 +1207,7 @@ function disp()
       var chats = null;    
       if(this.closest("div").id == lstid)
       {
+        focelem = this.closest("div");
         if(focelem.parentElement.id == 'true')
         {
         CHNN = this.textContent.slice(0, this.textContent.length - 5);
@@ -1209,8 +1231,8 @@ function disp()
         {
          notify[1].style.display = 'none';
         }
-        lstid = this.closest("div").id; 
-        firstchat = false;
+        lstid = this.closest("div").id;
+        firstchat = false; 
         }
         else
         {
@@ -1218,6 +1240,7 @@ function disp()
           socket.emit("chatpull", {channelname: CHNN});
           chats = "chat" + focelem.id;
           elem = document.getElementById(chats);
+          console.log(elem);
           var notify = this.childNodes;
           if(notify[1].style.display = 'block')
           {
@@ -1227,24 +1250,27 @@ function disp()
         }
       }
       else
-      {   
-        if(focelem.getElementsByTagName("*").length == 2)
+      { 
+        if(elem != null)
         {
-          x.style.display = "block";
-          Chansets.style.display = "block";
-          thelink.style.display = "block";
-          HLName.style.height = '9%';
-        }
-        else
-        {
-          chats = "chat" + focelem.id;
-          elem = document.getElementById(chats);
-          x.style.display = "block";
-          elem.style.display = "none";
-          Chansets.style.display = "block";
-          thelink.style.display = "block";
-          HLName.style.height = '9%';
-        }
+          if(focelem.getElementsByTagName("*").length == 2)
+          {
+            x.style.display = "block";
+            Chansets.style.display = "block";
+            thelink.style.display = "block";
+            HLName.style.height = '9%';
+          }
+          else
+          {
+            chats = "chat" + focelem.id;
+            elem = document.getElementById(chats);
+            x.style.display = "block";
+            elem.style.display = "none";
+            Chansets.style.display = "block";
+            thelink.style.display = "block";
+            HLName.style.height = '9%';
+          }
+        }    
         focelem = this.closest("div");
         if(focelem.parentElement.id == 'true')
         {
@@ -1275,10 +1301,9 @@ function disp()
         }
         else
         {
+          firstchat = true;
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
           socket.emit("chatpull", {channelname: CHNN})
-          chats = "chat" + focelem.id;
-          elem = document.getElementById(chats);
           var notify = this.childNodes;
           if(notify[1].style.display = 'block')
           {
@@ -1420,6 +1445,26 @@ function newchannelbut()
   front.style.display = "block";
   newchannel();
 }
+function DeleteChannel()
+{
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+  var del = confirm("Delete this channel?");
+  if(del == true)
+  {
+    socket.emit("userdelete", {channel: CHNN, select: 'channel'});
+    var delelem = focelem.parentElement;
+    delelem.parentNode.removeChild(delelem);
+    elem = null;
+    var clickelem = document.getElementById("channelsmenu").getElementsByClassName("load")[0]
+    clickelem.childNodes[0].childNodes[0].click();
+  }
+  else
+  {
+
+  }
+}
 function newchannel(response) 
 {   
   namespace = '/test';
@@ -1475,7 +1520,7 @@ function newchannel(response)
         channelplace.appendChild(notification);
         focelem = channelplace;
         lstid = channelplace.id;
-        socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+        socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
         newchat("general", 1);
       }
       else
@@ -1530,7 +1575,7 @@ function newchannel(response)
         channelplace.appendChild(channel);
         lstid = channelplace.id;
         focelem = channelplace;
-        socket.emit('userjoin', {channel: channel.textContent, select: 'channel'});
+        socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
         newchat("general", 1);
       }
       else

@@ -237,6 +237,20 @@ def join_handle_made(sentroom):
     UserIn.commit()
     cursor.close()
 
+@socketio.on('userdelete', namespace="/test")
+def delete_handler(data):
+    cursor = UserIn.cursor()
+    print("hello")
+    if data['select'] == 'channel':
+        cursor.execute("DELETE FROM userlastdata WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
+        cursor.execute("DELETE FROM userchannels WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
+        cursor.execute("DELETE FROM messages WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
+        cursor.execute("DELETE FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
+        cursor.execute("DELETE FROM channels WHERE channelname=%s", (data['channel'], ))
+    if data['select'] == 'chat':
+        pass
+    UserIn.commit()
+    cursor.close()
 #SigningUp
 @app.route("/SignUpCon", methods=['POST', 'GET'])
 def signup():
