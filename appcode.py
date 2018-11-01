@@ -240,7 +240,6 @@ def join_handle_made(sentroom):
 @socketio.on('userdelete', namespace="/test")
 def delete_handler(data):
     cursor = UserIn.cursor()
-    print("hello")
     if data['select'] == 'channel':
         cursor.execute("DELETE FROM userlastdata WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
         cursor.execute("DELETE FROM userchannels WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
