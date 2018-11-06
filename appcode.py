@@ -50,8 +50,16 @@ def handle_message():
             stuff = cursor.fetchone()
             join_room(stuff[0] + '#general')
             join_room(stuff[0])
+            cursor.execute("SELECT id FROM users WHERE username=%s", (username, ))
+            userid = cursor.fetchone()
+            cursor.execute("SELECT ownerid FROM channels WHERE channelname=%s", (str(stuff[0]), ))
+            ownerid = cursor.fetchone()
+
             if stuff:
-                emit('userdata', {'data': stuff[0], 'sentdata': 'channel'})       
+                if userid == ownerid:
+                    emit('userdata', {'data': stuff[0], 'sentdata': 'channel', 'owner': 'true'})                           
+                else:
+                    emit('userdata', {'data': stuff[0], 'sentdata': 'channel', 'owner': 'false'})       
     else:
         emit('userdata', {'data': " ", 'sentdata': 'channel'})
     cursor.execute("SELECT openedPM FROM PMopen WHERE userid=(SELECT id FROM users WHERE username=%s)", (username, ))

@@ -77,6 +77,23 @@
     border: solid;
     cursor: pointer;
   }
+  .LeaveChannelbutton{
+    border-style: solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: red;
+    border: solid;
+  }
+  .LeaveChannelbutton:hover{
+    border-style: solid;
+    border-radius: 12px;
+    background-color: red;
+    text-align: center;
+    color: white;
+    border: solid;
+    cursor: pointer; 
+  }
   .chattext{
     position: absolute;
     bottom: 0%;
@@ -108,11 +125,17 @@
     border-width: auto;
     border-color: black;
   }
+  .chattop{
+    height: 
+  }
   .chatarea{
     height: 80%;
     position: absolute;
     bottom: 6%;
     overflow: scroll;
+    border: solid;
+    border-bottom-style: none;
+    border-left-style: none;
   }
   .channels{
     padding-top: 10px;
@@ -331,9 +354,12 @@
     cursor: pointer;
   }
   .options{
-    width: 50%;
+    position: absolute; 
+    width: 100%;
     height: 50%;
     display: none;
+    background-color: rgb(66, 66, 66);
+    border-style: solid;
   }
   .sharelinkbut{
     border-style:solid;
@@ -364,11 +390,12 @@
   }
   .innersharelinkbox{
     width: 75%;
-    height: 50%;
+    height: 75%;
+    text-align: center;
     background-color: white;
     position: absolute;
     right: 10%;
-    top: 20%;
+    top: 10%;
   }
   .chatbub{
     height: 90px;
@@ -663,7 +690,7 @@
 
 
 <div id="back" class="container-fluid, chat">
-    <div>  
+    <div class="chattop">  
     <button id="settings" onclick="ToOP(false)" class="change">Channel Settings</button>
       <h1 class=chatitle id="Boldname">THIS IS A CHAT</h1>
     </div>
@@ -694,6 +721,8 @@
 <br>
 <br>
 <button class="DeleteChannelbutton" id="DelChanBut" onclick="DeleteChannel()">Delete Channel</button>
+<br>
+<button class="LeaveChannelbutton" id="LevChanBut" onclick="">Leave Channel</button>
 </div>
 
 <div class="channelback" id="channelbox">
@@ -807,8 +836,17 @@ $(document).ready(function()
     {
       if(msg.sentdata == "channel")
       {
-        channeload = false;
-        newchannel(msg.data);
+        if(msg.owner == "true")
+        {
+          channeload = false;
+          newchannel(msg.data, true);
+
+        }
+        else
+        {
+          channeload = false;
+          newchannel(msg.data, false);
+        }
       }
       if(msg.sentdata == "PM")
       {
@@ -1210,23 +1248,33 @@ function disp()
         focelem = this.closest("div");
         if(focelem.parentElement.id == 'true')
         {
-        CHNN = this.textContent.slice(0, this.textContent.length - 5);
-        chats = "chat" + focelem.id;
-        elem = document.getElementById(chats);
-        var thechats =  document.getElementsByClassName(CHNN + "channel")[0]
-        thechats = thechats.childNodes[1];
-        thechats = thechats.childNodes;
-        for(var i = 0; thechats.length != i; i++)
-        {
-          var selector = document.getElementsByClassName(CHNN + "channel")[0]
-          selector = selector.getAttribute("activechat"); 
-          var SELchat = thechats[i].textContent.slice(0, this.textContent.length - 5)
-          if(SELchat ==  selector)
+          if(focelem.parentElement.getAttribute("owner") == 'true')
           {
-            thechats[i].click();
-          } 
-        }
-        var notify = this.childNodes;
+            $("#DelChanBut").css("display", "block");
+            $("#LevChanBut").css("display", "none");
+          }
+          else
+          {
+            $("#DelChanBut").css("display", "none");
+            $("#LevChanBut").css("display", "block");
+          }
+          CHNN = this.textContent.slice(0, this.textContent.length - 5);
+          chats = "chat" + focelem.id;
+          elem = document.getElementById(chats);
+          var thechats =  document.getElementsByClassName(CHNN + "channel")[0]
+          thechats = thechats.childNodes[1];
+          thechats = thechats.childNodes;
+          for(var i = 0; thechats.length != i; i++)
+          {
+            var selector = document.getElementsByClassName(CHNN + "channel")[0]
+            selector = selector.getAttribute("activechat"); 
+            var SELchat = thechats[i].textContent.slice(0, this.textContent.length - 5)
+            if(SELchat ==  selector)
+            {
+              thechats[i].click();
+            } 
+          }
+          var notify = this.childNodes;
         if(notify[1].style.display = 'block')
         {
          notify[1].style.display = 'none';
@@ -1236,6 +1284,16 @@ function disp()
         }
         else
         {
+          if(focelem.parentElement.getAttribute("owner") == 'true')
+          {
+            $("#DelChanBut").css("display", "block");
+            $("#LevChanBut").css("display", "none");
+          }
+          else
+          {
+            $("#DelChanBut").css("display", "none");
+            $("#LevChanBut").css("display", "block");
+          }
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
           socket.emit("chatpull", {channelname: CHNN});
           chats = "chat" + focelem.id;
@@ -1274,6 +1332,16 @@ function disp()
         focelem = this.closest("div");
         if(focelem.parentElement.id == 'true')
         {
+          if(focelem.parentElement.getAttribute("owner") == 'true')
+          {
+            $("#DelChanBut").css("display", "block");
+            $("#LevChanBut").css("display", "none");
+          }
+          else
+          {
+            $("#DelChanBut").css("display", "none");
+            $("#LevChanBut").css("display", "block");
+          }
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
           var notify = this.childNodes;
           if(notify[1].style.display = 'block')
@@ -1301,6 +1369,16 @@ function disp()
         }
         else
         {
+          if(focelem.parentElement.getAttribute("owner") == 'true')
+          {
+            $("#DelChanBut").css("display", "block");
+            $("#LevChanBut").css("display", "none");
+          }
+          else
+          {
+            $("#DelChanBut").css("display", "none");
+            $("#LevChanBut").css("display", "block");
+          }
           firstchat = true;
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
           socket.emit("chatpull", {channelname: CHNN})
@@ -1445,6 +1523,9 @@ function newchannelbut()
   front.style.display = "block";
   newchannel();
 }
+/////////////////////////////////
+///Do a leave channel function///
+/////////////////////////////////
 function DeleteChannel()
 {
   namespace = '/test';
@@ -1465,7 +1546,7 @@ function DeleteChannel()
 
   }
 }
-function newchannel(response) 
+function newchannel(response, owner) 
 {   
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
@@ -1522,6 +1603,9 @@ function newchannel(response)
         lstid = channelplace.id;
         socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
         newchat("general", 1);
+        var isowner = document.createAttribute("owner");
+        isowner.value = 'true';
+        load.setAttributeNode(isowner);
       }
       else
       {
@@ -1543,6 +1627,18 @@ function newchannel(response)
         lstid = channelplace.id;
         focelem = channelplace;
         channeload = true;
+        if(owner == true)
+        {
+          var isowner = document.createAttribute("owner");
+          isowner.value = 'true';
+          load.setAttributeNode(isowner);
+        }
+        else
+        {
+          var isowner = document.createAttribute("owner");
+          isowner.value = 'false';
+          load.setAttributeNode(isowner);
+        }
       }
     }
 
@@ -1577,6 +1673,9 @@ function newchannel(response)
         focelem = channelplace;
         socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
         newchat("general", 1);
+        var isowner = document.createAttribute("owner");
+        isowner.value = 'true';
+        load.setAttributeNode(isowner);        
       }
       else
       {
@@ -1598,6 +1697,18 @@ function newchannel(response)
         lstid = channelplace.id;
         focelem = channelplace;
         channeload = true;
+        if(owner == true)
+        {
+          var isowner = document.createAttribute("owner");
+          isowner.value = 'true';
+          load.setAttributeNode(isowner);
+        }
+        else
+        {
+          var isowner = document.createAttribute("owner");
+          isowner.value = 'false';
+          load.setAttributeNode(isowner);
+        }       
       }
     }
 
