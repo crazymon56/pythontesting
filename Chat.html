@@ -77,6 +77,23 @@
     border: solid;
     cursor: pointer;
   }
+  .DeleteChatbutton{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: black;
+    text-align: center;
+    color: rgb(207, 207, 207);
+    border: solid;
+  }
+  .DeleteChatbutton:hover{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: rgb(207, 207, 207);
+    text-align: center;
+    color: black;
+    border: solid;
+    cursor: pointer;
+  }
   .LeaveChannelbutton{
     border-style: solid;
     border-radius: 12px;
@@ -108,12 +125,8 @@
     font-size: 65%;
   }
   .chatitle{
-    border-style: solid;
-    border-top-style: none;
-    border-left-style: none;
-    border-right-style: none;
-    border-color: black;
     color: rgb(68, 68, 68);
+    text-align: center;
   }
   .chat{
     height: 80%;
@@ -126,7 +139,7 @@
     border-color: black;
   }
   .chattop{
-    height: 
+    text-align: start;
   }
   .chatarea{
     height: 80%;
@@ -691,8 +704,8 @@
 
 <div id="back" class="container-fluid, chat">
     <div class="chattop">  
-    <button id="settings" onclick="ToOP(false)" class="change">Channel Settings</button>
-      <h1 class=chatitle id="Boldname">THIS IS A CHAT</h1>
+      <h1 class=chatitle id="Boldname"></h1>
+      <button id="settings" onclick="ToOP(false)" class="change">Channel Settings</button>
     </div>
       
       <div id="chatarea" class='chatarea'>
@@ -721,6 +734,8 @@
 <br>
 <br>
 <button class="DeleteChannelbutton" id="DelChanBut" onclick="DeleteChannel()">Delete Channel</button>
+<br>
+<button class="DeleteChatbutton" id="DelChatBut" onclick="DeleteChat()">Delete This Chat</button>
 <br>
 <button class="LeaveChannelbutton" id="LevChanBut" onclick="">Leave Channel</button>
 </div>
@@ -1049,23 +1064,39 @@ $(document).ready(function()
   socket.on('done', function()
   {
     focelem.parentElement.id = 'true';
-    var thechats =  document.getElementsByClassName(CHNN + "channel")[0]
-    thechats = thechats.childNodes[1];
-    thechats = thechats.childNodes;
-    for(var i = 0; thechats.length != i; i++)
+    if(focelem.childNodes[1] != null)
     {
-    var selector = document.getElementsByClassName(CHNN + "channel")[0]
-    selector = selector.getAttribute("activechat"); 
-    var SELchat = thechats[i].textContent.slice(0, thechats[i].textContent.length - 5)
-    if(SELchat ==  selector)
+      if(focelem.childNodes[1].childNodes.length == 0)
       {
-        thechats[i].click();
-      } 
+        $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+        $("#Boldname").text(CHNN);
+      }
+      else
+      {
+        var thechats =  document.getElementsByClassName(CHNN + "channel")[0]
+        thechats = thechats.childNodes[1];
+        thechats = thechats.childNodes;
+        for(var i = 0; thechats.length != i; i++)
+        {
+        var selector = document.getElementsByClassName(CHNN + "channel")[0]
+        selector = selector.getAttribute("activechat"); 
+        var SELchat = thechats[i].textContent.slice(0, thechats[i].textContent.length - 5)
+        if(SELchat ==  selector)
+          {
+            thechats[i].click();
+          } 
+        }
+        firstchat = true; 
+        var chats = null;          
+        chats = "chat" + focelem.id;
+        elem = document.getElementById(chats);
+      }
     }
-    firstchat = true; 
-    var chats = null;          
-    chats = "chat" + focelem.id;
-    elem = document.getElementById(chats);
+    else
+    {
+      $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+      $("#Boldname").text(CHNN);
+    }  
   })
 }); 
 
@@ -1248,52 +1279,64 @@ function disp()
         focelem = this.closest("div");
         if(focelem.parentElement.id == 'true')
         {
-          if(focelem.parentElement.getAttribute("owner") == 'true')
+          if(focelem.childNodes[1] == null)
           {
-            $("#DelChanBut").css("display", "block");
-            $("#LevChanBut").css("display", "none");
+            $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+            HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
           }
           else
           {
-            $("#DelChanBut").css("display", "none");
-            $("#LevChanBut").css("display", "block");
-          }
-          CHNN = this.textContent.slice(0, this.textContent.length - 5);
-          chats = "chat" + focelem.id;
-          elem = document.getElementById(chats);
-          var thechats =  document.getElementsByClassName(CHNN + "channel")[0]
-          thechats = thechats.childNodes[1];
-          thechats = thechats.childNodes;
-          for(var i = 0; thechats.length != i; i++)
-          {
-            var selector = document.getElementsByClassName(CHNN + "channel")[0]
-            selector = selector.getAttribute("activechat"); 
-            var SELchat = thechats[i].textContent.slice(0, this.textContent.length - 5)
-            if(SELchat ==  selector)
+            if(focelem.parentElement.getAttribute("owner") == 'true')
             {
-              thechats[i].click();
-            } 
+              $("#DelChanBut").css("display", "block");
+              $("#DelChatBut").css("display", "block");
+              $("#LevChanBut").css("display", "none");
+            }
+            else
+            {
+              $("#DelChanBut").css("display", "none");
+              $("#DelChatBut").css("display", "none");
+              $("#LevChanBut").css("display", "block");
+            }
+            CHNN = this.textContent.slice(0, this.textContent.length - 5);
+            chats = "chat" + focelem.id;
+            elem = document.getElementById(chats);
+            var thechats =  document.getElementsByClassName(CHNN + "channel")[0]
+            thechats = thechats.childNodes[1];
+            thechats = thechats.childNodes;
+            for(var i = 0; thechats.length != i; i++)
+            {
+              var selector = document.getElementsByClassName(CHNN + "channel")[0]
+              selector = selector.getAttribute("activechat"); 
+              var SELchat = thechats[i].textContent.slice(0, this.textContent.length - 5)
+              if(SELchat ==  selector)
+              {
+                thechats[i].click();
+              } 
+            }
+            var notify = this.childNodes;
+            if(notify[1].style.display = 'block')
+            {
+            notify[1].style.display = 'none';
+            }
+            lstid = this.closest("div").id;
+            firstchat = false;            
           }
-          var notify = this.childNodes;
-        if(notify[1].style.display = 'block')
-        {
-         notify[1].style.display = 'none';
-        }
-        lstid = this.closest("div").id;
-        firstchat = false; 
         }
         else
         {
           if(focelem.parentElement.getAttribute("owner") == 'true')
-          {
-            $("#DelChanBut").css("display", "block");
-            $("#LevChanBut").css("display", "none");
-          }
-          else
-          {
-            $("#DelChanBut").css("display", "none");
-            $("#LevChanBut").css("display", "block");
-          }
+            {
+              $("#DelChanBut").css("display", "block");
+              $("#DelChatBut").css("display", "block");
+              $("#LevChanBut").css("display", "none");
+            }
+            else
+            {
+              $("#DelChanBut").css("display", "none");
+              $("#DelChatBut").css("display", "none");
+              $("#LevChanBut").css("display", "block");
+            }
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
           socket.emit("chatpull", {channelname: CHNN});
           chats = "chat" + focelem.id;
@@ -1332,53 +1375,65 @@ function disp()
         focelem = this.closest("div");
         if(focelem.parentElement.id == 'true')
         {
-          if(focelem.parentElement.getAttribute("owner") == 'true')
+          if(focelem.childNodes[1] == null)
           {
-            $("#DelChanBut").css("display", "block");
-            $("#LevChanBut").css("display", "none");
+            $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+            HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
           }
           else
           {
-            $("#DelChanBut").css("display", "none");
-            $("#LevChanBut").css("display", "block");
-          }
-          CHNN = this.textContent.slice(0, this.textContent.length - 5);
-          var notify = this.childNodes;
-          if(notify[1].style.display = 'block')
-          {
-            notify[1].style.display = 'none';
-          }
-          lstid = this.closest("div").id;
-          chats = "chat" + focelem.id;
-          elem = document.getElementById(chats);
-          elem.style.display = "block";
-          var thechats =  document.getElementsByClassName(CHNN + "channel")[0]
-          thechats = thechats.childNodes[1];
-          thechats = thechats.childNodes;
-          for(var i = 0; thechats.length != i; i++)
-          {
-          var selector = document.getElementsByClassName(CHNN + "channel")[0]
-          selector = selector.getAttribute("activechat"); 
-          var SELchat = thechats[i].textContent.slice(0, thechats[i].textContent.length - 5)
-          if(SELchat ==  selector)
+            if(focelem.parentElement.getAttribute("owner") == 'true')
             {
-              thechats[i].click();
-            } 
+              $("#DelChanBut").css("display", "block");
+              $("#DelChatBut").css("display", "block");
+              $("#LevChanBut").css("display", "none");
+            }
+            else
+            {
+              $("#DelChanBut").css("display", "none");
+              $("#DelChatBut").css("display", "none");
+              $("#LevChanBut").css("display", "block");
+            }
+            CHNN = this.textContent.slice(0, this.textContent.length - 5);
+            var notify = this.childNodes;
+            if(notify[1].style.display = 'block')
+            {
+              notify[1].style.display = 'none';
+            }
+            lstid = this.closest("div").id;
+            chats = "chat" + focelem.id;
+            elem = document.getElementById(chats);
+            elem.style.display = "block";
+            var thechats =  document.getElementsByClassName(CHNN + "channel")[0]
+            thechats = thechats.childNodes[1];
+            thechats = thechats.childNodes;
+            for(var i = 0; thechats.length != i; i++)
+            {
+            var selector = document.getElementsByClassName(CHNN + "channel")[0]
+            selector = selector.getAttribute("activechat"); 
+            var SELchat = thechats[i].textContent.slice(0, thechats[i].textContent.length - 5)
+            if(SELchat ==  selector)
+              {
+                thechats[i].click();
+              } 
+            }
+            firstchat = false;
           }
-          firstchat = false;
         }
         else
         {
           if(focelem.parentElement.getAttribute("owner") == 'true')
-          {
-            $("#DelChanBut").css("display", "block");
-            $("#LevChanBut").css("display", "none");
-          }
-          else
-          {
-            $("#DelChanBut").css("display", "none");
-            $("#LevChanBut").css("display", "block");
-          }
+            {
+              $("#DelChanBut").css("display", "block");
+              $("#DelChatBut").css("display", "block");
+              $("#LevChanBut").css("display", "none");
+            }
+            else
+            {
+              $("#DelChanBut").css("display", "none");
+              $("#DelChatBut").css("display", "none");
+              $("#LevChanBut").css("display", "block");
+            }
           firstchat = true;
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
           socket.emit("chatpull", {channelname: CHNN})
@@ -1543,6 +1598,46 @@ function DeleteChannel()
   }
   else
   {
+
+  }
+}
+function DeleteChat()
+{
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+  var del = confirm("Delete this chat?");
+  if(del == true)
+  {
+    socket.emit("userdelete", {channel: CHNN, chat: activechat, select: 'chat'});
+    var delelem = focelem.childNodes[1]
+    delelem = delelem.childNodes;
+    for(var i = 0; delelem.length != i; i++)
+    {
+      if(delelem[i].textContent.slice(0, delelem[i].textContent.length - 5) == activechat)
+      {
+        var temp = delelem[i].parentElement;
+        temp.parentNode.removeChild(delelem);
+        if(focelem.childNodes[1].childNodes.length == 1)
+        {
+          $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.")
+        }
+        else
+        {
+          if(delelem[i + 1] == null)
+          {
+            delelem[0].click();
+          }
+          else
+          {
+            delelem[i + 1].click();
+          }
+
+        }
+        
+      }
+        
+    }
 
   }
 }
@@ -1745,14 +1840,23 @@ function newchat(response, notify)
   {
     firstchat = false;
   }
+
   if(chatname == null || chatname == "")
   {
-    
+
   }
   else
   {
     if(focelem.parentElement.id == 'true')
-    {
+      {  
+      if(focelem.childNodes[1] == null)
+      {
+        if(chatload == false)
+        {
+          firstchat = true;
+          socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: chatname})
+        }
+      }
       if(firstchat == false)
       {
         chatname = "#" + chatname;

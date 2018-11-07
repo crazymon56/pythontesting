@@ -209,7 +209,7 @@ def join_handle_made(sentroom):
                 text = text + possible[num]
             cursor.execute("SELECT link FROM channels WHERE link=%s", (text, ))
             if not cursor.fetchall():    
-                cursor.execute("INSERT INTO channels (channelname, link) VALUES(%s, %s)", (sentroom['channel'], text))
+                cursor.execute("INSERT INTO channels (ownerid, channelname, link) VALUES((SELECT id FROM users WHERE username=%s), %s, %s)", (username, sentroom['channel'], text))
                 cursor.execute("INSERT INTO chats (chatname, linkid) VALUES('#general', (SELECT id FROM channels WHERE channelname=%s))", (sentroom['channel'], ))
                 cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s))", (username, sentroom['channel']))
                 cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s)))", (username, sentroom['channel'], sentroom['channel']))
@@ -255,7 +255,9 @@ def delete_handler(data):
         cursor.execute("DELETE FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
         cursor.execute("DELETE FROM channels WHERE channelname=%s", (data['channel'], ))
     if data['select'] == 'chat':
-        pass
+        cursor.execute("DELETE FROM userlastdata WHERE channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (data['channel'], data['chat'], data['channel']))
+        cursor.execute("DELETE FROM messages WHERE channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (data['channel'], data['chat'], data['channel']))
+        cursor.execute("DELETE FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)", (data['chat'], data['channel']))
     UserIn.commit()
     cursor.close()
 #SigningUp
