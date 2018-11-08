@@ -737,7 +737,7 @@
 <br>
 <button class="DeleteChatbutton" id="DelChatBut" onclick="DeleteChat()">Delete This Chat</button>
 <br>
-<button class="LeaveChannelbutton" id="LevChanBut" onclick="">Leave Channel</button>
+<button class="LeaveChannelbutton" id="LevChanBut" onclick="LeaveChannel()">Leave Channel</button>
 </div>
 
 <div class="channelback" id="channelbox">
@@ -1054,7 +1054,7 @@ $(document).ready(function()
   {
     if(msg.notify == 'true')
     {
-      newchat(msg.data[0], true)
+      newchat(msg.data[0], true);
     }
     else
     {
@@ -1070,6 +1070,14 @@ $(document).ready(function()
       {
         $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
         $("#Boldname").text(CHNN);
+      }
+      else if(focelem.getAttribute("activechat") == 'null')
+      {
+        focelem.childNodes[1].childNodes[0].click();
+        firstchat = true; 
+        var chats = null;          
+        chats = "chat" + focelem.id;
+        elem = document.getElementById(chats);
       }
       else
       {
@@ -1184,6 +1192,7 @@ function tabbutton(flip)
     NM[1].style.display = "none";
     PM = false;
     var clickchannel = document.getElementsByClassName(CHNN + "channel");
+    focelem = clickchannel[0];
     if(activechat == "#general")
     {
       clickchannel = clickchannel[0].childNodes;
@@ -1192,6 +1201,7 @@ function tabbutton(flip)
     else
     {
       clickchannel = clickchannel[0].childNodes;
+      elem = clickchannel[1];
       clickchannel = clickchannel[1].childNodes;
       for(var i = 0; clickchannel.length != i; i++)
       {
@@ -1379,6 +1389,37 @@ function disp()
           {
             $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
             HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
+            elem = null;
+            if(focelem.parentElement.getAttribute("owner") == 'true')
+            {
+              $("#DelChanBut").css("display", "block");
+              $("#DelChatBut").css("display", "block");
+              $("#LevChanBut").css("display", "none");
+            }
+            else
+            {
+              $("#DelChanBut").css("display", "none");
+              $("#DelChatBut").css("display", "none");
+              $("#LevChanBut").css("display", "block");
+            }
+          }
+          else if(focelem.childNodes[1].childNodes.length == 0)
+          {
+            $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+            HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
+            elem = null;
+            if(focelem.parentElement.getAttribute("owner") == 'true')
+            {
+              $("#DelChanBut").css("display", "block");
+              $("#DelChatBut").css("display", "block");
+              $("#LevChanBut").css("display", "none");
+            }
+            else
+            {
+              $("#DelChanBut").css("display", "none");
+              $("#DelChatBut").css("display", "none");
+              $("#LevChanBut").css("display", "block");
+            }
           }
           else
           {
@@ -1578,9 +1619,26 @@ function newchannelbut()
   front.style.display = "block";
   newchannel();
 }
-/////////////////////////////////
-///Do a leave channel function///
-/////////////////////////////////
+function LeaveChannel()
+{
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+  var leave = confirm("Are you sure you want to leave?");
+  if(leave == true)
+  {
+    socket.emit("userleave", {channel: CHNN})
+    var delelem = focelem.parentElement;
+    delelem.parentNode.removeChild(delelem);
+    elem = null;
+    var clickelem = document.getElementById("channelsmenu").getElementsByClassName("load")[0]
+    clickelem.childNodes[0].childNodes[0].click();
+  }
+  else
+  {
+
+  }
+}
 function DeleteChannel()
 {
   namespace = '/test';
@@ -1616,9 +1674,9 @@ function DeleteChat()
     {
       if(delelem[i].textContent.slice(0, delelem[i].textContent.length - 5) == activechat)
       {
-        var temp = delelem[i].parentElement;
-        temp.parentNode.removeChild(delelem);
-        if(focelem.childNodes[1].childNodes.length == 1)
+        delelem[i].parentElement.removeChild(delelem[i]);;
+        
+        if(focelem.childNodes[1].childNodes.length == 0)
         {
           $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.")
         }
@@ -1662,8 +1720,8 @@ function newchannel(response, owner)
   var element = document.getElementById("channelsmenu");
   var cl = channelname + "channel";
   var notification = document.createElement("div");
-  var ACatt = document.createAttribute("Activechat");
-  ACatt.value = "#general";
+  var ACatt = document.createAttribute("activechat");
+  ACatt.value = null;
   channelplace.setAttributeNode(ACatt);
   firstchat = true;
   var channellink = joinchannel
@@ -1853,9 +1911,14 @@ function newchat(response, notify)
       {
         if(chatload == false)
         {
+          channelplace.setAttribute("activechat", "#" + chatname);
           firstchat = true;
-          socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: chatname})
+          socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: "#" + chatname})
         }
+      }
+      else
+      {
+        channelplace.setAttribute("activechat", "#" + chatname);
       }
       if(firstchat == false)
       {
