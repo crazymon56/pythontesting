@@ -134,7 +134,6 @@ def handle_chats(response):
         cursor.execute("SELECT chatname FROM chats WHERE id=%s", (items[0], ))
         stuff = cursor.fetchone()
         join_room(response['channelname'])
-        print(stuff[0])
         cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, response['channelname'], stuff[0], response['channelname']))
         lastmesid = cursor.fetchone()
         if lastmesid[0] != 0:
@@ -217,8 +216,6 @@ def join_handle_made(sentroom):
                 Mestime = time.asctime(time.localtime())
                 cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, "This is the beginning of everything.", username, '#general', sentroom['channel'], sentroom['channel']))
                 cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, username + ' has joined', username, '#general', sentroom['channel'], sentroom['channel']))
-
-        emit('confirmjoinmessage', {'data' : session['username'] + ' has joined'})
     elif sentroom['select'] == 'join':
         cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
         if not cursor.fetchall():
@@ -235,13 +232,13 @@ def join_handle_made(sentroom):
             cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE link=%s))", (username, sentroom['link']))
             cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
             stuff = cursor.fetchone()
-            emit('userdata', {'data': stuff[0], 'sentdata': 'channel'})
+            emit('userdata', {'data': stuff[0], 'sentdata': 'channel', 'owner': 'false', 'join': 'true'})
     else:
         cursor.execute("INSERT INTO chats (chatname, linkid) VALUES(%s, (SELECT id FROM channels WHERE channelname=%s))", (sentroom['chatname'], sentroom['channel']))
         cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s) AND chatname=%s))", (username, sentroom['channel'], sentroom['channel'], sentroom['chatname']))
         Mestime = time.asctime(time.localtime())
         cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, "This is the beginning of everything.", username, sentroom['chatname'], sentroom['channel'], sentroom['channel']))
-        ##FIX DUPLICATE CHATS
+        ##Fix when owner adds a new chat, other users in channel do not get added.
     UserIn.commit()
     cursor.close()
 

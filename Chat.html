@@ -811,11 +811,6 @@ $(document).ready(function()
         socket.emit('connectdone')
       })
   }
-  
-  socket.on('confirmjoinmessage', function(msg)
-  {
-    $('#chatarea').append('<br>' + msg.data);
-  })
   socket.on('confirmjoin', function(msg)
   {
     if(msg.select == 'nochannel')
@@ -854,13 +849,20 @@ $(document).ready(function()
         if(msg.owner == "true")
         {
           channeload = false;
-          newchannel(msg.data, true);
-
+          newchannel(msg.data, true, false);
         }
         else
         {
-          channeload = false;
-          newchannel(msg.data, false);
+          if(msg.join == "true")
+          {
+            channeload = false;
+            newchannel(msg.data, false, true);
+          }
+          else
+          {
+            channeload = false;
+            newchannel(msg.data, false, false);
+          }
         }
       }
       if(msg.sentdata == "PM")
@@ -1301,12 +1303,14 @@ function disp()
               $("#DelChanBut").css("display", "block");
               $("#DelChatBut").css("display", "block");
               $("#LevChanBut").css("display", "none");
+              $("#small").css("display", "block");
             }
             else
             {
               $("#DelChanBut").css("display", "none");
               $("#DelChatBut").css("display", "none");
               $("#LevChanBut").css("display", "block");
+              $("#small").css("display", "none");
             }
             CHNN = this.textContent.slice(0, this.textContent.length - 5);
             chats = "chat" + focelem.id;
@@ -1340,12 +1344,14 @@ function disp()
               $("#DelChanBut").css("display", "block");
               $("#DelChatBut").css("display", "block");
               $("#LevChanBut").css("display", "none");
+              $("#small").css("display", "block");
             }
             else
             {
               $("#DelChanBut").css("display", "none");
               $("#DelChatBut").css("display", "none");
               $("#LevChanBut").css("display", "block");
+              $("#small").css("display", "none");
             }
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
           socket.emit("chatpull", {channelname: CHNN});
@@ -1395,12 +1401,14 @@ function disp()
               $("#DelChanBut").css("display", "block");
               $("#DelChatBut").css("display", "block");
               $("#LevChanBut").css("display", "none");
+              $("#small").css("display", "block");
             }
             else
             {
               $("#DelChanBut").css("display", "none");
               $("#DelChatBut").css("display", "none");
               $("#LevChanBut").css("display", "block");
+              $("#small").css("display", "none");
             }
           }
           else if(focelem.childNodes[1].childNodes.length == 0)
@@ -1413,12 +1421,14 @@ function disp()
               $("#DelChanBut").css("display", "block");
               $("#DelChatBut").css("display", "block");
               $("#LevChanBut").css("display", "none");
+              $("#small").css("display", "block");
             }
             else
             {
               $("#DelChanBut").css("display", "none");
               $("#DelChatBut").css("display", "none");
               $("#LevChanBut").css("display", "block");
+              $("#small").css("display", "none");
             }
           }
           else
@@ -1428,12 +1438,14 @@ function disp()
               $("#DelChanBut").css("display", "block");
               $("#DelChatBut").css("display", "block");
               $("#LevChanBut").css("display", "none");
+              $("#small").css("display", "block");
             }
             else
             {
               $("#DelChanBut").css("display", "none");
               $("#DelChatBut").css("display", "none");
               $("#LevChanBut").css("display", "block");
+              $("#small").css("display", "none");
             }
             CHNN = this.textContent.slice(0, this.textContent.length - 5);
             var notify = this.childNodes;
@@ -1468,12 +1480,14 @@ function disp()
               $("#DelChanBut").css("display", "block");
               $("#DelChatBut").css("display", "block");
               $("#LevChanBut").css("display", "none");
+              $("#small").css("display", "block");
             }
             else
             {
               $("#DelChanBut").css("display", "none");
               $("#DelChatBut").css("display", "none");
               $("#LevChanBut").css("display", "block");
+              $("#small").css("display", "none");
             }
           firstchat = true;
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
@@ -1628,8 +1642,11 @@ function LeaveChannel()
   if(leave == true)
   {
     socket.emit("userleave", {channel: CHNN})
+    $("." + CHNN + "channel").parent().prev().remove();
     var delelem = focelem.parentElement;
     delelem.parentNode.removeChild(delelem);
+    $("#OPback").css("display", "none");
+    $("#front").css("display", "block");
     elem = null;
     var clickelem = document.getElementById("channelsmenu").getElementsByClassName("load")[0]
     clickelem.childNodes[0].childNodes[0].click();
@@ -1648,8 +1665,11 @@ function DeleteChannel()
   if(del == true)
   {
     socket.emit("userdelete", {channel: CHNN, select: 'channel'});
+    $("." + CHNN + "channel").parent().prev().remove();
     var delelem = focelem.parentElement;
     delelem.parentNode.removeChild(delelem);
+    $("#OPback").css("display", "none");
+    $("#front").css("display", "block");
     elem = null;
     var clickelem = document.getElementById("channelsmenu").getElementsByClassName("load")[0]
     clickelem.childNodes[0].childNodes[0].click();
@@ -1690,16 +1710,12 @@ function DeleteChat()
           {
             delelem[i + 1].click();
           }
-
         }
-        
       }
-        
     }
-
   }
 }
-function newchannel(response, owner) 
+function newchannel(response, owner, joining) 
 {   
   namespace = '/test';
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
@@ -1777,8 +1793,6 @@ function newchannel(response, owner)
         notification.className = "notificationmarkchat";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
-        lstid = channelplace.id;
-        focelem = channelplace;
         channeload = true;
         if(owner == true)
         {
@@ -1791,6 +1805,15 @@ function newchannel(response, owner)
           var isowner = document.createAttribute("owner");
           isowner.value = 'false';
           load.setAttributeNode(isowner);
+        }
+        if(joining == true)
+        {
+
+        }
+        else
+        {
+          lstid = channelplace.id;          
+          focelem = channelplace;        
         }
       }
     }
@@ -1822,13 +1845,15 @@ function newchannel(response, owner)
         notification.className = "notificationmarkchat";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
-        lstid = channelplace.id;
         focelem = channelplace;
         socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
         newchat("general", 1);
+        if(owner != false)
+        {
         var isowner = document.createAttribute("owner");
         isowner.value = 'true';
         load.setAttributeNode(isowner);        
+        }
       }
       else
       {
@@ -1847,8 +1872,6 @@ function newchannel(response, owner)
         notification.className = "notificationmarkchat";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
-        lstid = channelplace.id;
-        focelem = channelplace;
         channeload = true;
         if(owner == true)
         {
@@ -1861,13 +1884,19 @@ function newchannel(response, owner)
           var isowner = document.createAttribute("owner");
           isowner.value = 'false';
           load.setAttributeNode(isowner);
-        }       
+        } 
+        if(joining == true)
+        {
+
+        }
+        else
+        {
+          lstid = channelplace.id;          
+          focelem = channelplace;        
+        }     
       }
     }
-
   }
-  
-
 }
 
 function newchat(response, notify)
@@ -1878,7 +1907,8 @@ function newchat(response, notify)
   {
     if(notify == 1)
     {
-      var chatname = response
+      var chatname = response;
+      firstchat = true;
     }
     else
     {
@@ -1909,11 +1939,17 @@ function newchat(response, notify)
       {  
       if(focelem.childNodes[1] == null)
       {
-        if(chatload == false)
+        if(notify == 1)
         {
           channelplace.setAttribute("activechat", "#" + chatname);
           firstchat = true;
-          socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: "#" + chatname})
+          
+        }
+        else if(chatload == false)
+        {
+          channelplace.setAttribute("activechat", "#" + chatname);
+          firstchat = true;
+          socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: "#" + chatname});
         }
       }
       else
@@ -1948,6 +1984,11 @@ function newchat(response, notify)
         notification.className = "notificationmarkSchat";
         chat.appendChild(notification);
         chatplace.appendChild(chat);
+        if(notify == 1)
+        {
+          chatplace.style.display = 'none';
+          focelem = document.getElementsByClassName(CHNN + "channel")[0];
+        }        
       }
     }
     else
