@@ -665,7 +665,9 @@
 <div class="topbackground" style="background-color:rgb(68, 68, 68)">
   <div class=top>
     <h1 id=text></h1>
-      <input class=logoutbutton type="submit" onclick='logginout()' value="Logout" />
+    <form id='logout' method="POST" action='/Logout'> 
+      <input class=logoutbutton type="submit" onclick='logginout()' value="Logout" />  
+    </form>
     <h3><center>B<sup>3</sup></center></h3>
   </div>      
   
@@ -1148,14 +1150,11 @@ function ToOP(close)
 function logginout()
 {
   namespace = '/test';
-
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+  
   socket.emit('logout');
 }
-function options()
-{
 
-}
 function tabbutton(flip)
 {
   var allchannels = document.getElementById("channelsmenu");
