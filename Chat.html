@@ -150,6 +150,18 @@
     border-bottom-style: none;
     border-left-style: none;
   }
+  .loadmessages{
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+  }
+  .newmesline{
+    width: 100%;
+    color: red;
+    text-align: center;
+    border-bottom: solid;
+    display: none;
+  }
   .channels{
     padding-top: 10px;
     width: 20%;
@@ -710,8 +722,12 @@
       <button id="settings" onclick="ToOP(false)" class="change">Channel Settings</button>
     </div>
       
-      <div id="chatarea" class='chatarea'>
-      </div>
+      <div id="chatarea" class="chatarea">
+          <div id="loadmessages" class="loadmessages" onclick="loadmoremes()">Click to load more messages</div>
+          <div id=messages >
+            <div id="newmesline" class="newmesline">New messages start below</div>
+          </div>
+        </div>
       <form id='mes' method="POST" action='#'> 
       <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message autocomplete=off /><input class="sendbutton" type=submit value=Send />
       </form>
@@ -919,14 +935,30 @@ $(document).ready(function()
         }
         else
         {
-          $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm);  
+          if(PM == true)
+          {
+            $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span");  
+          }
+          else
+          {
+            var PMS = $("#PMmenu").find("button");
+            for(var i = 0; PMS.length != i; i++)
+            {
+              var NM = PMS[i].childNodes;
+              if(PMS[i].textContent.slice(0, PMS[i].textContent.length - 5) == msg.sender)
+              {
+                NM[1].style.display = "block";
+              }
+            }
+            // socket.emit('useresponse', {data: "", PM: 'true', DT: msg.DT, sender: msg.sender});
+          }
         }
       }
       if(msg.sender == "_")
       {
         if(msg.reciever == document.getElementById("Boldname").textContent)
         {
-          $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
+          $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span"); 
         }
       }
     }
@@ -936,33 +968,23 @@ $(document).ready(function()
       {
         if(msg.UPchat == activechat)
         {
-          $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
+          $("#messages").append("<br><sup>" + msg.DT + "</sup>" + "<span>" + msg.userm +"</span>");  
         }
         else
         { 
-          
-          if(msg.UPchat == "#general")
+          var notifiedC = document.getElementsByClassName(msg.UPchannel + "channel");
+          notifiedC = notifiedC[0].childNodes;
+          notifiedC = notifiedC[1].childNodes;
+          for(var i = 0; notifiedC.length != i; i++)
           {
-            var notifiedC = document.getElementsByClassName(msg.UPchannel + "channel");
-            notifiedC = notifiedC[0].childNodes;
-            notifiedC = notifiedC[0].childNodes;
-            notifiedC[1].style.display = "block";  
-          }
-          else
-          {
-            var notifiedC = document.getElementsByClassName(msg.UPchannel + "channel");
-            notifiedC = notifiedC[0].childNodes;
-            notifiedC = notifiedC[1].childNodes;
-            for(var i = 0; notifiedC.length != i; i++)
+            var tempname = notifiedC[i].textContent.slice(0, notifiedC[i].textContent.length - 5);
+            if(tempname == msg.UPchat)
             {
-              var tempname = notifiedC[i].textContent.slice(0, notifiedC[i].textContent.length - 5);
-              if(tempname == msg.UPchat)
-              {
-                var temp = notifiedC[i].childNodes;
-                temp[1].style.display = "block";
-              }
-            }           
-          }
+              var temp = notifiedC[i].childNodes;
+              temp[1].style.display = "block";
+            }
+          }           
+          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: activechat, PM: 'false', DT: msg.DT, sender: msg.sender});
         }
       }
       else
@@ -993,6 +1015,7 @@ $(document).ready(function()
               }
             }
           }
+          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: activechat, PM: 'false', DT: msg.DT, sender: msg.sender})
         }
         else
         {
@@ -1029,13 +1052,30 @@ $(document).ready(function()
   {
     if(load == false)
     { 
-      $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + msg.userm); 
+      if(msg.newmesstart == "true")
+      {
+        $("#messages").prepend("<br><sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span>");
+        $("#newmesline").css("display", "block");        
+        $("#newmesline").prependTo("#messages");
+      }
+      else
+      {
+        $("#messages").prepend("<br><sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span>"); 
+      }
     }
   })
 
   socket.on('messageloaddone', function()
   {
     load = true;
+    if(($("#messages").children().length - 1) % 135 == 0)
+    {
+      $("#loadmessages").css("display", "block");
+    }
+    else
+    {
+      $("#loadmessages").css("display", "none");
+    }
   })
 
   $('form#mes').submit(function(event)
@@ -1147,6 +1187,15 @@ function ToOP(close)
     options.style.display = "block";
   }
 }
+function loadmoremes()
+{
+  namespace = '/test';
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+  var num = ($("#messages").children().length - 1) / 3 / 45
+  load = false;
+  socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "true", num: num})
+}
 function logginout()
 {
   namespace = '/test';
@@ -1164,7 +1213,6 @@ function tabbutton(flip)
     PM = true;
     allchannels.style.display = 'none';
     allPM.style.display = 'block';
-    $("#chatarea").empty();
     $("#PMtab").find("div").css("display", "none");
     if($("#PMmenu").find(".chatbub").length > 0)
     {
@@ -1228,7 +1276,7 @@ function disp()
   if(PM == true)
   {
     HLName.style.height = '15%';
-    $("#chatarea").empty()
+    $('#messages').find("*").not("#newmesline").remove();
     if(this.id == lstid)
     {
       x.style.display = "none";
@@ -1274,12 +1322,17 @@ function disp()
         HLName.textContent = CHNN + ": " + this.textContent.slice(0, this.textContent.length - 5);
         HLName.style.height = '9%';
         activechat = this.textContent.slice(0, this.textContent.length - 5);
-        $('#chatarea').empty();
-        socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false', sender: "", reciever: ""})
+        $('#messages').find("*").not("#newmesline").remove();
+        socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "", num: ""})
         var notify = this.childNodes;
-        if(notify[1].style.display = 'block')
+        if(notify[1].style.display == 'block')
         {
+
           notify[1].style.display = 'none';
+        }
+        else
+        {
+          $("#newmesline").css("display", "none");         
         }
     }
     else
