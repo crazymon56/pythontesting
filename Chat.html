@@ -923,25 +923,33 @@ $(document).ready(function()
       {
         if(activePM != msg.sender)
         {
-          var PMS = $("#PMmenu").find("button");
+          var PMexist = false;
+
+          var PMS = $("#PMmenu").find(".chatbub");
           for(var i = 0; PMS.length != i; i++)
           {
             var NM = PMS[i].childNodes;
             if(PMS[i].textContent.slice(0, PMS[i].textContent.length - 5) == msg.sender)
             {
+              PMexist = true;
               NM[1].style.display = "block";
             }
           }
+          if(PMexist == false)
+          {
+            newPM(msg.sender, true)
+          }
+          socket.emit('useresponse', {data: "", PM: 'true', DT: msg.DT, sender: msg.sender});
         }
         else
         {
           if(PM == true)
           {
-            $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span");  
+            $('#messages').append('<br>' + "<sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span");  
           }
           else
           {
-            var PMS = $("#PMmenu").find("button");
+            var PMS = $("#PMmenu").find(".chatbub");
             for(var i = 0; PMS.length != i; i++)
             {
               var NM = PMS[i].childNodes;
@@ -950,7 +958,7 @@ $(document).ready(function()
                 NM[1].style.display = "block";
               }
             }
-            // socket.emit('useresponse', {data: "", PM: 'true', DT: msg.DT, sender: msg.sender});
+            socket.emit('useresponse', {data: "", PM: 'true', DT: msg.DT, sender: msg.sender});
           }
         }
       }
@@ -958,7 +966,7 @@ $(document).ready(function()
       {
         if(msg.reciever == document.getElementById("Boldname").textContent)
         {
-          $('#chatarea').append('<br>' + "<sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span"); 
+          $('#messages').append('<br>' + "<sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span"); 
         }
       }
     }
@@ -1194,7 +1202,14 @@ function loadmoremes()
 
   var num = ($("#messages").children().length - 1) / 3 / 45
   load = false;
-  socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "true", num: num})
+  if(PM == true)
+  {
+    socket.emit('messagepull', {PM: 'true', sender: user, reciever: activePm, extraload: "true", num: num})
+  }
+  else
+  {
+    socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "true", num: num})
+  }
 }
 function logginout()
 {
@@ -1287,9 +1302,13 @@ function disp()
       elem = null;
       activePM = this.textContent.slice(0, this.textContent.length - 5);
       var notify = this.childNodes;
-      if(notify[1].style.display = 'block')
+      if(notify[1].style.display == 'block')
       {
         notify[1].style.display = 'none';
+      }
+      else
+      {
+        $("#newmesline").css("display", "none");         
       }
     }
     else
@@ -1302,12 +1321,16 @@ function disp()
       focelem = this;
       activePM = this.textContent.slice(0, this.textContent.length - 5);
       var notify = this.childNodes;
-      if(notify[1].style.display = 'block')
+      if(notify[1].style.display == 'block')
       {
         notify[1].style.display = 'none';
       }
+      else
+      {
+        $("#newmesline").css("display", "none");         
+      }
     }
-    socket.emit('messagepull', {PM: 'true', sender: user, reciever: this.textContent.slice(0, this.textContent.length - 5)});
+    socket.emit('messagepull', {PM: 'true', sender: user, reciever: this.textContent.slice(0, this.textContent.length - 5), extraload: ""});
   }
   else
   {
@@ -1606,12 +1629,8 @@ function newPM(x, PMcheck)
   }
   else
   {
-    var chatuser = x.target.textContent;  
+    var chatuser = x.target.textContent;
     socket.emit('PMjoin', {sender: user, reciever: chatuser, recieve: ""});
-  }
-  if(activePM != chatuser)
-  {
-
   }
   PMbub.className = "chatbub";
   PMbub.id = chatuser + 'PM';
