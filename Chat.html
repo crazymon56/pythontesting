@@ -291,6 +291,8 @@
   .channeltab{
     width: 50%;
     font-size: 75%;
+    height: 40px;
+    text-align: center;
     color: white;
     position: absolute;
     left: 0%;
@@ -356,9 +358,17 @@
   }
   .channelsmenu{
     display: block;
+    position: absolute;
+    top: 8%;
+    left: 0%;
+    width: 100%;
   }
   .PMmenu{
     display: none;
+    position: absolute;
+    top: 8%;
+    left: 0%;
+    width: 100%;
   }
   .optionbutton{
     border-style:solid;
@@ -414,13 +424,36 @@
     position: absolute;
   }
   .innersharelinkbox{
-    width: 75%;
+    width: 65%;
     height: 75%;
     text-align: center;
     background-color: white;
     position: absolute;
-    right: 10%;
+    right: 20%;
     top: 10%;
+  }
+  .copytoclipboard{
+    position: absolute;
+    right: 0%;
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    font-size: 100%;
+  }
+  .copytoclipboard:hover{
+    position: absolute;
+    right: 0%;
+    border-style:solid;
+    border-radius: 12px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    font-size: 100%;
+    cursor: pointer;
   }
   .chatbub{
     height: 90px;
@@ -544,12 +577,32 @@
   }
   .channels{
       width: 25%;
+      position: relative;
   }
   .chat{
       width: 75%;
   }
   .chatarea{
     width: 100%;
+  }
+  .settings{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    position: absolute;
+    top: 10%;
+  }
+  .settings:hover{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    cursor: pointer;
   }  
   }
   @media only screen and (max-width: 550px)
@@ -561,13 +614,10 @@
     {
       width: 100%;
       position: absolute;
+      height: 35px;
       top: 0%;
       font-size: 60%;
-    }
-    .channeltabtext{
-      position: absolute;
-      top: 23%;
-      right: 23%;
+      text-align: center;
     }
     .PMtab
     {
@@ -576,7 +626,8 @@
       position: absolute;
       bottom: 0%;
     }
-    .channeltab:hover{
+    .channeltab:hover
+    {
     width: 100%;
     font-size: 60%;
     top: 0%;
@@ -586,7 +637,6 @@
     border-color: black;
     background-color: white;
     cursor: pointer;
-    
   }
   .channeltab:focus{
     width: 100%;
@@ -642,11 +692,12 @@
   }
   .channelsmenu{
     position: absolute;
-    top: 5%;
+    top: 15%;
   }
   .PMmenu{
     position: absolute;
-    top: 5%;
+    top: 15%;
+    width: 100%;
   }
   .channels{
     position: relative;
@@ -658,12 +709,13 @@
   .sendbutton{
     font-size: 75%;
     bottom: 0%;
-    width: 100%;
-    height: 7%;
+    width: 30%;
+    height: 30px;
   }
   .chattext{
-    bottom: 6.5%;
-    width: 100%;
+    bottom: 0%;
+    width: 70%;
+    height: 30px;
   }
   .chatarea{
     font-size: 85%;
@@ -671,6 +723,87 @@
   }
   .chatitle{
     font-size: 150%;
+  }
+  .settings{
+    border-style:solid;
+    height: 4%;
+    font-size: 70%;
+    border-radius: 7px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    position: absolute;
+    top: 10%;
+  }
+  .settings:hover{
+    border-style:solid;
+    font-size: 70%;
+    border-radius: 7px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    cursor: pointer;
+  }
+  .sharelinkbut{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    position: absolute;
+  }
+  .sharelinkbut:hover{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    position: absolute;
+    cursor: pointer;
+  }
+  .sharelinkbox{
+    width: 75%;
+    height: 10%;
+    border-style: solid;
+    border-color: black;
+    background-color: rgb(71, 71, 71);
+    position: absolute;
+  }
+  .innersharelinkbox{
+    width: 65%;
+    height: 75%;
+    text-align: center;
+    background-color: white;
+    position: absolute;
+    right: 20%;
+    top: 10%;
+  }
+  .copytoclipboard{
+    position: absolute;
+    right: 0%;
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    font-size: 75%;
+  }
+  .copytoclipboard:hover{
+    position: absolute;
+    right: 0%;
+    border-style:solid;
+    border-radius: 12px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    font-size: 75%;
+    cursor: pointer;
   }
 }
 </style>
@@ -692,22 +825,16 @@
 <div id=chan class="container-fluid, channels">
   <div class=tabs style=position:relative>
     <button id=channeltab class=channeltab onclick="tabbutton(0)"><div class="channeltabtext">Channels</div>
-    <br>
-    <br>
     <div class="notificationmarktab"><div style="transform: rotate(90deg)">blah!</div></div></button>
     <button id=PMtab class=PMtab onclick="tabbutton(1)">Private<div class="notificationmarktab"><div style="transform: rotate(90deg)">blah!</div></div> 
       <br>
       Messages</button>
   </div >
   <div class="channelsmenu" id="channelsmenu">
-    <br>
-    <br>
     <button class=change style=float:left onclick="channelbox(false)">+</button>
     <br>
   </div>
   <div class="PMmenu" id="PMmenu">
-    <br>
-    <br>
     <button class=change style=float:left onclick="PMsearchbox(false)">+PM</button> 
     <br>
     <br>
@@ -719,7 +846,7 @@
 <div id="back" class="container-fluid, chat">
     <div class="chattop">  
       <h1 class=chatitle id="Boldname"></h1>
-      <button id="settings" onclick="ToOP(false)" class="change">Channel Settings</button>
+      <button id="settings" onclick="ToOP(false)" class="settings">Channel Settings</button>
     </div>
       
       <div id="chatarea" class="chatarea">
@@ -747,6 +874,7 @@
   <button class='change' id='linkclose' onclick='sharelinkbut(true)'>x</button>
   <div class="innersharelinkbox" id='linkinsert'> 
   </div>
+  <button id="copytext" class="copytoclipboard" data-clipboard-target="#linkinsert" onclick="cpytxt()">Copy</button>
   <br>
 </div>
 <br>
@@ -794,6 +922,7 @@
 			  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
         crossorigin="anonymous"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js" ></script>
 <script type="text/javascript" charset="utf-8">
 var channelplace = null;
 var chatplace = null;
@@ -1169,14 +1298,21 @@ function textcolor(TColor)
 }
 function backgroundcolor(BKcolor)
 {
-  var elem = document.getElementById('back');
-  elem.style.backgroundColor = BKcolor;
+  $("body").css("background-color", BKcolor);
 }
 function smallchan() 
 {
   var c = document.createElement("button");
   c.setAttribute("class", "smallchatbub");
   c.setAttribute("id", "small");
+}
+function cpytxt()
+{
+  new ClipboardJS('#copytext', {
+    text: function(trigger) {
+        return trigger.getAttribute('#linkinsert');
+    }
+});
 }
 function ToOP(close)
 {
