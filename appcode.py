@@ -269,9 +269,9 @@ def join_handle_made(sentroom):
             cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE link=%s))", (username, sentroom['link']))
             cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
             stuff = cursor.fetchone()
-            cursor.execute("SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s) LIMIT 1", (stuff[0]))
+            cursor.execute("SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s) LIMIT 1", (stuff[0], ))
             joinchat = cursor.fetchone()
-            cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, username + ' has joined', username, joinchat[0], stuff[0], stuff[0]))
+            cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), %s, (SELECT id FROM channels WHERE channelname=%s))", (Mestime, username + ' has joined', username, joinchat[0], stuff[0]))
             emit('userdata', {'data': stuff[0], 'sentdata': 'channel', 'owner': 'false', 'join': 'true'})
     else:
         cursor.execute("INSERT INTO chats (chatname, linkid) VALUES(%s, (SELECT id FROM channels WHERE channelname=%s))", (sentroom['chatname'], sentroom['channel']))
