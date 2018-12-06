@@ -5,18 +5,16 @@
     - Make a logo for Blah Chat.
 
 #CURRENT TASK
-----Getting network setup so Chat system actually can operate.
-----Use these websites.
-https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
-http://api.jquery.com/jquery.ajax/
-https://www.tutorialspoint.com/flask/flask_sessions.htm
-https://flask-socketio.readthedocs.io/en/latest/
-https://pythonprogramming.net/flask-homepage-completed/
-----Get Chat system up and working.
+-----FIX the unicode server side to recognize it.
+    --------Look up mysql unicode and see how it works.
+-----Check when user sends a message to a deleted channel/chat.
+-----Double check PM when user tries to search for a user they are already in a chat with
+-----Double check when user creates a channel
+-----Have it to where user immediatelly clicks on joined channel
 
 
 #LOGIN PAGE
-1. 
+1. Reorganize the way it looks.
 
 
 

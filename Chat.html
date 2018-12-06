@@ -1,16 +1,12 @@
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" charset="UTF-8">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
-
 <style>
-  * {
-    box-sizing: border-box;
-  }
   .top{
   
-    height: 20%;
+    height: 100%;
     width: 100%;
     border-style: solid;
     border-width: 5px, auto;
@@ -19,6 +15,9 @@
     border-right-color: black;
     border-left-color: black;
     border-top-color: black;
+  }
+  .topbackground{
+    height: 20%;
   }
   .topbottom{
     border-left-style: solid;
@@ -115,13 +114,14 @@
     position: absolute;
     bottom: 0%;
     width: 90%;
+    height: 6%;
   }
   .sendbutton{
     position: absolute;
     bottom: 0;
     right: 0;
     width: 10%;
-    height: 35px;
+    height: 6%;
     font-size: 65%;
   }
   .chatitle{
@@ -135,13 +135,16 @@
     position: relative;
     border-style: solid;
     border-left-style: none;
-    border-width: auto;
-    border-color: black;
+    border-color: black;;
   }
   .chattop{
-    text-align: start;
+    position: absolute;
+    top: 0%;
+    padding-left: 0;
+    padding-right: 0;
   }
   .chatarea{
+    border-color: black;
     height: 80%;
     position: absolute;
     bottom: 6%;
@@ -164,7 +167,6 @@
     display: none;
   }
   .channels{
-    padding-top: 10px;
     width: 20%;
     height: 80%;
     float: left;
@@ -250,7 +252,6 @@
     bottom: 50%;
     border-style: solid;
     border-color: black;
-
   }
   .usersearchinput{
     position: absolute;
@@ -267,9 +268,9 @@
     border-style: solid;
     padding: 12px 16px;
     border-color: black;
-    left: 15%;
+    left: 0%;
     top: 45%;
-    width: 70%;
+    width: 100%;
     list-style-type: none;
     text-align: center;
   }
@@ -287,7 +288,11 @@
     cursor: pointer;
   }
   .tabs{
-    position: relative;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 1;
+    align-items: flex-start; 
   }
   .channeltab{
     width: 50%;
@@ -304,6 +309,7 @@
   .PMtab{
     width: 50%;
     font-size: 75%;
+    height: 40px;
     color: white;
     position: absolute;
     right: 0%;
@@ -500,15 +506,6 @@
     display: none;
   }
   .notificationmarktab{
-    color: white;
-    background-color: red;
-    text-align: center;
-    font-size: 95%;
-    width: 10%;
-    height: 100%;
-    position: absolute;
-    top: 0%;
-    left: 0%;
     display: none;
   }
   .smallchatbub{
@@ -530,29 +527,10 @@
     font-size: 10px;
     cursor: pointer;
   }
-  .smallchatbub:focus{
-    height: 40px;
-    width: 100%;
-    border-style: solid;
-    border-width: 3.5px;
-    border-color: black;
-    background-color: white;
-    font-family: fantasy;
-    font-size-adjust: 0.5; 
-    border-radius: 12px;
-    text-align: center;
-    text-decoration: none;
-    text-size-adjust: auto;
-    position: relative;
-    float: left;
-    overflow: hidden;
-    font-size: 10px;
-    cursor: pointer;
-  }
   .chatbub:hover{
     transform: scale(1.2)
   }
-  @media only screen and (min-width: 551px)
+  /* @media only screen and (min-width: 551px)
   {
   .tabs{
     position: relative;
@@ -593,82 +571,101 @@
     width: 100%;
   }
   .chattop{
-    position: relative;
+    position: absolute;
     height: 14%;
   }
   .CHsettings{
     border-style:solid;
     border-radius: 12px;
-    background-color: white;
+    background-color: white; 
     text-align: center;
-    color: gray;
-    border: solid;
+    color: gray; 
+    border: solid; 
     position: absolute;
     bottom: 0%;
   }
   .CHsettings:hover{
     border-style:solid;
     border-radius: 12px;
-    background-color: gray;
+    background-color: gray; 
     text-align: center;
     color: white;
-    border: solid;
+    border: solid; 
     cursor: pointer;
   }
   .PSsettings{
     border-style:solid;
     border-radius: 12px;
-    background-color: white;
+    background-color: white; 
     text-align: center;
     color: gray;
-    border: solid;
+    border: solid; 
     position: absolute;
     bottom: 0%;
-    left: 18%;
+    right: 0%;
     
   }
   .PSsettings:hover{
     border-style:solid;
     border-radius: 12px;
-    background-color: gray;
+    background-color: gray; 
     text-align: center;
     color: white;
-    border: solid;
-    cursor: pointer;
-  }  
+    border: solid; 
+    cursor: pointer; 
+  }   */
+  @media (max-width: 549.99px) and (min-height: 0px)
+{
+  .container-fluid{
+    padding-right: 0;
+    padding-left: 0;
   }
-  @media only screen and (max-width: 550px)
+    .chatbub{
+    height: 75px;
+    width: 75px;
+    color: black;
+    background-color: white;
+    border: none;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    transition: transform .5s;
+    cursor: pointer;
+    margin: auto;
+  }
+  .chatbub:hover{
+    transform: scale(1.2)
+  }
+  .tabs{
+    height: 75px;
+  }
+  .channeltab
   {
-    .tabs{
-      top: 5%;
-    }
-    .channeltab
-    {
-      width: 100%;
-      position: absolute;
-      height: 35px;
-      top: 0%;
-      font-size: 60%;
-      text-align: center;
-    }
-    .PMtab
-    {
-      width: 100%;
-      font-size: 60%;
-      position: absolute;
-      bottom: 0%;
-    }
-    .channeltab:hover
-    {
+    width: 100%;
+    position: absolute;
+    height: 35px;
+    top: 0%;
+    font-size: 60%;
+    text-align: center;
+  }
+  .PMtab
+  {
     width: 100%;
     font-size: 60%;
-    top: 0%;
-    color: gray;
     position: absolute;
-    border-style: solid;
-    border-color: black;
-    background-color: white;
-    cursor: pointer;
+    bottom: 0%;
+  }
+  .channeltab:hover
+  {
+  width: 100%;
+  font-size: 60%;
+  top: 0%;
+  color: gray;
+  position: absolute;
+  border-style: solid;
+  border-color: black;
+  background-color: white;
+  cursor: pointer;
   }
   .channeltab:focus{
     width: 100%;
@@ -705,10 +702,13 @@
     cursor: pointer;
     border-bottom-style: none;
   }
-  .top{
+  .topbackground{
     height: 15%;
   }
   .logoutbutton{
+    position: absolute;
+    top: 0%;
+    right: 0%;
     border: solid;
     background-color: white;
     text-align: center;
@@ -716,8 +716,8 @@
     float: left;
     border-radius: 12px;
     width: 20%;
-    height: 30%;
-    font-size: 75%;
+    height: 55%;
+    font-size: 50%;
   }
   .front{
     height: 85%;
@@ -732,22 +732,24 @@
     width: 100%;
   }
   .channels{
+    left: 0%;
     position: relative;
     width: 25%;
+    height: 85%;
   }
   .chat{
+    right: 0%;
     width: 75%;
+    height: 85%;
   }
   .sendbutton{
     font-size: 75%;
     bottom: 0%;
     width: 30%;
-    height: 30px;
   }
   .chattext{
-    bottom: 0%;
+    float: left;
     width: 70%;
-    height: 30px;
   }
   .chatarea{
     font-size: 85%;
@@ -755,50 +757,41 @@
   }
   .chatitle{
     font-size: 150%;
+    bottom: 15%;
+    left: 25%;
+    position: absolute;
+  }
+  .chattop{
+    height: 14%;
   }
   .CHsettings{
     border-style:solid;
-    height: 4%;
-    font-size: 70%;
-    border-radius: 7px;
-    background-color: white;
+    height: 40%;
+    font-size: 65%;
     text-align: center;
-    color: gray;
-    border: solid;
-    position: absolute;
-    top: 10%;
+    float: left;
   }
   .CHsettings:hover{
     border-style:solid;
-    font-size: 70%;
-    border-radius: 7px;
-    background-color: gray;
     text-align: center;
-    color: white;
-    border: solid;
     cursor: pointer;
   }
   .PSsettings{
-    border-style:solid;
-    height: 4%;
-    font-size: 70%;
-    border-radius: 7px;
-    background-color: white;
+    height: 40%;
+    font-size: 65%;
     text-align: center;
-    color: gray;
-    border: solid;
-    position: absolute;
-    top: 10%;
-    left: 40%;
+    float: right;
+  }
+  .PSsettings:hover{
+    font-size: 70%;
+    text-align: center;
+    cursor: pointer;
   }
   .PSsettings:hover{
     border-style:solid;
     font-size: 70%;
     border-radius: 7px;
-    background-color: gray;
     text-align: center;
-    color: white;
-    border: solid;
     cursor: pointer;
   }
   .sharelinkbut{
@@ -828,6 +821,7 @@
     background-color: rgb(71, 71, 71);
     position: absolute;
   }
+
   .innersharelinkbox{
     width: 65%;
     height: 75%;
@@ -836,6 +830,557 @@
     position: absolute;
     right: 20%;
     top: 10%;
+  }
+  .PMuserfindbox{
+    overflow: scroll;
+    align-items: flex-start;
+  }
+  .usersearchtext{
+    position: absolute;
+    width: 100%;
+    left: 0%;
+  }
+  .closebtn{
+    border-style:solid;
+    border-radius: 6px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    position: sticky;
+    top: 0%;
+    float: right;
+    z-index: 1;
+  }
+  .closebtn:hover{
+    border-style:solid;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+  }
+  .usersearchinput{
+    color: white;
+    z-index: 1;
+    position: sticky;
+    width: 85%;
+    left: 0%;
+    top: 0%;
+  }
+  .userfinddropdown{
+    float: top;
+  }
+  .copytoclipboard{
+    position: absolute;
+    right: 0%;
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    font-size: 75%;
+  }
+  .copytoclipboard:hover{
+    position: absolute;
+    right: 0%;
+    border-style:solid;
+    border-radius: 12px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    font-size: 75%;
+    cursor: pointer;
+  }
+}
+
+@media (min-width: 550px) and (min-height: 0px)
+{
+  .container-fluid{
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .tabs{
+    height: 75px;
+  }
+  .channeltab
+  {
+    width: 100%;
+    position: absolute;
+    height: 35px;
+    top: 0%;
+    font-size: 60%;
+    text-align: center;
+  }
+  .PMtab
+  {
+    width: 100%;
+    font-size: 60%;
+    position: absolute;
+    bottom: 0%;
+  }
+  .channeltab:hover
+  {
+  width: 100%;
+  font-size: 60%;
+  top: 0%;
+  color: gray;
+  position: absolute;
+  border-style: solid;
+  border-color: black;
+  background-color: white;
+  cursor: pointer;
+  }
+  .channeltab:focus{
+    width: 100%;
+    font-size: 60%;
+    top: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+    border-bottom-style: none;
+  }
+  .PMtab:hover{
+    width: 100%;
+    font-size: 60%;
+    bottom: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+  }
+  .PMtab:focus{
+    width: 100%;
+    font-size: 60%;
+    bottom: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+    border-bottom-style: none;
+  }
+  .topbackground{
+    height: 15%;
+  }
+  .logoutbutton{
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: solid;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    float: left;
+    border-radius: 12px;
+    width: 20%;
+    height: 55%;
+    font-size: 75%;
+  }
+  .front{
+    height: 85%;
+  }
+  .channelsmenu{
+    position: absolute;
+    top: 15%;
+  }
+  .PMmenu{
+    position: absolute;
+    top: 15%;
+    width: 100%;
+  }
+  .channels{
+    left: 0%;
+    position: relative;
+    width: 25%;
+    height: 85%;
+  }
+  .chat{
+    right: 0%;
+    width: 75%;
+    height: 85%;
+  }
+  .sendbutton{
+    font-size: 75%;
+    bottom: 0%;
+    width: 30%;
+  }
+  .chattext{
+    float: left;
+    width: 70%;
+  }
+  .chatarea{
+    font-size: 85%;
+    width: 100%;
+  }
+  .chatitle{
+    font-size: 150%;
+  }
+  .chattop{
+    height: 14%;
+  }
+  .CHsettings{
+    border-style:solid;
+    height: 40%;
+    font-size: 65%;
+    text-align: center;
+    float: left;
+  }
+  .CHsettings:hover{
+    border-style:solid;
+    text-align: center;
+    cursor: pointer;
+  }
+  .PSsettings{
+    height: 40%;
+    font-size: 65%;
+    text-align: center;
+    float: right;
+  }
+  .PSsettings:hover{
+    font-size: 70%;
+    text-align: center;
+    cursor: pointer;
+  }
+  .sharelinkbut{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    position: absolute;
+  }
+  .sharelinkbut:hover{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    position: absolute;
+    cursor: pointer;
+  }
+  .sharelinkbox{
+    width: 75%;
+    height: 10%;
+    border-style: solid;
+    border-color: black;
+    background-color: rgb(71, 71, 71);
+    position: absolute;
+  }
+
+  .innersharelinkbox{
+    width: 65%;
+    height: 75%;
+    text-align: center;
+    background-color: white;
+    position: absolute;
+    right: 20%;
+    top: 10%;
+  }
+  .PMuserfindbox{
+    overflow: scroll;
+    align-items: flex-start;
+  }
+  .usersearchtext{
+    position: absolute;
+    width: 100%;
+    left: 0%;
+  }
+  .closebtn{
+    border-style:solid;
+    border-radius: 6px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    position: sticky;
+    top: 0%;
+    float: right;
+    z-index: 1;
+  }
+  .closebtn:hover{
+    border-style:solid;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+  }
+  .usersearchinput{
+    color: white;
+    z-index: 1;
+    position: sticky;
+    width: 85%;
+    left: 0%;
+    top: 0%;
+  }
+  .userfinddropdown{
+    float: top;
+  }
+  .copytoclipboard{
+    position: absolute;
+    right: 0%;
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    font-size: 75%;
+  }
+  .copytoclipboard:hover{
+    position: absolute;
+    right: 0%;
+    border-style:solid;
+    border-radius: 12px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    font-size: 75%;
+    cursor: pointer;
+  }
+}
+@media (min-width: 950px) and (min-height: 0px)
+{  
+  .container-fluid{
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .CHsettings{
+    border-style:solid;
+    height: 40%;
+    font-size: 80%;
+    text-align: center;
+    float: left;
+  }
+  .CHsettings:hover{
+    border-style:solid;
+    text-align: center;
+    cursor: pointer;
+  }
+  .PSsettings{
+    height: 40%;
+    font-size: 80%;
+    text-align: center;
+    float: right;
+  }
+  .PSsettings:hover{
+    text-align: center;
+    cursor: pointer;
+  }
+  .container-fluid{
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .tabs{
+    height: 75px;
+  }
+  .channeltab
+  {
+    width: 100%;
+    position: absolute;
+    height: 35px;
+    top: 0%;
+    font-size: 60%;
+    text-align: center;
+  }
+  .PMtab
+  {
+    width: 100%;
+    font-size: 60%;
+    position: absolute;
+    bottom: 0%;
+  }
+  .channeltab:hover
+  {
+  width: 100%;
+  font-size: 60%;
+  top: 0%;
+  color: gray;
+  position: absolute;
+  border-style: solid;
+  border-color: black;
+  background-color: white;
+  cursor: pointer;
+  }
+  .channeltab:focus{
+    width: 100%;
+    font-size: 60%;
+    top: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+    border-bottom-style: none;
+  }
+  .PMtab:hover{
+    width: 100%;
+    font-size: 60%;
+    bottom: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+  }
+  .PMtab:focus{
+    width: 100%;
+    font-size: 60%;
+    bottom: 0%;
+    color: gray;
+    position: absolute;
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    cursor: pointer;
+    border-bottom-style: none;
+  }
+  .topbackground{
+    height: 15%;
+  }
+  .logoutbutton{
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: solid;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    float: left;
+    border-radius: 12px;
+    width: 10%;
+    height: 55%;
+    font-size: 75%;
+  }
+  .front{
+    height: 85%;
+  }
+  .channelsmenu{
+    position: absolute;
+    top: 15%;
+  }
+  .PMmenu{
+    position: absolute;
+    top: 15%;
+    width: 100%;
+  }
+  .channels{
+    left: 0%;
+    position: relative;
+    width: 25%;
+    height: 85%;
+  }
+  .chat{
+    right: 0%;
+    width: 75%;
+    height: 85%;
+  }
+  .sendbutton{
+    font-size: 75%;
+    bottom: 0%;
+    width: 30%;
+  }
+  .chattext{
+    float: left;
+    width: 70%;
+  }
+  .chatarea{
+    font-size: 85%;
+    width: 100%;
+  }
+  .chatitle{
+    font-size: 150%;
+  }
+  .chattop{
+    height: 14%;
+  }
+  .sharelinkbut{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    position: absolute;
+  }
+  .sharelinkbut:hover{
+    border-style:solid;
+    border-radius: 12px;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    border: solid;
+    position: absolute;
+    cursor: pointer;
+  }
+  .sharelinkbox{
+    width: 75%;
+    height: 10%;
+    border-style: solid;
+    border-color: black;
+    background-color: rgb(71, 71, 71);
+    position: absolute;
+  }
+
+  .innersharelinkbox{
+    width: 65%;
+    height: 75%;
+    text-align: center;
+    background-color: white;
+    position: absolute;
+    right: 20%;
+    top: 10%;
+  }
+  .PMuserfindbox{
+    overflow: scroll;
+    align-items: flex-start;
+  }
+  .usersearchtext{
+    position: absolute;
+    width: 100%;
+    left: 0%;
+  }
+  .closebtn{
+    border-style:solid;
+    border-radius: 6px;
+    background-color: white;
+    text-align: center;
+    color: gray;
+    border: solid;
+    position: sticky;
+    top: 0%;
+    float: right;
+    z-index: 1;
+  }
+  .closebtn:hover{
+    border-style:solid;
+    background-color: gray;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+  }
+  .usersearchinput{
+    color: white;
+    z-index: 1;
+    position: sticky;
+    width: 85%;
+    left: 0%;
+    top: 0%;
+  }
+  .userfinddropdown{
+    float: top;
   }
   .copytoclipboard{
     position: absolute;
@@ -862,28 +1407,33 @@
   }
 }
 </style>
-<div class="topbackground" style="background-color:rgb(68, 68, 68)">
-  <div class=top>
-    <h1 id=text></h1>
-    <form id='logout' method="POST" action='/Logout'> 
-      <input class=logoutbutton type="submit" onclick='logginout()' value="Logout" />  
-    </form>
-    <h3><center>B<sup>3</sup></center></h3>
-  </div>      
-  
-    <div class=topbottom style="background-color:rgb(68, 68, 68)">
+<!-- try to add changing of name of chats/channels -->
+<div class="topbackground container-fluid" style="background-color:rgb(68, 68, 68)">
+  <div class="border">
+    <div class="top row-fluid">
+      <div class="col-12">
+      <h1 id=text></h1>
+      <form id='logout' method="POST" action='/Logout'> 
+        <button type="submit" onclick='logginout()' class="btn btn-sm logoutbutton">Logout</button>
+        <!-- <input class=logoutbutton type="submit" onclick='logginout()' value="Logout" />   -->
+      </form>
+      <h3 style="position: absolute; top: 0; left: 50%"><center>B<sup>3</sup></center></h3>
+      </div>
     </div>
+  </div>      
 </div>
 
-<body >
+<body class="container-fluid">
 <div id=front>
-<div id=chan class="container-fluid, channels">
-  <div class=tabs style=position:relative>
-    <button id=channeltab class=channeltab onclick="tabbutton(0)"><div class="channeltabtext">Channels</div>
+<div id=chan class="row-fluid channels">
+  <div class="tabs">
+    <button type="button" id=channeltab class="btn btn-sm channeltab" onclick="tabbutton(0)">Channels <br> <span class="badge badge-danger notificationmarktab">blah!</span></button>
+    <button type="button" id=PMtab class="btn btn-sm PMtab" onclick="tabbutton(1)">Private Message <br> <span class="badge badge-danger notificationmarktab">blah!</span></button>
+    <!-- <button id=channeltab class=channeltab onclick="tabbutton(0)"><div class="channeltabtext">Channels</div>
     <div class="notificationmarktab"><div style="transform: rotate(90deg)">blah!</div></div></button>
     <button id=PMtab class=PMtab onclick="tabbutton(1)">Private<div class="notificationmarktab"><div style="transform: rotate(90deg)">blah!</div></div> 
       <br>
-      Messages</button>
+      Messages</button> -->
   </div >
   <div class="channelsmenu" id="channelsmenu">
     <br>
@@ -900,11 +1450,13 @@
 
 
 
-<div id="back" class="container-fluid, chat">
-    <div class="chattop">  
+<div id="back" class="row-fluid chat">
+    <div class="chattop col-12 w-100">  
       <h1 class=chatitle id="Boldname"></h1>
-      <button id="CHsettings" onclick="ToOP(false, 0)" class="CHsettings">Channel Settings</button>
-      <button id="PSsettings" onclick="ToOP(false, 1)" class="PSsettings">Personal Settings</button>
+      <button id="CHsettings" onclick="ToOP(false, 0)" type="button" class="btn btn-secondary btn-sm CHsettings">Channel Settings</button>
+      <button id="PSsettings" onclick="ToOP(false, 1)" type="button" class="btn btn-secondary btn-sm PSsettings">Personal Settings</button>
+      <!-- <button id="CHsettings" onclick="ToOP(false, 0)" class="CHsettings position-sticky">Channel Settings</button>
+      <button id="PSsettings" onclick="ToOP(false, 1)" class="PSsettings position-sticky">Personal Settings</button> -->
       <br>
       <!-- <input type="image" class="chatbub" src="data:image/jpeg;base64,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" /> -->
     </div>
@@ -923,7 +1475,10 @@
 </div>
 <div class="options" id=OPback>
   <div id="channeloptions" class="channeloptions">
-    <button class='change' id=Close onclick="ToOP(true, 0)">X</button>
+    <!-- <button class='change' id=Close onclick="ToOP(true, 0)">X</button> -->
+    <button type="button" class="close float-left" aria-label="Close" onclick="ToOP(true, 0)">
+      <span aria-hidden="true">&times;</span>
+    </button>
     <br>
     <br>
     <button onclick="newchat()" class=change id="small" >+Chat</button>
@@ -945,14 +1500,15 @@
     <button class="LeaveChannelbutton" id="LevChanBut" onclick="LeaveChannel()">Leave Channel</button>
     <br>
     <!-- Try to implement the ability to add images to channel buttons -->
-    <input value="Channel Image" type="file" name="UserImage" id="UserImage" class="change" accept="image/x-png,image/gif,image/jpeg" /><input type="submit" value="Update" />  
+      <!-- <input value="Channel Image" type="file" name="UserImage" id="UserImage" class="change" accept="image/x-png,image/gif,image/jpeg" /><input type="submit" value="Update" />   -->
   </div>  
   <div id="personaloptions" class="personaloptions">
-    <button class='change' id=Close onclick="ToOP(true, 1)">X</button>
+    <button type="button" class="close float-left" aria-label="Close" onclick="ToOP(true, 1)">
+      <span aria-hidden="true">&times;</span>
+    </button>    <br>
     <br>
-    <br>
-    <button class=change onclick="backgroundcolor('rgb(68, 68, 68)'), textcolor('white')">Dark background</button>
-    <button class=change onclick="backgroundcolor('white'), textcolor('rgb(68, 68, 68)')">Light background</button>
+    <button class=change onclick="backgroundcolor('rgb(68, 68, 68)', 'black'), textcolor('white')">Dark background</button>
+    <button class=change onclick="backgroundcolor('white', 'black'), textcolor('rgb(68, 68, 68)')">Light background</button>
 
   </div>
 </div>
@@ -975,11 +1531,9 @@
 
 <div class="PMuserfind" id="PMuserfind">
   <div class="PMuserfindbox"> 
-    <button class=change onclick="PMsearchbox(true)">x</button>
+    <button class="closebtn" onclick="PMsearchbox(true)">x</button>
     <div class="usersearchinput">
-      Find Users:
-      <br>
-      <input type=text name=usersearch id=userinput placeholder="Enter friend's username" onkeyup="usersearch()" /> 
+      <input type=text class="usersearchtext" name=usersearch id=userinput placeholder="Enter username" onkeyup="usersearch()" /> 
       <br>
     </div>
     <ul class="userfinddropdown" id="userfinddropdown">
@@ -989,10 +1543,9 @@
 </div>
 
 </body>
-<script
-			  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-			  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
-        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js" ></script>
 <script type="text/javascript" charset="utf-8">
@@ -1008,18 +1561,17 @@ var user = null;
 var channeload = false;
 var chatload = false;
 var PMload = false;
-var activechat = null;
 var load = false;
 var connect = false;
 var userinput = null;
 var PM = false;
 var activePM = null;
 var elem = null;
+var chanswitch = false;
 $(document).ready(function()
 {
   
   namespace = '/test';
-
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
   
   if(connect == false)
@@ -1175,7 +1727,7 @@ $(document).ready(function()
     {
       if(msg.UPchannel == CHNN)
       {
-        if(msg.UPchat == activechat)
+        if(msg.UPchat == focelem.getAttribute("activechat"))
         {
           $("#messages").append("<br><sup>" + msg.DT + "</sup>" + "<span>" + msg.userm +"</span>");  
         }
@@ -1193,7 +1745,7 @@ $(document).ready(function()
               temp[1].style.display = "block";
             }
           }           
-          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: activechat, PM: 'false', DT: msg.DT, sender: msg.sender});
+          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), PM: 'false', DT: msg.DT, sender: msg.sender});
         }
       }
       else
@@ -1224,7 +1776,7 @@ $(document).ready(function()
               }
             }
           }
-          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: activechat, PM: 'false', DT: msg.DT, sender: msg.sender})
+          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), PM: 'false', DT: msg.DT, sender: msg.sender})
         }
         else
         {
@@ -1232,7 +1784,7 @@ $(document).ready(function()
           notifiedC = notifiedC[0].childNodes;
           notifiedC = notifiedC[0].childNodes;
           notifiedC[1].style.display = 'block';          
-          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: activechat, PM: 'false', DT: msg.DT, sender: msg.sender})
+          socket.emit('useresponse', {UPchannel: msg.UPchannel, UPchat: msg.UPchat, data: "", DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), PM: 'false', DT: msg.DT, sender: msg.sender})
         }
       }
     }
@@ -1279,7 +1831,7 @@ $(document).ready(function()
   socket.on('messageloaddone', function()
   {
     load = true;
-    if(($("#messages").children().length - 1) % 135 == 0)
+    if(($("#messages").children().length - 1) % 135 == 0 && ($("#messages").children().length - 1) != 0)
     {
       $("#loadmessages").css("display", "block");
     }
@@ -1299,9 +1851,16 @@ $(document).ready(function()
       }
       else
       {
-        socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), DOWNchannel: CHNN, DOWNchat: activechat, UPchannel: CHNN, UPchat: activechat, PM: 'false'});
-        event.preventDefault();
-        $('#usertext').val('');
+        if(focelem.childNodes[1] && focelem.childNodes[1].childNodes.length != 0)
+        {
+          socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), UPchannel: CHNN, UPchat: focelem.getAttribute("activechat"), PM: 'false'});
+          event.preventDefault();
+          $('#usertext').val('');
+        }
+        else
+        {
+          event.preventDefault();
+        }  
       }
   });
 
@@ -1316,14 +1875,27 @@ $(document).ready(function()
       newchat(msg.data[0], false);
     }
   });
-  socket.on('done', function()
+  socket.on('done', function(data)
   {
     focelem.parentElement.id = 'true';
+    var thechats =  document.getElementsByClassName(CHNN + "channel")[0];
+    if(thechats.getAttribute("activechat") == 'null')
+    {
+      if(focelem.childNodes[1] == null)
+      {
+        elem = null;
+      }
+      else
+      {
+        thechats.setAttribute("activechat", thechats.childNodes[1].childNodes[0].textContent.slice(0, thechats.childNodes[1].childNodes[0].textContent.length - 5));
+      }
+    }
     if(focelem.childNodes[1] != null)
     {
       if(focelem.childNodes[1].childNodes.length == 0)
       {
-        $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+        $('#messages').find("*").not("#newmesline").remove();
+        $("#messages").prepend("<span>" + "This channel seems to have no chats. Try adding some to make this place more lively." + "</span>");
         $("#Boldname").text(CHNN);
       }
       else if(focelem.getAttribute("activechat") == 'null')
@@ -1341,10 +1913,10 @@ $(document).ready(function()
         thechats = thechats.childNodes;
         for(var i = 0; thechats.length != i; i++)
         {
-        var selector = document.getElementsByClassName(CHNN + "channel")[0]
-        selector = selector.getAttribute("activechat"); 
-        var SELchat = thechats[i].textContent.slice(0, thechats[i].textContent.length - 5)
-        if(SELchat ==  selector)
+          var selector = document.getElementsByClassName(CHNN + "channel")[0]
+          selector = selector.getAttribute("activechat"); 
+          var SELchat = thechats[i].textContent.slice(0, thechats[i].textContent.length - 5);
+          if(SELchat == selector)
           {
             thechats[i].click();
           } 
@@ -1357,9 +1929,10 @@ $(document).ready(function()
     }
     else
     {
-      $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+      $('#messages').find("*").not("#newmesline").remove();
+      $("#messages").prepend("<span>" + "This channel seems to have no chats. Try adding some to make this place more lively." + "</span>");
       $("#Boldname").text(CHNN);
-    }  
+    }   
   })
 }); 
 
@@ -1370,9 +1943,10 @@ function textcolor(TColor)
   elem.style.color = TColor;
   chat_text.style.color = TColor;
 }
-function backgroundcolor(BKcolor)
+function backgroundcolor(BKcolor, BDcolor)
 {
   $("body").css("background-color", BKcolor);
+  $("#chatarea").css("border-color", BDcolor);
 }
 function smallchan() 
 {
@@ -1433,7 +2007,7 @@ function loadmoremes()
   }
   else
   {
-    socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "true", num: num})
+    socket.emit('messagepull', {chat: focelem.getAttribute("activechat"), channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "true", num: num})
   }
 }
 function logginout()
@@ -1461,11 +2035,23 @@ function tabbutton(flip)
       $("#Boldname").text(tempname);
       $("#chatbuttons").children().css('display', 'none');
       var PMS = $("#PMmenu").find("button");
-      PMS[1].click();
+      if(activePM == null)
+      {
+        PMS[1].click();
+      }
+      else
+      {
+        for(var i = 0; PMS.length != i; i++)
+        {
+          if(PMS[i].textContent.slice(0, PMS[i].textContent.length - 5) == activePM)
+          {
+            PMS[i].click();
+          }
+        }
+      }
     }
     else
     {
-      PM = true;
       $("#Boldname").empty();
       $("#chatbuttons").children().css('display', 'none');
       $("#loadmessages").css("display", "none");
@@ -1477,11 +2063,8 @@ function tabbutton(flip)
   {
     allPM.style.display = 'none';
     allchannels.style.display = 'block';
-    var chansettings = document.getElementById('CHsettings');
-    chansettings.style.display = "block";
-    $("#PSsettings").css("left", "18%");
-    var NM = $("#channeltab").find("div");
-    NM[1].style.display = "none";
+
+    $("#channeltab").find("span").css("display", "none");
     PM = false;
     var clickchannel = document.getElementsByClassName(CHNN + "channel");
     focelem = clickchannel[0];
@@ -1492,7 +2075,7 @@ function tabbutton(flip)
       $("#loadmessages").css("display", "none");
       $('#messages').find("*").not("#newmesline").remove();
     }
-    if(activechat == "#general")
+    if(clickchannel[0].getAttribute("activechat") == "#general")
     {
       clickchannel = clickchannel[0].childNodes;
       clickchannel[0].click();
@@ -1504,7 +2087,7 @@ function tabbutton(flip)
       clickchannel = clickchannel[1].childNodes;
       for(var i = 0; clickchannel.length != i; i++)
       {
-        if(clickchannel[i].textContent.slice(0, clickchannel[i].textContent.length - 5) == activechat)
+        if(clickchannel[i].textContent.slice(0, clickchannel[i].textContent.length - 5) == focelem.getAttribute("activechat"))
         {
           clickchannel[i].click();
         }
@@ -1526,14 +2109,12 @@ function disp()
   var thelink = document.getElementById("sharelinkbut");
   if(PM == true)
   {
-    HLName.style.height = '15%';
     $('#messages').find("*").not("#newmesline").remove();
     if(this.id == lstid)
     {
       x.style.display = "none";
       HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
       Chansets.style.display = "none";
-      Pssets.style.left = "0%";
       lstid = this.id;
       focelem = this;
       elem = null;
@@ -1553,7 +2134,6 @@ function disp()
       x.style.display = "none";
       HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
       Chansets.style.display = "none";
-      Pssets.style.left = "0%";
       lstid = this.id;
       elem = null;
       focelem = this;
@@ -1579,22 +2159,65 @@ function disp()
     }
     if(this.className == "smallchatbub")
     {
+      if(this.textContent.slice(0, this.textContent.length - 5) == this.closest("div").parentElement.getAttribute("activechat") && CHNN == this.closest("div").parentElement.childNodes[0].textContent.slice(0, this.closest("div").parentElement.childNodes[0].textContent.length - 5))
+      {
+        if(chanswitch == true)
+        {
+          chanswitch = false;
+          HLName.textContent = CHNN + ": " + this.textContent.slice(0, this.textContent.length - 5);
+          HLName.style.height = '9%';
+          $(".smallchatbub").css({backgroundColor: "gray", borderColor: "black"})
+          $(this).css({backgroundColor: "white", borderColor: "black"});
+          $('#messages').find("*").not("#newmesline").remove();
+          socket.emit('messagepull', {chat: this.closest("div").parentElement.getAttribute("activechat"), channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "", num: ""})
+          var notify = this.childNodes;
+          if(notify[1].style.display == 'block')
+          {
+            notify[1].style.display = 'none';
+          }
+          else
+          {
+            $("#newmesline").css("display", "none");         
+          }
+        }
+        var chansettings = document.getElementById('CHsettings');
+        if(chansettings.style.display == "none")
+        {
+          chansettings.style.display = "block";
+          HLName.textContent = CHNN + ": " + this.textContent.slice(0, this.textContent.length - 5);
+          HLName.style.height = '9%';
+          $('#messages').find("*").not("#newmesline").remove();
+          socket.emit('messagepull', {chat: this.closest("div").parentElement.getAttribute("activechat"), channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "", num: ""})
+          var notify = this.childNodes;
+          if(notify[1].style.display == 'block')
+          {
+            notify[1].style.display = 'none';
+          }
+          else
+          {
+            $("#newmesline").css("display", "none");         
+          }
+        }
+      }
+      else
+      {
+        $(".smallchatbub").css({backgroundColor: "gray", borderColor: "black"})
+        $(this).css({backgroundColor: "white", borderColor: "black"});
         this.closest("div").parentElement.setAttribute("activechat", this.textContent.slice(0, this.textContent.length - 5))
         HLName.textContent = CHNN + ": " + this.textContent.slice(0, this.textContent.length - 5);
         HLName.style.height = '9%';
-        activechat = this.textContent.slice(0, this.textContent.length - 5);
         $('#messages').find("*").not("#newmesline").remove();
-        socket.emit('messagepull', {chat: activechat, channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "", num: ""})
+        socket.emit('messagepull', {chat: this.closest("div").parentElement.getAttribute("activechat"), channel: CHNN, PM: 'false', sender: "", reciever: "", extraload: "", num: ""})
         var notify = this.childNodes;
         if(notify[1].style.display == 'block')
         {
-
           notify[1].style.display = 'none';
         }
         else
         {
           $("#newmesline").css("display", "none");         
         }
+      }
     }
     else
     {
@@ -1606,7 +2229,8 @@ function disp()
         {
           if(focelem.childNodes[1] == null)
           {
-            $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+            $('#messages').find("*").not("#newmesline").remove();
+            $("#messages").prepend("<span>" + "This channel seems to have no chats. Try adding some to make this place more lively." + "</span>");
             HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
           }
           else
@@ -1653,24 +2277,23 @@ function disp()
         else
         {
           if(focelem.parentElement.getAttribute("owner") == 'true')
-            {
-              $("#DelChanBut").css("display", "block");
-              $("#DelChatBut").css("display", "block");
-              $("#LevChanBut").css("display", "none");
-              $("#small").css("display", "block");
-            }
-            else
-            {
-              $("#DelChanBut").css("display", "none");
-              $("#DelChatBut").css("display", "none");
-              $("#LevChanBut").css("display", "block");
-              $("#small").css("display", "none");
-            }
+          {
+            $("#DelChanBut").css("display", "block");
+            $("#DelChatBut").css("display", "block");
+            $("#LevChanBut").css("display", "none");
+            $("#small").css("display", "block");
+          }
+          else
+          {
+            $("#DelChanBut").css("display", "none");
+            $("#DelChatBut").css("display", "none");
+            $("#LevChanBut").css("display", "block");
+            $("#small").css("display", "none");
+          }
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
           socket.emit("chatpull", {channelname: CHNN});
           chats = "chat" + focelem.id;
           elem = document.getElementById(chats);
-          console.log(elem);
           var notify = this.childNodes;
           if(notify[1].style.display = 'block')
           {
@@ -1706,9 +2329,13 @@ function disp()
         {
           if(focelem.childNodes[1] == null)
           {
-            $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+            $('#messages').find("*").not("#newmesline").remove();
+            $("#messages").prepend("<span>" + "This channel seems to have no chats. Try adding some to make this place more lively." + "</span>");
+            $("#loadmessages").css("display", "none");
             HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
             elem = null;
+            CHNN = this.textContent.slice(0, this.textContent.length - 5);
+            lstid = this.closest("div").id;
             if(focelem.parentElement.getAttribute("owner") == 'true')
             {
               $("#DelChanBut").css("display", "block");
@@ -1726,9 +2353,15 @@ function disp()
           }
           else if(focelem.childNodes[1].childNodes.length == 0)
           {
-            $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.");
+            $('#messages').find("*").not("#newmesline").remove();
+            $("#messages").prepend("<span>" + "This channel seems to have no chats. Try adding some to make this place more lively." + "</span>");
+            $("#loadmessages").css("display", "none");
             HLName.textContent = this.textContent.slice(0, this.textContent.length - 5);
-            elem = null;
+            chats = "chat" + focelem.id;
+            elem = document.getElementById(chats);
+            $(elem).css("display", "block");
+            CHNN = this.textContent.slice(0, this.textContent.length - 5);
+            lstid = this.closest("div").id;
             if(focelem.parentElement.getAttribute("owner") == 'true')
             {
               $("#DelChanBut").css("display", "block");
@@ -1743,6 +2376,7 @@ function disp()
               $("#LevChanBut").css("display", "block");
               $("#small").css("display", "none");
             }
+
           }
           else
           {
@@ -1760,13 +2394,14 @@ function disp()
               $("#LevChanBut").css("display", "block");
               $("#small").css("display", "none");
             }
-            CHNN = this.textContent.slice(0, this.textContent.length - 5);
+            chanswitch = true;
             var notify = this.childNodes;
             if(notify[1].style.display = 'block')
             {
               notify[1].style.display = 'none';
             }
             lstid = this.closest("div").id;
+            CHNN = this.textContent.slice(0, this.textContent.length - 5);
             chats = "chat" + focelem.id;
             elem = document.getElementById(chats);
             elem.style.display = "block";
@@ -1775,10 +2410,10 @@ function disp()
             thechats = thechats.childNodes;
             for(var i = 0; thechats.length != i; i++)
             {
-            var selector = document.getElementsByClassName(CHNN + "channel")[0]
-            selector = selector.getAttribute("activechat"); 
-            var SELchat = thechats[i].textContent.slice(0, thechats[i].textContent.length - 5)
-            if(SELchat ==  selector)
+              var selector = document.getElementsByClassName(CHNN + "channel")[0]
+              selector = selector.getAttribute("activechat"); 
+              var SELchat = thechats[i].textContent.slice(0, thechats[i].textContent.length - 5)
+              if(SELchat ==  selector)
               {
                 thechats[i].click();
               } 
@@ -1802,7 +2437,12 @@ function disp()
               $("#LevChanBut").css("display", "block");
               $("#small").css("display", "none");
             }
+            if(focelem.childNodes[1] == null)
+            {
+              $("#loadmessages").css("display", "none");
+            }
           firstchat = true;
+          chanswitch = true;
           CHNN = this.textContent.slice(0, this.textContent.length - 5);
           socket.emit("chatpull", {channelname: CHNN})
           var notify = this.childNodes;
@@ -1996,28 +2636,32 @@ function DeleteChat()
   var del = confirm("Delete this chat?");
   if(del == true)
   {
-    socket.emit("userdelete", {channel: CHNN, chat: activechat, select: 'chat'});
+    socket.emit("userdelete", {channel: CHNN, chat: focelem.getAttribute("activechat"), select: 'chat'});
     var delelem = focelem.childNodes[1]
     delelem = delelem.childNodes;
-    for(var i = 0; delelem.length != i; i++)
+    for(var i = 0; delelem.length + 1 != i; i++)
     {
-      if(delelem[i].textContent.slice(0, delelem[i].textContent.length - 5) == activechat)
+      if(delelem[i] != null)
       {
-        delelem[i].parentElement.removeChild(delelem[i]);;
-        
-        if(focelem.childNodes[1].childNodes.length == 0)
+        if(delelem[i].textContent.slice(0, delelem[i].textContent.length - 5) == focelem.getAttribute("activechat"))
         {
-          $("#chatarea").text("This channel seems to have no chats. Try adding some to make this place more lively.")
-        }
-        else
-        {
-          if(delelem[i + 1] == null)
+          delelem[i].parentElement.removeChild(delelem[i]);
+          if(focelem.childNodes[1].childNodes.length == 0)
           {
-            delelem[0].click();
+            $('#messages').find("*").not("#newmesline").remove();
+            $("#messages").prepend("<span>" + "This channel seems to have no chats. Try adding some to make this place more lively." + "</span>");
+            $("#Boldname").text(CHNN);
           }
           else
           {
-            delelem[i + 1].click();
+            if(delelem[i + 1] == null)
+            {
+              delelem[0].click();
+            }
+            else
+            {
+              delelem[i + 1].click();
+            }
           }
         }
       }
@@ -2049,7 +2693,7 @@ function newchannel(response, owner, joining)
   ACatt.value = null;
   channelplace.setAttributeNode(ACatt);
   firstchat = true;
-  var channellink = joinchannel
+  var channellink = joinchannel;
 
   if(x == 0)
   {
@@ -2077,13 +2721,12 @@ function newchannel(response, owner, joining)
         notification.className = "notificationmarkchat";
         channelplace.appendChild(channel);
         channelplace.appendChild(notification);
-        focelem = channelplace;
-        lstid = channelplace.id;
         socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
-        newchat("general", 1);
         var isowner = document.createAttribute("owner");
         isowner.value = 'true';
         load.setAttributeNode(isowner);
+        lstid = channelplace.id;
+        focelem = channelplace;
       }
       else
       {
@@ -2155,8 +2798,8 @@ function newchannel(response, owner, joining)
         channel.appendChild(notification);
         channelplace.appendChild(channel);
         focelem = channelplace;
+        lstid = channelplace.id;
         socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
-        newchat("general", 1);
         if(owner != false)
         {
         var isowner = document.createAttribute("owner");
@@ -2233,10 +2876,6 @@ function newchat(response, notify)
   var chats = "chat" + focelem.id;
   var notification = document.createElement("div");
   
-  if(focelem.parentElement.id == 'true')
-  {
-    firstchat = false;
-  }
 
   if(chatname == null || chatname == "")
   {
@@ -2245,21 +2884,11 @@ function newchat(response, notify)
   else
   {
     if(focelem.parentElement.id == 'true')
-      {  
+    {  
       if(focelem.childNodes[1] == null)
       {
-        if(notify == 1)
-        {
-          channelplace.setAttribute("activechat", "#" + chatname);
-          firstchat = true;
-          
-        }
-        else if(chatload == false)
-        {
-          channelplace.setAttribute("activechat", "#" + chatname);
-          firstchat = true;
-          socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: "#" + chatname});
-        }
+        channelplace.setAttribute("activechat", "#" + chatname);
+        firstchat = true;
       }
       else
       {
@@ -2296,8 +2925,8 @@ function newchat(response, notify)
         if(notify == 1)
         {
           chatplace.style.display = 'none';
-          focelem = document.getElementsByClassName(CHNN + "channel")[0];
-        }        
+        }
+        socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: chatname});        
       }
     }
     else

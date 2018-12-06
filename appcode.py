@@ -132,6 +132,14 @@ def mespull_handle(message):
                 emit('messageload', {'userm': items[0], 'DT': items[1], 'newmesstart': 'false'})
         emit('messageloaddone')
     else:
+        # cursor.execute("SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)", (message['chat'], message['channel']))
+        # chats = cursor.fetchone
+        # if not channels:
+        #     emit('messageload', {'userm': "This channel has been deleted", 'DT': "", 'newmesstart': 'false'})   
+        # else:
+        #     if not chats:
+        #         emit('messageload', {'userm': "This chat has been deleted", 'DT': "", 'newmesstart': 'false'})
+        #     else:
         temp = [-1]
         cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['channel'], message['chat'], message['channel']))
         result = cursor.fetchone()
@@ -245,13 +253,8 @@ def join_handle_made(sentroom):
             cursor.execute("SELECT link FROM channels WHERE link=%s", (text, ))
             if not cursor.fetchall():    
                 cursor.execute("INSERT INTO channels (ownerid, channelname, link) VALUES((SELECT id FROM users WHERE username=%s), %s, %s)", (username, sentroom['channel'], text))
-                cursor.execute("INSERT INTO chats (chatname, linkid) VALUES('#general', (SELECT id FROM channels WHERE channelname=%s))", (sentroom['channel'], ))
                 cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s))", (username, sentroom['channel']))
-                cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s)))", (username, sentroom['channel'], sentroom['channel']))
                 check = True
-                Mestime = time.asctime(time.localtime())
-                cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, "This is the beginning of everything.", username, '#general', sentroom['channel'], sentroom['channel']))
-                cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, username + ' has joined', username, '#general', sentroom['channel'], sentroom['channel']))
     elif sentroom['select'] == 'join':
         cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
         Mestime = time.asctime(time.localtime())
@@ -280,7 +283,7 @@ def join_handle_made(sentroom):
         cursor.execute("SELECT useid FROM userchannels WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (sentroom['channel'], ))
         users = cursor.fetchall()
         for items in users:
-            cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES(%s, (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE chatname=%s))", (items[0], sentroom['channel'], sentroom['chatname']))
+            cursor.execute("INSERT INTO userlastdata (useid, channelid, chatid) VALUES(%s, (SELECT id FROM channels WHERE channelname=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)))", (items[0], sentroom['channel'], sentroom['chatname'], sentroom['channel']))
     UserIn.commit()
     cursor.close()
 
