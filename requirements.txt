@@ -1,5 +1,7 @@
 Flask
 Redis
-flask-socketio
+Flask-Socketio==2.1.0
 mysql-connector-python
 Jinja2
+gevent==1.2.2
+gevent-websocket==0.10.1

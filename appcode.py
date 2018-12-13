@@ -178,9 +178,9 @@ def handle_chats(response):
         if lastmesid[0] != 0:
             emit('send', {'data': stuff, 'notify': 'true'})
         else:
-            emit('send', {'data': stuff, 'notify': 'false'})
+            emit('send', {'data': stuff[0], 'notify': 'false'}, namespace='/test')   
     cursor.close()
-    emit('done', {'data': 'true'})
+    emit('done', {'data': 'true'}, namespace='/test')
 
 @socketio.on('useresponse', namespace='/test')
 def message_handle(message):
@@ -380,4 +380,4 @@ def index():
         
     return html
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)    
+    socketio.run(app, host='0.0.0.0', port=80)    

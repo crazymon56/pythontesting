@@ -11,7 +11,7 @@
 -----Double check PM when user tries to search for a user they are already in a chat with
 -----Double check when user creates a channel
 -----Have it to where user immediatelly clicks on joined channel
-
+https://github.com/miguelgrinberg/Flask-SocketIO/issues/489
 
 #LOGIN PAGE
 1. Reorganize the way it looks.

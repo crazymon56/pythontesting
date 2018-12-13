@@ -1,7 +1,7 @@
-<html lang="en">
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" charset="UTF-8">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<html>
+<head lang="en">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <style>
   .top{
@@ -1467,7 +1467,7 @@
             <div id="newmesline" class="newmesline">New messages start below</div>
           </div>
         </div>
-      <form id='mes' method="POST" action='#'> 
+      <form id='mes' method="POST" action='#' accept-charset="utf-8"> 
       <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message autocomplete=off /><input class="sendbutton" type=submit value=Send />
       </form>
 
@@ -1546,7 +1546,7 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js" ></script>
 <script type="text/javascript" charset="utf-8">
 var channelplace = null;
@@ -1568,12 +1568,10 @@ var PM = false;
 var activePM = null;
 var elem = null;
 var chanswitch = false;
+namespace = '/test';
+var socket = io.connect(namespace);
 $(document).ready(function()
 {
-  
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  
   if(connect == false)
   {
     socket.on('connect', function()
@@ -1582,6 +1580,10 @@ $(document).ready(function()
         socket.emit('connectdone')
       })
   }
+  socket.on('disconnect',function()
+  {
+   console.log('user disconnected');  
+  });
   socket.on('confirmjoin', function(msg)
   {
     if(msg.select == 'nochannel')
@@ -1856,6 +1858,7 @@ $(document).ready(function()
           socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), UPchannel: CHNN, UPchat: focelem.getAttribute("activechat"), PM: 'false'});
           event.preventDefault();
           $('#usertext').val('');
+
         }
         else
         {
@@ -1868,11 +1871,12 @@ $(document).ready(function()
   {
     if(msg.notify == 'true')
     {
-      newchat(msg.data[0], true);
+      newchat(msg.data, true);
+      
     }
     else
     {
-      newchat(msg.data[0], false);
+      newchat(msg.data, false);
     }
   });
   socket.on('done', function(data)
@@ -1996,9 +2000,6 @@ function ToOP(close, butid)
 }
 function loadmoremes()
 {
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
   var num = ($("#messages").children().length - 1) / 3 / 45
   load = false;
   if(PM == true)
@@ -2011,10 +2012,7 @@ function loadmoremes()
   }
 }
 function logginout()
-{
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  
+{  
   socket.emit('logout');
 }
 
@@ -2097,10 +2095,6 @@ function tabbutton(flip)
 }
 function disp()
 {
-  namespace = '/test';
-
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
   load = false;
   var x = document.getElementById("small");
   var HLName = document.getElementById("Boldname");
@@ -2474,25 +2468,16 @@ function PMsearchbox(close)
 }
 function usersearch()
 {
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
-  
   $('ul').empty();
   var input = $('#userinput').val();
   socket.emit('userspull', {data: input});
 }
 function search()
 {
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
   socket.emit("userspull");
 }
 function newPM(x, PMcheck)
-{
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  
+{  
   var PM = document.getElementById("PMuserfind");
   var front = document.getElementById("front");
   var PMbub = document.createElement("button");
@@ -2533,9 +2518,6 @@ function newPM(x, PMcheck)
 }
 function sharelinkbut(close)
 {
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
   var sharelinkbut = document.getElementById('sharelinkbut');
   var sharelinkbox = document.getElementById('sharelinkbox');
   if(close == true)
@@ -2567,9 +2549,6 @@ function channelbox(close){
 }
 function joinchannel()
 {
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
   var userchannelink = prompt("Insert channel link to join.", "")
   socket.emit('userjoin', {select: 'join', link: userchannelink})
  
@@ -2584,9 +2563,6 @@ function newchannelbut()
 }
 function LeaveChannel()
 {
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
   var leave = confirm("Are you sure you want to leave?");
   if(leave == true)
   {
@@ -2607,9 +2583,6 @@ function LeaveChannel()
 }
 function DeleteChannel()
 {
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
   var del = confirm("Delete this channel?");
   if(del == true)
   {
@@ -2630,9 +2603,6 @@ function DeleteChannel()
 }
 function DeleteChat()
 {
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
   var del = confirm("Delete this chat?");
   if(del == true)
   {
@@ -2670,9 +2640,6 @@ function DeleteChat()
 }
 function newchannel(response, owner, joining) 
 {   
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
   if(channeload == true)
   {
     var channelname = prompt("Name your new channel.", "");
@@ -2727,6 +2694,7 @@ function newchannel(response, owner, joining)
         load.setAttributeNode(isowner);
         lstid = channelplace.id;
         focelem = channelplace;
+        channel.click();
       }
       else
       {
@@ -2797,8 +2765,6 @@ function newchannel(response, owner, joining)
         notification.className = "notificationmarkchat";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
-        focelem = channelplace;
-        lstid = channelplace.id;
         socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
         if(owner != false)
         {
@@ -2806,6 +2772,7 @@ function newchannel(response, owner, joining)
         isowner.value = 'true';
         load.setAttributeNode(isowner);        
         }
+        channel.click();
       }
       else
       {
@@ -2853,8 +2820,6 @@ function newchannel(response, owner, joining)
 
 function newchat(response, notify)
 {
-  namespace = '/test';
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
   if(focelem.parentElement.id == 'true')
   {
     if(notify == 1)
@@ -2887,12 +2852,12 @@ function newchat(response, notify)
     {  
       if(focelem.childNodes[1] == null)
       {
-        channelplace.setAttribute("activechat", "#" + chatname);
+        channelplace.setAttribute("activechat", 'null');
         firstchat = true;
       }
       else
       {
-        channelplace.setAttribute("activechat", "#" + chatname);
+        
       }
       if(firstchat == false)
       {
@@ -2906,6 +2871,7 @@ function newchat(response, notify)
         chat.appendChild(notification);
         document.getElementById(chats).appendChild(chat);
         socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: chatname})
+        chat.click();
       }
       else
       {
@@ -2927,6 +2893,8 @@ function newchat(response, notify)
           chatplace.style.display = 'none';
         }
         socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: chatname});        
+        elem = chatplace;
+        chat.click();
       }
     }
     else
