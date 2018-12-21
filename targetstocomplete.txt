@@ -12,6 +12,7 @@
 -----Double check when user creates a channel
 -----Have it to where user immediatelly clicks on joined channel
 https://github.com/miguelgrinberg/Flask-SocketIO/issues/489
+https://codepen.io/tuanitpro/pen/wJZJbp
 
 #LOGIN PAGE
 1. Reorganize the way it looks.

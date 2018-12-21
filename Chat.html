@@ -114,14 +114,25 @@
     position: absolute;
     bottom: 0%;
     width: 90%;
-    height: 6%;
+  }
+  .imagecontainer{
+    width: 10%;
+    height: 10%;
+  }
+  .image{
+    max-width: 50%;
+    max-height: 50%;
+  }
+  .picinsert{
+    padding-left: 0;
+    padding-right: 0;
+    width: 10%;
   }
   .sendbutton{
     position: absolute;
     bottom: 0;
     right: 0;
     width: 10%;
-    height: 6%;
     font-size: 65%;
   }
   .chatitle{
@@ -752,7 +763,7 @@
     width: 70%;
   }
   .chatarea{
-    font-size: 85%;
+    font-size: 100%;
     width: 100%;
   }
   .chatitle{
@@ -1014,10 +1025,10 @@
   }
   .chattext{
     float: left;
-    width: 70%;
+    width: 55%;
   }
   .chatarea{
-    font-size: 85%;
+    font-size: 100%;
     width: 100%;
   }
   .chatitle{
@@ -1045,7 +1056,6 @@
     float: right;
   }
   .PSsettings:hover{
-    font-size: 70%;
     text-align: center;
     cursor: pointer;
   }
@@ -1294,10 +1304,10 @@
   }
   .chattext{
     float: left;
-    width: 70%;
+    width: 55%;
   }
   .chatarea{
-    font-size: 85%;
+    font-size: 100%;
     width: 100%;
   }
   .chatitle{
@@ -1439,6 +1449,8 @@
     <br>
     <button class=change style=float:left onclick="channelbox(false)">+</button>
     <br>
+    <!-- <button class="chatbub">Hello <span class="badge badge-danger notificationmarktab">blah!</span></button>
+    <button class="smallchatbub" style="background-color: gray; border-color: black;">generalchat<span class="badge badge-danger notificationmarktab">blah!</span></button> -->
   </div>
   <div class="PMmenu" id="PMmenu">
     <br>
@@ -1468,7 +1480,9 @@
           </div>
         </div>
       <form id='mes' method="POST" action='#' accept-charset="utf-8"> 
-      <input id="usertext" class="container-fluid, chattext" name="usertext" type=text placeholder=message autocomplete=off /><input class="sendbutton" type=submit value=Send />
+      <input id="usertext" class="chattext col-sm-10" name="usertext" type=text placeholder=message autocomplete=off />
+      <input type="file" id="userpic" name='image' class="picinsert offset-md-8 fixed-bottom" name="pic" accept"image*/" value="📎" />
+      <input class="sendbutton col-sm-2" type=submit value=Send />
       </form>
 
 </div>
@@ -1602,6 +1616,16 @@ $(document).ready(function()
     newPM(msg.sender, true);
     socket.emit('PMjoin', {sender: msg.sender, recieve: 'true'})
   })
+  socket.on("PMexist", function(msg){
+    if(msg.exist == 'false')
+    {
+      newPM(msg.sender, true)
+    }
+    else
+    {
+      newPM(msg.sender, true)
+    }
+  })
   socket.on('userdata', function(msg)
   {
     if(msg.data == " ")
@@ -1662,14 +1686,14 @@ $(document).ready(function()
     {
       if(msg.PM == 'false')
       {
-        $("#channeltab").find("div").css("display", "block");
+        $("#channeltab").find("span").css("display", "block");
       }
     }
     if(PM == false)
     {
       if(msg.PM == 'true')
       {
-        $("#PMtab").find("div").css("display", "block");
+        $("#PMtab").find("span").css("display", "block");
       }
     }
     if(msg.PM == 'true')
@@ -1731,7 +1755,15 @@ $(document).ready(function()
       {
         if(msg.UPchat == focelem.getAttribute("activechat"))
         {
+          if(msg.file == 'true')
+          {
+            $("#messages").append("<br><sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span>" + "<br>" + "<span class=imagecontainer>" + "<img class=offset-md-1 height=250 width=250 src=" + msg.userfile + ">" + "</span>");  
+          }
+          else
+          {
           $("#messages").append("<br><sup>" + msg.DT + "</sup>" + "<span>" + msg.userm +"</span>");  
+
+          }
         }
         else
         { 
@@ -1855,10 +1887,62 @@ $(document).ready(function()
       {
         if(focelem.childNodes[1] && focelem.childNodes[1].childNodes.length != 0)
         {
-          socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), UPchannel: CHNN, UPchat: focelem.getAttribute("activechat"), PM: 'false'});
           event.preventDefault();
-          $('#usertext').val('');
+          const selfile = document.getElementById("userpic").files[0];
+          if(selfile != null)
+          {
+            fr = new FileReader();
+            fr.readAsDataURL(selfile);
+            fr.onload = function(evt){
+              var img = document.createElement("img");
+              img.src = evt.target.result;
 
+              var canvas = document.createElement("canvas");
+              var ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0);
+
+              var max_height = 250;
+              var max_width = 250;
+              var width = img.width;
+              var height = img.height;
+
+              if(width > height)
+              {
+                if(width > max_width)
+                {
+                  height *= max_width / width;
+                  width = max_width;
+                }
+              }
+              else
+              {
+                if(height > max_height)
+                {
+                  width *= max_height / height;
+                  height = max_height;
+                }
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              var ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0, width, height);
+              theimg = canvas.toDataURL(selfile.type);
+
+            }
+            fr.readAsDataURL(selfile);            
+            socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), file: fr.result, DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), UPchannel: CHNN, UPchat: focelem.getAttribute("activechat"), PM: 'false'});
+            $('#usertext').val('');
+          }
+          else
+          {
+            socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), file: '', DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), UPchannel: CHNN, UPchat: focelem.getAttribute("activechat"), PM: 'false'});
+            $('#usertext').val('');
+          }
+          
+          document.getElementById("userpic").value = "";
+          
+          
         }
         else
         {
@@ -2025,7 +2109,7 @@ function tabbutton(flip)
     PM = true;
     allchannels.style.display = 'none';
     allPM.style.display = 'block';
-    $("#PMtab").find("div").css("display", "none");
+    $("#PMtab").find("span").css("display", "none");
     if($("#PMmenu").find(".chatbub").length > 0)
     {
       var Selchat = $("#PMmenu").find(".chatbub")[0];
@@ -2485,37 +2569,68 @@ function newPM(x, PMcheck)
   var head = document.getElementById("Boldname");
   var br = document.createElement("br");
   var notification = document.createElement("div");
-
-  if(PMcheck == true)
-  {
-    var chatuser = x;
-  }
-  else
-  {
-    var chatuser = x.target.textContent;
-    socket.emit('PMjoin', {sender: user, reciever: chatuser, recieve: ""});
-  }
-  PMbub.className = "chatbub";
-  PMbub.id = chatuser + 'PM';
-  PMbub.addEventListener("click", disp)
-  PMbub.append(chatuser);
-  element.append(PMbub);
-  element.append(br);
-  element.append(br);
-  notification.textContent = 'blah!';
-  notification.className = "notificationmarkchat";
-  PMbub.appendChild(notification);
-  PM.style.display = "none";
-  front.style.display = "block";
-  $("ul").empty();
-  $("#userinput").empty();
-  head.style.display = "block";
-  lstid = chatuser + 'PM';
+  
+  pmlist = element.getElementsByClassName("chatbub");
+  var ck = false;
+  temp = null;
   if(PMload == true)
   {
-    notification.style.display = "block";
+    if(!PMcheck)
+    {
+      temp = x.target.textContent;
+    }
+    if(PMcheck == true)
+    {
+      temp = x;
+    }
+    for(var i = 0; pmlist.length != i; i++)
+    {
+      if(pmlist[i].id == (temp + 'PM'))
+      {
+        PM.style.display = "none";
+        front.style.display = "block";
+        ck = true;
+        pmlist[i].click();
+      }
+    }
+  }
+  if(ck == false)
+  {
+    if(PMcheck == true)
+    {
+      var chatuser = x;
+    }
+    else
+    {
+      var chatuser = x.target.textContent;
+      socket.emit('PMjoin', {sender: user, reciever: chatuser, recieve: ""});
+    }
+    PMbub.className = "chatbub";
+    PMbub.id = chatuser + 'PM';
+    PMbub.addEventListener("click", disp)
+    PMbub.append(chatuser);
+    element.append(PMbub);
+    element.append(br);
+    element.append(br);
+    notification.textContent = 'blah!';
+    notification.className = "notificationmarkchat";
+    PMbub.appendChild(notification);
+    PM.style.display = "none";
+    front.style.display = "block";
+    $("ul").empty();
+    $("#userinput").empty();
+    head.style.display = "block";
+    lstid = chatuser + 'PM';
+    if(PMload == true)
+    {
+      notification.style.display = "block";
+    }
   }
 }
+
+
+
+  
 function sharelinkbut(close)
 {
   var sharelinkbut = document.getElementById('sharelinkbut');
@@ -2655,7 +2770,7 @@ function newchannel(response, owner, joining)
   var text = document.createTextNode(channelname);
   var element = document.getElementById("channelsmenu");
   var cl = channelname + "channel";
-  var notification = document.createElement("div");
+  var notification = document.createElement("span");
   var ACatt = document.createAttribute("activechat");
   ACatt.value = null;
   channelplace.setAttributeNode(ACatt);
@@ -2685,7 +2800,7 @@ function newchannel(response, owner, joining)
         channel.appendChild(text);
         var str = 'blah!';
         notification.textContent = str.sup();
-        notification.className = "notificationmarkchat";
+        notification.className = "badge badge-danger notificationmarktab";
         channelplace.appendChild(channel);
         channelplace.appendChild(notification);
         socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
@@ -2710,7 +2825,7 @@ function newchannel(response, owner, joining)
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmarkchat";
+        notification.className = "badge badge-danger notificationmarktab";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
         channeload = true;
@@ -2762,7 +2877,7 @@ function newchannel(response, owner, joining)
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmarkchat";
+        notification.className = "badge badge-danger notificationmarktab";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
         socket.emit('userjoin', {channel: channel.textContent.slice(0, channel.textContent.length - 5), select: 'channel'});
@@ -2788,7 +2903,7 @@ function newchannel(response, owner, joining)
         channel.addEventListener("click", disp);
         channel.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmarkchat";
+        notification.className = "badge badge-danger notificationmarktab";
         channel.appendChild(notification);
         channelplace.appendChild(channel);
         channeload = true;
@@ -2867,7 +2982,7 @@ function newchat(response, notify)
         chat.className = "smallchatbub";
         chat.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmarkSchat";
+        notification.className = "badge badge-danger notificationmarktab";
         chat.appendChild(notification);
         document.getElementById(chats).appendChild(chat);
         socket.emit('userjoin', {channel: focelem.firstChild.textContent.slice(0, focelem.firstChild.textContent.length - 5), select: 'chat', chatname: chatname})
@@ -2885,7 +3000,7 @@ function newchat(response, notify)
         chat.className = "smallchatbub";
         chat.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmarkSchat";
+        notification.className = "badge badge-danger notificationmarktab";
         chat.appendChild(notification);
         chatplace.appendChild(chat);
         if(notify == 1)
@@ -2906,7 +3021,7 @@ function newchat(response, notify)
         chat.className = "smallchatbub";
         chat.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmarkSchat";
+        notification.className = "badge badge-danger notificationmarktab";
         chat.appendChild(notification);
         document.getElementById(chats).appendChild(chat);
         if(notify == true)
@@ -2925,7 +3040,7 @@ function newchat(response, notify)
         chat.className = "smallchatbub";
         chat.appendChild(text);
         notification.textContent = 'blah!';
-        notification.className = "notificationmarkSchat";
+        notification.className = "badge badge-danger notificationmarktab";
         chat.appendChild(notification);
         chatplace.appendChild(chat);
         if(notify == true)
