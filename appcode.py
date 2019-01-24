@@ -7,9 +7,14 @@ import mysql.connector
 import re
 import random
 import time
+import shutil
+
+UPLOAD_FOLDER = "/home/cthigpen/dockerstuff/Messingaround/gittest/pythontesting/usersimages"
+ALLOWED_EXTENSIONS = set(['txt'])
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "slwol;ayesal."
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 socketio = SocketIO(app)
 
 UserIn = mysql.connector.connect(user="root", db="chatinformation", passwd="passwordfun", host="mysqldb")
@@ -21,7 +26,7 @@ UserIn = mysql.connector.connect(user="root", db="chatinformation", passwd="pass
 def chat():
     cursor = UserIn.cursor()
     try:
-        if(session['username'] == ''):
+        if session['username']:
             return redirect('Login')
         
         
@@ -53,7 +58,6 @@ def handle_message():
             userid = cursor.fetchone()
             cursor.execute("SELECT ownerid FROM channels WHERE channelname=%s", (str(stuff[0]), ))
             ownerid = cursor.fetchone()
-
             if stuff:
                 if userid == ownerid:
                     emit('userdata', {'data': stuff[0], 'sentdata': 'channel', 'owner': 'true'})                           
@@ -148,17 +152,56 @@ def mespull_handle(message):
             cursor.execute("UPDATE userlastdata SET lastmesid=0 WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['channel'], message['chat'], message['channel']))
         if message['extraload']:
             numberofmessages = (message['num'] + 1) * 45
-            cursor.execute("SELECT message, datetime, id FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s) ORDER BY id DESC LIMIT %s", (message['chat'], message['channel'], message['channel'], numberofmessages))
+            cursor.execute("SELECT message, datetime, id, imagemes FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s) ORDER BY id DESC LIMIT %s", (message['chat'], message['channel'], message['channel'], numberofmessages))
             messages = cursor.fetchall()
             del messages[0:message['num'] * 45]
         else:
-            cursor.execute("SELECT message, datetime, id FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s) ORDER BY id DESC LIMIT 45", (message['chat'], message['channel'], message['channel']))
+            cursor.execute("SELECT message, datetime, id, imagemes FROM messages WHERE chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s) ORDER BY id DESC LIMIT 45", (message['chat'], message['channel'], message['channel']))
             messages = cursor.fetchall()
         for items in messages:
+            base64 = ""
             if items[2] == temp[0]:
-                emit('messageload', {'userm': items[0], 'DT': items[1], 'newmesstart': 'true'})   
+                if items[3] == 'yes':
+                    cursor.execute("SELECT id FROM channels WHERE channelname=%s", (message['channel'], ))
+                    channel = cursor.fetchone()
+                    cursor.execute("SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)", (message['chat'], message['channel']))
+                    chat = cursor.fetchone()
+                    cursor.execute("SELECT userid FROM messages WHERE id=%s", (items[2], ))
+                    user = cursor.fetchone()
+                    messageid = items[2]
+                    num = 1000
+                    find = False
+                    while find == False:
+                        if channel[0] > num:
+                            num = num + 1000
+                        else:
+                            find = True                    
+                    path = "usersimages/" + str(num) + "/" + str(channel[0]) + "/" + str(chat[0])
+                    filename = str(user[0]) + "," + str(messageid[0])
+                    with open(os.path.join(path, filename), "r") as fh:
+                       base64 = fh.read()
+                emit('messageload', {'userm': items[0], 'image': base64, 'DT': items[1], 'newmesstart': 'true'})   
             else:
-                emit('messageload', {'userm': items[0], 'DT': items[1], 'newmesstart': 'false'})
+                if items[3] == 'yes':
+                    cursor.execute("SELECT id FROM channels WHERE channelname=%s", (message['channel'], ))
+                    channel = cursor.fetchone()
+                    cursor.execute("SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)", (message['chat'], message['channel']))
+                    chat = cursor.fetchone()
+                    cursor.execute("SELECT userid FROM messages WHERE id=%s", (items[2], ))
+                    user = cursor.fetchone()
+                    messageid = items[2]
+                    num = 1000
+                    find = False
+                    while find == False:
+                        if channel[0] > num:
+                            num = num + 1000
+                        else:
+                            find = True                    
+                    path = "usersimages/" + str(num) + "/" + str(channel[0]) + "/" + str(chat[0])
+                    filename = str(user[0]) + "," + str(messageid)
+                    with open(os.path.join(path, filename), "r") as fh:
+                        base64 = fh.read()
+                emit('messageload', {'userm': items[0], 'image': base64, 'DT': items[1], 'newmesstart': 'false'})
         emit('messageloaddone')
         UserIn.commit()
         cursor.close()
@@ -208,13 +251,34 @@ def message_handle(message):
     else:
         Mestime = time.asctime(time.localtime())
         if message['data']:
-            if message['file']:
-                emit('usermessage', {'userm': message['data'], 'userfile': message['file'], 'DT': Mestime, 'UPchannel': message['DOWNchannel'], 'UPchat': message['DOWNchat'], 'sender': username, 'PM': 'false', 'file': 'true'}, room=message['DOWNchannel'])
+            if message['Ifile']:
+                cursor.execute("INSERT INTO messages (datetime, imagemes, message, userid, chatid, channelid) VALUES(%s, %s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, 'yes',  message['data'], username, message['DOWNchat'], message['DOWNchannel'], message['DOWNchannel']))
+                UserIn.commit()
+                
+                cursor.execute("SELECT id FROM channels WHERE channelname=%s", (message['DOWNchannel'], ))
+                channel = cursor.fetchone()
+                cursor.execute("SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)", (message['DOWNchat'], message['DOWNchannel']))
+                chat = cursor.fetchone()
+                cursor.execute("SELECT id FROM users WHERE username=%s", (username, ))
+                user = cursor.fetchone()
+                cursor.execute("SELECT id FROM messages WHERE imagemes=%s AND userid=(SELECT id FROM users WHERE username=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)) AND channelid=(SELECT id FROM channels WHERE channelname=%s) ORDER BY id DESC LIMIT 1", ('yes', username, message['DOWNchat'], message['DOWNchannel'], message['DOWNchannel']))
+                messageid = cursor.fetchone()
+                num = 1000
+                find = False
+                while find == False:
+                    if channel[0] > num:
+                        num = num + 1000
+                    else:
+                        find = True
+                path = "usersimages/" + str(num) + "/" + str(channel[0]) + "/" + str(chat[0])
+                filename = str(user[0]) + "," + str(messageid[0])
+                with open(os.path.join(path, str(filename)), "w+") as fh:
+                    fh.write(message['Ifile'])
+                emit('usermessage', {'userm': message['data'], 'userfile': message['Ifile'], 'DT': Mestime, 'UPchannel': message['DOWNchannel'], 'UPchat': message['DOWNchat'], 'sender': username, 'PM': 'false', 'file': 'true'}, room=message['DOWNchannel'])
             else:
                 emit('usermessage', {'userm': message['data'], 'userfile': "", 'DT': Mestime, 'UPchannel': message['DOWNchannel'], 'UPchat': message['DOWNchat'], 'sender': username, 'PM': 'false', 'file': 'false'}, room=message['DOWNchannel'])
 
-            # cursor.execute("INSERT INTO images (image, messageid) VALUES(%s, 1)", (message['data'], ))
-            # cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, message['data'], username, message['DOWNchat'], message['DOWNchannel'], message['DOWNchannel']))
+                cursor.execute("INSERT INTO messages (datetime, imagemes, message, userid, chatid, channelid) VALUES(%s, %s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", ('no', Mestime, message['data'], username, message['DOWNchat'], message['DOWNchannel'], message['DOWNchannel']))
         if message['DOWNchannel'] != message['UPchannel'] or (message['DOWNchannel'] == message['UPchannel'] and message['DOWNchat'] != message['UPchat']):
             cursor.execute("SELECT lastmesid FROM userlastdata WHERE useid=(SELECT id FROM users WHERE username=%s) AND channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (username, message['UPchannel'], message['UPchat'], message['UPchannel']))
             result = cursor.fetchone()
@@ -270,6 +334,27 @@ def join_handle_made(sentroom):
             if not cursor.fetchall():    
                 cursor.execute("INSERT INTO channels (ownerid, channelname, link) VALUES((SELECT id FROM users WHERE username=%s), %s, %s)", (username, sentroom['channel'], text))
                 cursor.execute("INSERT INTO userchannels (useid, channelid) VALUES((SELECT id FROM users WHERE username=%s), (SELECT id FROM channels WHERE channelname=%s))", (username, sentroom['channel']))
+                UserIn.commit()
+                cursor.execute("SELECT id FROM channels where channelname=%s", (sentroom['channel'], ))
+                channelid = cursor.fetchone()
+                find = False
+                num = 1000
+                while find == False:
+                    if channelid[0] > num:
+                        num = num + 1000
+                    else:
+                        find = True
+                channelgroup = num
+                path = "usersimages/" + str(channelgroup)
+                if not os.path.isdir(path):
+                    os.makedirs(path)
+                    path = path + "/" + str(channelid[0])
+                    if not os.path.isdir(path):
+                        os.makedirs(path)
+                else:
+                    path = path + "/" + str(channelid[0])
+                    if not os.path.isdir(path):
+                        os.makedirs(path)
                 check = True
     elif sentroom['select'] == 'join':
         cursor.execute("SELECT channelname FROM channels WHERE link=%s", (sentroom['link'], ))
@@ -294,6 +379,21 @@ def join_handle_made(sentroom):
             emit('userdata', {'data': stuff[0], 'sentdata': 'channel', 'owner': 'false', 'join': 'true'})
     else:
         cursor.execute("INSERT INTO chats (chatname, linkid) VALUES(%s, (SELECT id FROM channels WHERE channelname=%s))", (sentroom['chatname'], sentroom['channel']))
+        UserIn.commit()
+        cursor.execute("SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)", (sentroom['chat'], sentroom['channel']))
+        chatid = cursor.fetchone()
+        cursor.execute("SELECT id FROM channels WHERE channelname=%s", (sentroom['channel'], ))
+        channelid = cursor.fetchone()
+        check = False
+        num = 1000
+        while check == False:
+            if channelid[0] > num:
+                num = num + 1000
+            else: 
+                check = True
+        path = "usersimages/" + str(num) + "/" + str(channelid[0]) + "/" + str(chatid[0])
+        if not os.path.isdir(path):
+            os.makedirs(path)
         Mestime = time.asctime(time.localtime())
         cursor.execute("INSERT INTO messages (datetime, message, userid, chatid, channelid) VALUES(%s, %s, (SELECT id FROM users WHERE username=%s), (SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)), (SELECT id FROM channels WHERE channelname=%s))", (Mestime, "This is the beginning of everything.", username, sentroom['chatname'], sentroom['channel'], sentroom['channel']))
         cursor.execute("SELECT useid FROM userchannels WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (sentroom['channel'], ))
@@ -317,12 +417,37 @@ def leave_handler(data):
 def delete_handler(data):
     cursor = UserIn.cursor()
     if data['select'] == 'channel':
+        cursor.execute("SELECT id FROM channels WHERE channelname=%s", (data['channel'], ))
+        channelid = cursor.fetchone()
+        check = False
+        num = 1000
+        while check == False:
+            if channelid[0] > num:
+                num = num + 1000
+            else: 
+                check = True        
+        path = "usersimages/" + str(num) + "/" + str(channelid[0])
+        shutil.rmtree(path)
         cursor.execute("DELETE FROM userlastdata WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
         cursor.execute("DELETE FROM userchannels WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
         cursor.execute("DELETE FROM messages WHERE channelid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
         cursor.execute("DELETE FROM chats WHERE linkid=(SELECT id FROM channels WHERE channelname=%s)", (data['channel'], ))
         cursor.execute("DELETE FROM channels WHERE channelname=%s", (data['channel'], ))
+
     if data['select'] == 'chat':
+        cursor.execute("SELECT id FROM channels WHERE channelname=%s", (data['channel'], ))
+        channelid = cursor.fetchone()
+        cursor.execute("SELECT id FROM chats WHERE chatname=%s AND linkid=%s", (data['chat'], channelid[0]))
+        chatid = cursor.fetchone()
+        check = False
+        num = 1000
+        while check == False:
+            if channelid[0] > num:
+                num = num + 1000
+            else: 
+                check = True        
+        path = "usersimages/" + str(num) + "/" + str(channelid[0]) + "/" + str(chatid[0])
+        shutil.rmtree(path)       
         cursor.execute("DELETE FROM userlastdata WHERE channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (data['channel'], data['chat'], data['channel']))
         cursor.execute("DELETE FROM messages WHERE channelid=(SELECT id FROM channels WHERE channelname=%s) AND chatid=(SELECT id FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s))", (data['channel'], data['chat'], data['channel']))
         cursor.execute("DELETE FROM chats WHERE chatname=%s AND linkid=(SELECT id FROM channels WHERE channelname=%s)", (data['chat'], data['channel']))

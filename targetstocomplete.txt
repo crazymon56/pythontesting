@@ -5,14 +5,14 @@
     - Make a logo for Blah Chat.
 
 #CURRENT TASK
------FIX the unicode server side to recognize it.
-    --------Look up mysql unicode and see how it works.
 -----Check when user sends a message to a deleted channel/chat.
 -----Double check PM when user tries to search for a user they are already in a chat with
 -----Double check when user creates a channel
 -----Have it to where user immediatelly clicks on joined channel
+-----Finish fixing the increased size of base64 encoding of images when resized.
 https://github.com/miguelgrinberg/Flask-SocketIO/issues/489
 https://codepen.io/tuanitpro/pen/wJZJbp
+https://www.youtube.com/watch?v=Uwp7D8KEhcQ
 
 #LOGIN PAGE
 1. Reorganize the way it looks.
@@ -43,7 +43,7 @@ https://codepen.io/tuanitpro/pen/wJZJbp
     - Allow user to @message another user.
     - Allow user to send not only text, but also Images and possible Vidoes to another user.
 
-3. Changin top interface.
+3. Changing top interface.
     - Make sure to have it greet user on top with name he/she logged in with.
     - Allow user to see who is online or offline.
 

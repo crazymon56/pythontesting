@@ -126,7 +126,7 @@
   .picinsert{
     padding-left: 0;
     padding-right: 0;
-    width: 10%;
+    width: 20%;
   }
   .sendbutton{
     position: absolute;
@@ -1481,7 +1481,8 @@
         </div>
       <form id='mes' method="POST" action='#' accept-charset="utf-8"> 
       <input id="usertext" class="chattext col-sm-10" name="usertext" type=text placeholder=message autocomplete=off />
-      <input type="file" id="userpic" name='image' class="picinsert offset-md-8 fixed-bottom" name="pic" accept"image*/" value="📎" />
+      <input style="display: none" type="file" id="userpic" name='image' class="picinsert offset-md-8 fixed-bottom" name="pic" accept"image*/" value="📎" />
+      <label for=userpic class="picinsert offset-md-8 fixed-bottom">&#128206; Choose a file</label>
       <input class="sendbutton col-sm-2" type=submit value=Send />
       </form>
 
@@ -1857,7 +1858,14 @@ $(document).ready(function()
       }
       else
       {
-        $("#messages").prepend("<br><sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span>"); 
+        if(msg.image)
+        {
+          $("#messages").prepend("<br><span><sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span>" + "<br>" +"<span class=imagecontainer>" + "<img class=offset-md-1 height=250 width=250 src=" + msg.image + ">" + "</span></span>"); 
+        }
+        else
+        {
+          $("#messages").prepend("<br><span><sup>" + msg.DT + "</sup>" + "<span>" + msg.userm + "</span></span>"); 
+        }
       }
     }
   })
@@ -1865,7 +1873,7 @@ $(document).ready(function()
   socket.on('messageloaddone', function()
   {
     load = true;
-    if(($("#messages").children().length - 1) % 135 == 0 && ($("#messages").children().length - 1) != 0)
+    if(($("#messages").children().length - 1) % 90 == 0 && ($("#messages").children().length - 1) != 0)
     {
       $("#loadmessages").css("display", "block");
     }
@@ -1889,50 +1897,31 @@ $(document).ready(function()
         {
           event.preventDefault();
           const selfile = document.getElementById("userpic").files[0];
-          if(selfile != null)
+          if(selfile)
           {
-            fr = new FileReader();
-            fr.readAsDataURL(selfile);
-            fr.onload = function(evt){
-              var img = document.createElement("img");
-              img.src = evt.target.result;
-
-              var canvas = document.createElement("canvas");
-              var ctx = canvas.getContext("2d");
-              ctx.drawImage(img, 0, 0);
-
-              var max_height = 250;
-              var max_width = 250;
-              var width = img.width;
-              var height = img.height;
-
-              if(width > height)
-              {
-                if(width > max_width)
-                {
-                  height *= max_width / width;
-                  width = max_width;
-                }
-              }
-              else
-              {
-                if(height > max_height)
-                {
-                  width *= max_height / height;
-                  height = max_height;
-                }
-              }
-
-              canvas.width = width;
-              canvas.height = height;
-              var ctx = canvas.getContext("2d");
-              ctx.drawImage(img, 0, 0, width, height);
-              theimg = canvas.toDataURL(selfile.type);
-
+            var canvas = document.createElement("canvas");
+            var ctx = canvas.getContext("2d");
+            console.log("ehllo")
+            var max_height = 250;
+            var max_width = 250;
+            var width = canvas.width;
+            var height = canvas.height;
+            var img = new Image;
+            img.onload = function()
+            {
+              var iw = img.width;
+              var ih = img.height;
+              var scale = Math.min((max_width/iw), (max_height/ih));
+              var iwscaled = iw*scale;
+              var ihscaled = ih*scale;
+              canvas.width = iwscaled;
+              canvas.height=ihscaled;
+              ctx.drawImage(img, 0, 0, iwscaled, ihscaled);
+              var base64 = canvas.toDataURL("image/jpeg", 0.5);
+              socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), Ifile: base64, DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), UPchannel: CHNN, UPchat: focelem.getAttribute("activechat"), PM: 'false'});
+              $('#usertext').val('');
             }
-            fr.readAsDataURL(selfile);            
-            socket.emit('useresponse', {data: document.getElementById('text').textContent +  ': ' + $('#usertext').val(), file: fr.result, DOWNchannel: CHNN, DOWNchat: focelem.getAttribute("activechat"), UPchannel: CHNN, UPchat: focelem.getAttribute("activechat"), PM: 'false'});
-            $('#usertext').val('');
+            img.src = URL.createObjectURL(selfile)
           }
           else
           {
@@ -2084,7 +2073,7 @@ function ToOP(close, butid)
 }
 function loadmoremes()
 {
-  var num = ($("#messages").children().length - 1) / 3 / 45
+  var num = ($("#messages").children().length - 1) / 2 / 45
   load = false;
   if(PM == true)
   {
